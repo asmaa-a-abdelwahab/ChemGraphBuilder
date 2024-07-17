@@ -2,28 +2,32 @@
 Tests for the AddGraphNodes class from the add_graph_nodes module.
 """
 
+import os
 import unittest
 from unittest.mock import patch, MagicMock
-import os
 import pandas as pd
-from chemgraphbuilder.add_graph_nodes import AddGraphNodes
+from ChemGraphBuilder.chemgraphbuilder.add_graph_nodes import AddGraphNodes
+
 
 class TestAddGraphNodes(unittest.TestCase):
     """
     Test case for the AddGraphNodes class.
     """
 
-    @patch('ChemGraphBuilder.chemgraphbuilder.add_graph_nodes.Neo4jBase.__init__')
-    @patch('ChemGraphBuilder.chemgraphbuilder.add_graph_nodes.GraphDatabase.driver')
-    def setUp(self, mock_driver, _mock_neo4j_base):
+    def setUp(self):
         """
         Set up the test case with a mocked Neo4j driver.
         """
-        self.mock_driver = mock_driver
+        patcher1 = patch('chemgraphbuilder.add_graph_nodes.Neo4jBase.__init__', return_value=None)
+        patcher2 = patch('chemgraphbuilder.add_graph_nodes.GraphDatabase.driver')
+        self.addCleanup(patcher1.stop)
+        self.addCleanup(patcher2.stop)
+        self.mock_neo4j_base_init = patcher1.start()
+        self.mock_driver = patcher2.start()
         self.mock_driver.session = MagicMock()
         self.add_graph_nodes = AddGraphNodes(driver=self.mock_driver)
 
-    @patch('ChemGraphBuilder.chemgraphbuilder.add_graph_nodes.GraphDatabase.driver')
+    @patch('chemgraphbuilder.add_graph_nodes.GraphDatabase.driver')
     def test_create_uniqueness_constraint(self, mock_driver):
         """
         Test the create_uniqueness_constraint method.
@@ -31,27 +35,25 @@ class TestAddGraphNodes(unittest.TestCase):
         mock_session = MagicMock()
         mock_driver.session.return_value.__enter__.return_value = mock_session
 
-        AddGraphNodes.create_uniqueness_constraint(
-            mock_driver, 'TestLabel', 'test_property')
+        AddGraphNodes.create_uniqueness_constraint(mock_driver, 'TestLabel', 'test_property')
 
         mock_session.run.assert_called_once_with(
-            'CREATE CONSTRAINT IF NOT EXISTS FOR (n:TestLabel) '
-            'REQUIRE n.test_property IS UNIQUE'
+            'CREATE CONSTRAINT IF NOT EXISTS FOR (n:TestLabel) REQUIRE n.test_property IS UNIQUE'
         )
 
     def test_generate_property_string(self):
         """
-        Test the _generate_property_string method.
+        Test the public_generate_property_string method.
         """
-        self.assertEqual(AddGraphNodes._generate_property_string(123), 123)
-        self.assertEqual(AddGraphNodes._generate_property_string(123.456), 123.456)
-        self.assertEqual(AddGraphNodes._generate_property_string('text'), "'text'")
+        self.assertEqual(self.add_graph_nodes.public_generate_property_string(123), 123)
+        self.assertEqual(self.add_graph_nodes.public_generate_property_string(123.456), 123.456)
+        self.assertEqual(self.add_graph_nodes.public_generate_property_string('text'), "'text'")
         self.assertEqual(
-            AddGraphNodes._generate_property_string("text'with\nspecial"),
+            self.add_graph_nodes.public_generate_property_string("text'with\nspecial"),
             "'text\\'with\\nspecial'"
         )
 
-    @patch('ChemGraphBuilder.chemgraphbuilder.add_graph_nodes.pd.read_csv')
+    @patch('chemgraphbuilder.add_graph_nodes.pd.read_csv')
     def test_read_csv_file(self, mock_read_csv):
         """
         Test the read_csv_file method.
@@ -70,7 +72,7 @@ class TestAddGraphNodes(unittest.TestCase):
         }
         self.assertEqual(result, expected)
 
-    @patch('ChemGraphBuilder.chemgraphbuilder.add_graph_nodes.pd.read_csv')
+    @patch('chemgraphbuilder.add_graph_nodes.pd.read_csv')
     def test_combine_csv_files(self, mock_read_csv):
         """
         Test the combine_csv_files method.
@@ -93,8 +95,7 @@ class TestAddGraphNodes(unittest.TestCase):
         expected = pd.concat([mock_df1, mock_df2], ignore_index=True)
         pd.testing.assert_frame_equal(result, expected)
 
-    @patch.object(AddGraphNodes,
-                  '_generate_property_string',
+    @patch.object(AddGraphNodes, '_generate_property_string',
                   side_effect=lambda x: f'processed_{x}')
     def test_generate_cypher_queries(self, _mock_generate_property_string):
         """
@@ -128,8 +129,7 @@ class TestAddGraphNodes(unittest.TestCase):
         mock_read_csv_file.return_value = {1: {'property1': 'value1', 'property2': 10.0}}
         mock_generate_cypher_queries.return_value = ['dummy_query']
 
-        self.add_graph_nodes.process_and_add_nodes(
-            'dummy_path.csv', 'TestLabel', 'unique_id')
+        self.add_graph_nodes.process_and_add_nodes('dummy_path.csv', 'TestLabel', 'unique_id')
 
         mock_read_csv_file.assert_called_once_with('dummy_path.csv', 'unique_id')
         mock_generate_cypher_queries.assert_called_once_with(
@@ -139,29 +139,34 @@ class TestAddGraphNodes(unittest.TestCase):
 
     @patch.object(AddGraphNodes, 'process_and_add_nodes')
     @patch.object(AddGraphNodes, 'combine_csv_files')
-    @patch('ChemGraphBuilder.chemgraphbuilder.add_graph_nodes.os.remove')
-    @patch('ChemGraphBuilder.chemgraphbuilder.add_graph_nodes.pd.DataFrame.to_csv')
-    def test_process_and_add_nodes_from_directory(
-        self, mock_to_csv, mock_os_remove, mock_combine_csv_files,
-        mock_process_and_add_nodes):
+    @patch('chemgraphbuilder.add_graph_nodes.os.remove')
+    @patch('chemgraphbuilder.add_graph_nodes.pd.DataFrame.to_csv')
+    def test_process_and_add_nodes_from_directory(self, mock_to_csv,
+                                                  mock_os_remove,
+                                                  mock_combine_csv_files,
+                                                  mock_process_and_add_nodes):
         """
         Test the process_and_add_nodes_from_directory method.
         """
-        mock_df = pd.DataFrame({'unique_id': [1], 'property1': ['value1'],
+        mock_df = pd.DataFrame({'unique_id': [1],
+                                'property1': ['value1'],
                                 'property2': [10.0]})
         mock_combine_csv_files.return_value = mock_df
 
-        self.add_graph_nodes.process_and_add_nodes_from_directory(
-            'dummy_directory', 'TestLabel', 'unique_id')
+        self.add_graph_nodes.process_and_add_nodes_from_directory('dummy_directory',
+                                                                  'TestLabel',
+                                                                  'unique_id')
 
         mock_combine_csv_files.assert_called_once_with('dummy_directory')
-        mock_to_csv.assert_called_once_with(
-            os.path.join('dummy_directory', 'combined_temp.csv'), index=False)
-        mock_process_and_add_nodes.assert_called_once_with(
-            os.path.join('dummy_directory', 'combined_temp.csv'),
-                         'TestLabel', 'unique_id')
-        mock_os_remove.assert_called_once_with(
-            os.path.join('dummy_directory', 'combined_temp.csv'))
+        mock_to_csv.assert_called_once_with(os.path.join('dummy_directory',
+                                                         'combined_temp.csv'),
+                                            index=False)
+        mock_process_and_add_nodes.assert_called_once_with(os.path.join('dummy_directory',
+                                                                        'combined_temp.csv'),
+                                                           'TestLabel',
+                                                           'unique_id')
+        mock_os_remove.assert_called_once_with(os.path.join('dummy_directory',
+                                                            'combined_temp.csv'))
 
 if __name__ == '__main__':
     unittest.main()
