@@ -1,225 +1,165 @@
 """
-Module for adding node data from CSV files to a Neo4j database.
-
-This module provides a class and methods to read node data from CSV files
-and add them to a Neo4j database, including creating uniqueness constraints
-and generating Cypher queries.
+Tests for the AddGraphNodes class from the add_graph_nodes module.
 """
 
+import unittest
+from unittest.mock import patch, MagicMock
 import os
-import logging
+import sys
 import pandas as pd
-from neo4jdriver import Neo4jBase
 
-class AddGraphNodes(Neo4jBase):
+# Add the parent directory to the system path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+from chemgraphbuilder.add_graph_nodes import AddGraphNodes
+
+class TestAddGraphNodes(unittest.TestCase):
     """
-    A class used to add node data from a CSV file or a directory of CSV files to a Neo4j database.
-
-    Methods:
-    --------
-    create_uniqueness_constraint(driver, label, unique_property):
-        Create a uniqueness constraint for the unique property of nodes in Neo4j.
-    generate_cypher_queries(node_dict, label, unique_property):
-        Generate Cypher queries to update nodes in Neo4j based on the data from the CSV file.
-    execute_queries(queries):
-        Execute a list of provided Cypher queries against the Neo4j database.
-    read_csv_file(file_path, unique_property):
-        Read data from a CSV file and extract node properties.
-    combine_csv_files(input_directory):
-        Combine multiple CSV files with the same columns into a single DataFrame.
-    process_and_add_nodes(file_path, label, unique_property):
-        Process the CSV file and add node data to the Neo4j database.
-    process_and_add_nodes_from_directory(directory_path, label, unique_property):
-        Combine CSV files from a directory and add node data to the Neo4j database.
+    Test case for the AddGraphNodes class.
     """
 
-    def __init__(self, driver):
+    @patch('chemgraphbuilder.add_graph_nodes.Neo4jBase.__init__')
+    @patch('chemgraphbuilder.add_graph_nodes.GraphDatabase.driver')
+    def setUp(self, mock_driver, _mock_neo4j_base):
         """
-        Initializes the AddGraphNodes class with a Neo4j driver.
+        Set up the test case with a mocked Neo4j driver.
+        """
+        self.mock_driver = mock_driver
+        self.mock_driver.session = MagicMock()
+        self.add_graph_nodes = AddGraphNodes(driver=self.mock_driver)
 
-        Parameters:
-        -----------
-        driver : neo4j.GraphDatabase.driver
-            A driver instance to connect to the Neo4j database.
+    @patch('chemgraphbuilder.add_graph_nodes.GraphDatabase.driver')
+    def test_create_uniqueness_constraint(self, mock_driver):
         """
-        super().__init__()
-        self.driver = driver
-        self.logger.info("AddGraphNodes class initialized.")
+        Test the create_uniqueness_constraint method.
+        """
+        mock_session = MagicMock()
+        mock_driver.session.return_value.__enter__.return_value = mock_session
 
-    @staticmethod
-    def create_uniqueness_constraint(driver, label, unique_property):
-        """
-        Create a uniqueness constraint for the unique property of nodes in Neo4j.
+        AddGraphNodes.create_uniqueness_constraint(
+            mock_driver, 'TestLabel', 'test_property')
 
-        Parameters:
-        -----------
-        driver : neo4j.GraphDatabase.driver
-            A driver instance to connect to the Neo4j database.
-        label : str
-            The label of the node.
-        unique_property : str
-            The unique property of the node.
-        """
-        constraint_query = (
-            f"CREATE CONSTRAINT IF NOT EXISTS FOR (n:{label}) "
-            f"REQUIRE n.{unique_property} IS UNIQUE"
+        mock_session.run.assert_called_once_with(
+            'CREATE CONSTRAINT IF NOT EXISTS FOR (n:TestLabel) '
+            'REQUIRE n.test_property IS UNIQUE'
         )
-        with driver.session() as session:
-            try:
-                session.run(constraint_query)
-                logging.info(
-                    "Uniqueness constraint created successfully on %s property of %s nodes.",
-                    unique_property, label)
-            except Exception as e:
-                logging.error("Failed to create uniqueness constraint: %s", e)
 
-    @staticmethod
-    def _generate_property_string(value):
-        if isinstance(value, (int, float)):
-            return value
-        try:
-            return float(value)
-        except (TypeError, ValueError):
-            escaped_value = "'" + str(value).replace("'", "\\'").replace("\n", "\\n") + "'"
-            return escaped_value
-
-    def generate_cypher_queries(self, node_dict, label, unique_property):
+    def test_generate_property_string(self):
         """
-        Generate Cypher queries for updating Neo4j based on the provided node data dictionary.
-
-        Parameters:
-        -----------
-        node_dict : dict
-            A dictionary with unique identifiers as keys and node data as values.
-        label : str
-            The label of the node.
-        unique_property : str
-            The unique property of the node.
-
-        Yields:
-        -------
-        str
-            A Cypher query string.
+        Test the _generate_property_string method.
         """
-        for unique_id, properties in node_dict.items():
-            unique_id = f'"{unique_id}"' if isinstance(unique_id, str) else unique_id
-            query = f"MERGE (n:{label} {{{unique_property}: {unique_id}}})"
-            set_clauses = [
-                f"n.{prop.replace(' ', '')} = {self._generate_property_string(value)}"
-                for prop, value in properties.items()
-            ]
-            if set_clauses:
-                query += " SET " + ", ".join(set_clauses)
-            else:
-                query += ";"
-            self.logger.debug(query)
-            yield query
-        self.logger.info("Cypher queries generated successfully.")
+        self.assertEqual(AddGraphNodes._generate_property_string(123), 123)
+        self.assertEqual(AddGraphNodes._generate_property_string(123.456), 123.456)
+        self.assertEqual(AddGraphNodes._generate_property_string('text'), "'text'")
+        self.assertEqual(
+            AddGraphNodes._generate_property_string("text'with\nspecial"),
+            "'text\\'with\\nspecial'"
+        )
 
-    def execute_queries(self, queries):
+    @patch('chemgraphbuilder.add_graph_nodes.pd.read_csv')
+    def test_read_csv_file(self, mock_read_csv):
         """
-        Execute the provided list of Cypher queries against the Neo4j database.
-
-        Parameters:
-        -----------
-        queries : list
-            A list of Cypher query strings to execute.
+        Test the read_csv_file method.
         """
-        self.logger.info("Executing Cypher queries...")
-        with self.driver.session() as session:
-            self.logger.info("Executing Cypher queries Started....")
-            for query in queries:
-                try:
-                    session.run(query)
-                except Exception as e:
-                    self.logger.error("Failed to execute query: %s", e)
-        self.logger.info("All queries executed.")
+        mock_df = pd.DataFrame({
+            'unique_id': [1, 2],
+            'property1': ['value1', 'value2'],
+            'property2': [10.0, 20.0]
+        })
+        mock_read_csv.return_value = mock_df
 
-    def read_csv_file(self, file_path, unique_property):
-        """
-        Read data from a CSV file and extract node properties.
-
-        Parameters:
-        -----------
-        file_path : str
-            The path to the CSV file.
-        unique_property : str
-            The column name that serves as the unique identifier for the nodes.
-
-        Returns:
-        --------
-        dict
-            A dictionary with unique identifiers as keys and extracted data as values.
-        """
-        self.logger.info("Reading data from CSV file: %s", file_path)
-        df = pd.read_csv(file_path).dropna(subset=[unique_property], how='any')
-        node_dict = {
-            row[unique_property]: row.drop(labels=[unique_property]).to_dict()
-            for _, row in df.iterrows()
+        result = self.add_graph_nodes.read_csv_file('dummy_path.csv', 'unique_id')
+        expected = {
+            1: {'property1': 'value1', 'property2': 10.0},
+            2: {'property1': 'value2', 'property2': 20.0}
         }
-        self.logger.info("Successfully read data for %d nodes from CSV.", len(node_dict))
-        return node_dict
+        self.assertEqual(result, expected)
 
-    def combine_csv_files(self, input_directory):
+    @patch('chemgraphbuilder.add_graph_nodes.pd.read_csv')
+    def test_combine_csv_files(self, mock_read_csv):
         """
-        Combine multiple CSV files with the same columns into a single DataFrame.
-
-        Parameters:
-        -----------
-        input_directory : str
-            The directory containing the CSV files to be combined.
-
-        Returns:
-        --------
-        DataFrame
-            A combined DataFrame containing data from all the CSV files.
+        Test the combine_csv_files method.
         """
-        self.logger.info("Combining CSV files from directory: %s", input_directory)
-        dfs = [
-            pd.read_csv(os.path.join(input_directory, file))
-            for file in os.listdir(input_directory)
-            if file.endswith(".csv")
+        mock_df1 = pd.DataFrame({
+            'unique_id': [1],
+            'property1': ['value1'],
+            'property2': [10.0]
+        })
+        mock_df2 = pd.DataFrame({
+            'unique_id': [2],
+            'property1': ['value2'],
+            'property2': [20.0]
+        })
+        mock_read_csv.side_effect = [mock_df1, mock_df2]
+
+        with patch('os.listdir', return_value=['file1.csv', 'file2.csv']):
+            result = self.add_graph_nodes.combine_csv_files('dummy_directory')
+
+        expected = pd.concat([mock_df1, mock_df2], ignore_index=True)
+        pd.testing.assert_frame_equal(result, expected)
+
+    @patch.object(AddGraphNodes, '_generate_property_string', side_effect=lambda x: f'processed_{x}')
+    def test_generate_cypher_queries(self, _mock_generate_property_string):
+        """
+        Test the generate_cypher_queries method.
+        """
+        node_dict = {
+            1: {'property1': 'value1', 'property2': 10.0},
+            2: {'property1': 'value2', 'property2': 20.0}
+        }
+        queries = list(self.add_graph_nodes.generate_cypher_queries(
+            node_dict, 'TestLabel', 'unique_id'))
+
+        expected_queries = [
+            'MERGE (n:TestLabel {unique_id: 1}) SET n.property1 = processed_value1, '
+            'n.property2 = processed_10.0',
+            'MERGE (n:TestLabel {unique_id: 2}) SET n.property1 = processed_value2, '
+            'n.property2 = processed_20.0'
         ]
-        combined_df = pd.concat(dfs, ignore_index=True)
-        self.logger.info("Successfully combined %d CSV files.", len(dfs))
-        return combined_df
 
-    def process_and_add_nodes(self, file_path, label, unique_property):
-        """
-        Process the CSV file and add node data to the Neo4j database.
+        self.assertEqual(queries, expected_queries)
 
-        Parameters:
-        -----------
-        file_path : str
-            The path to the CSV file.
-        label : str
-            The label of the node.
-        unique_property : str
-            The unique property of the node.
+    @patch.object(AddGraphNodes, 'execute_queries')
+    @patch.object(AddGraphNodes, 'generate_cypher_queries')
+    @patch.object(AddGraphNodes, 'read_csv_file')
+    def test_process_and_add_nodes(self, mock_read_csv_file, mock_generate_cypher_queries, mock_execute_queries):
         """
-        self.logger.info("Processing and adding nodes from file: %s", file_path)
-        node_dict = self.read_csv_file(file_path, unique_property)
-        queries = list(self.generate_cypher_queries(node_dict, label, unique_property))
-        self.execute_queries(queries)
-        self.logger.info("Successfully processed and added nodes from file: %s", file_path)
+        Test the process_and_add_nodes method.
+        """
+        mock_read_csv_file.return_value = {1: {'property1': 'value1', 'property2': 10.0}}
+        mock_generate_cypher_queries.return_value = ['dummy_query']
 
-    def process_and_add_nodes_from_directory(self, directory_path, label, unique_property):
-        """
-        Combine CSV files from a directory and add node data to the Neo4j database.
+        self.add_graph_nodes.process_and_add_nodes(
+            'dummy_path.csv', 'TestLabel', 'unique_id')
 
-        Parameters:
-        -----------
-        directory_path : str
-            The path to the directory containing the CSV files.
-        label : str
-            The label of the node.
-        unique_property : str
-            The unique property of the node.
+        mock_read_csv_file.assert_called_once_with('dummy_path.csv', 'unique_id')
+        mock_generate_cypher_queries.assert_called_once_with(
+            {1: {'property1': 'value1', 'property2': 10.0}}, 'TestLabel', 'unique_id'
+        )
+        mock_execute_queries.assert_called_once_with(['dummy_query'])
+
+    @patch.object(AddGraphNodes, 'process_and_add_nodes')
+    @patch.object(AddGraphNodes, 'combine_csv_files')
+    @patch('chemgraphbuilder.add_graph_nodes.os.remove')
+    @patch('chemgraphbuilder.add_graph_nodes.pd.DataFrame.to_csv')
+    def test_process_and_add_nodes_from_directory(
+        self, mock_to_csv, mock_os_remove, mock_combine_csv_files, mock_process_and_add_nodes):
         """
-        self.logger.info("Processing and adding nodes from directory: %s", directory_path)
-        combined_df = self.combine_csv_files(directory_path)
-        temp_file = os.path.join(directory_path, "combined_temp.csv")
-        combined_df.to_csv(temp_file, index=False)
-        self.process_and_add_nodes(temp_file, label, unique_property)
-        os.remove(temp_file)
-        self.logger.info("Successfully processed and added nodes from directory: %s", directory_path)
+        Test the process_and_add_nodes_from_directory method.
+        """
+        mock_df = pd.DataFrame({'unique_id': [1], 'property1': ['value1'], 'property2': [10.0]})
+        mock_combine_csv_files.return_value = mock_df
+
+        self.add_graph_nodes.process_and_add_nodes_from_directory(
+            'dummy_directory', 'TestLabel', 'unique_id')
+
+        mock_combine_csv_files.assert_called_once_with('dummy_directory')
+        mock_to_csv.assert_called_once_with(
+            os.path.join('dummy_directory', 'combined_temp.csv'), index=False)
+        mock_process_and_add_nodes.assert_called_once_with(
+            os.path.join('dummy_directory', 'combined_temp.csv'), 'TestLabel', 'unique_id')
+        mock_os_remove.assert_called_once_with(
+            os.path.join('dummy_directory', 'combined_temp.csv'))
+
+if __name__ == '__main__':
+    unittest.main()
