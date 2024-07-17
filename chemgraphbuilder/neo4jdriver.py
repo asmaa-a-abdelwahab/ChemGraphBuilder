@@ -1,4 +1,11 @@
 
+"""
+Module for managing connections to a Neo4j database.
+
+This module provides classes and methods to establish and manage connections
+with a Neo4j database, including custom error handling.
+"""
+
 import logging
 import getpass
 import os
@@ -6,7 +13,7 @@ from neo4j import GraphDatabase
 
 class Neo4jConnectionError(Exception):
     """Custom exception for Neo4j connection errors."""
-    pass
+    # No need for pass statement, docstring is sufficient
 
 class Neo4jBase:
     """
@@ -22,14 +29,14 @@ class Neo4jBase:
     - close: Close the connection to the Neo4j database.
     """
 
-    def __init__(self, logger=None, uri="neo4j+s://f8875ed1.databases.neo4j.io:7687", user="neo4j"):
+    def __init__(self, logger=None, uri="tcp://5.tcp.eu.ngrok.io:12445", user="neo4j"):
         self.uri = uri
         self.user = user
         self.driver = None
 
         # Set up logging configuration
         logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
-        self.logger = logging.getLogger(__name__)
+        self.logger = logger or logging.getLogger(__name__)
 
     def connect_to_neo4j(self):
         """Establish a connection to the Neo4j database using provided URI and username."""
@@ -41,7 +48,7 @@ class Neo4jBase:
             self.driver = GraphDatabase.driver(self.uri, auth=(self.user, password))
             self.logger.info("Successfully connected to the Neo4j database.")
         except Exception as e:
-            self.logger.error(f"Failed to connect to the Neo4j database: {e}")
+            self.logger.error("Failed to connect to the Neo4j database: %s", e)
             raise Neo4jConnectionError("Failed to connect to the Neo4j database.") from e
 
     def close(self):
