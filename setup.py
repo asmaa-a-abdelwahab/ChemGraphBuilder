@@ -10,7 +10,8 @@ setup(
     ],
     entry_points={
         'console_scripts': [
-            'load-graph-nodes=chemgraphbuilder.graph_data_loader:main',
+            'load-graph-nodes=chemgraphbuilder.graph_nodes_loader:main',
+            'load-graph-relationships=chemgraphbuilder.graph_relationships_loader:main',
         ],
     },
 )

@@ -9,12 +9,12 @@ import os
 import ast
 import json
 import pandas as pd
-from neo4jdriver import Neo4jBase
+from chemgraphbuilder.neo4jdriver import Neo4jBase
 
 
 class AddGraphRelationships(Neo4jBase):
     """
-    A class used to add relationship data from a CSV file or a directory of CSV 
+    A class used to add relationship data from a CSV file or a directory of CSV
     files to a Neo4j database.
 
     Methods

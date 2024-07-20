@@ -9,7 +9,7 @@ and generating Cypher queries.
 import os
 import logging
 import pandas as pd
-from neo4jdriver import Neo4jBase
+from chemgraphbuilder.neo4jdriver import Neo4jBase
 
 class AddGraphNodes(Neo4jBase):
     """
