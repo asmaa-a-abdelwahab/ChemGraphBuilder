@@ -137,11 +137,16 @@ class GraphRelationshipsLoader:
 
 def main():
     """Main function to handle command-line arguments and run the GraphRelationshipsLoader."""
-    parser = argparse.ArgumentParser(description="Load graph relationships into a Neo4j database.")
-    parser.add_argument("--uri", type=str, required=True, help="URI for the Neo4j database.")
-    parser.add_argument("--username", type=str, required=True, help="Username for the Neo4j database.")
-    parser.add_argument("--password", type=str, required=True, help="Password for the Neo4j database.")
-    parser.add_argument("--relationship_type", type=str, required=True, help="Type of the relationship to add.")
+    parser = argparse.ArgumentParser(description="Load graph relationships into"
+                                                 "a Neo4j database.")
+    parser.add_argument("--uri", type=str, required=True,
+                        help="URI for the Neo4j database.")
+    parser.add_argument("--username", type=str, required=True,
+                        help="Username for the Neo4j database.")
+    parser.add_argument("--password", type=str, required=True,
+                        help="Password for the Neo4j database.")
+    parser.add_argument("--relationship_type", type=str, required=True,
+                        help="Type of the relationship to add.")
     args = parser.parse_args()
 
     loader = GraphRelationshipsLoader(args.uri, args.username, args.password)

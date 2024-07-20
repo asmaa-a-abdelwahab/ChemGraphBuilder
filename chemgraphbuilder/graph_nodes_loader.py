@@ -13,7 +13,7 @@ Functions:
 
 import argparse
 from neo4j import GraphDatabase
-from chemgraphbuilder.add_graph_nodes import AddGraphNodes  # Assuming this is the module where AddGraphNodes is defined
+from chemgraphbuilder.add_graph_nodes import AddGraphNodes
 
 
 class GraphNodesLoader:
@@ -103,11 +103,16 @@ def main():
     """
     Main function to parse command-line arguments and load data for the specified node type.
     """
-    parser = argparse.ArgumentParser(description="Load data into Neo4j graph database.")
-    parser.add_argument('--uri', required=True, help='URI for the Neo4j database')
-    parser.add_argument('--username', required=True, help='Username for the Neo4j database')
-    parser.add_argument('--password', required=True, help='Password for the Neo4j database')
-    parser.add_argument('--label', required=True, help='Label of the node')
+    parser = argparse.ArgumentParser(description="Load data into"
+                                                 "Neo4j graph database.")
+    parser.add_argument('--uri', required=True,
+                        help='URI for the Neo4j database')
+    parser.add_argument('--username', required=True,
+                        help='Username for the Neo4j database')
+    parser.add_argument('--password', required=True,
+                        help='Password for the Neo4j database')
+    parser.add_argument('--label', required=True,
+                        help='Label of the node')
 
     args = parser.parse_args()
 
