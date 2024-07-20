@@ -37,5 +37,5 @@ graph_nodes_loader.load_data_for_node_type(label)
 After installing the package using `pip install .` or `pip install chemgraphbuilder`, you can use the command-line interface:
 
 ```sh
-load-graph-nodes --uri bolt://localhost:7689 --username neo4j --password cyp450kg --label Compound
+load-graph-nodes --uri **** --username **** --password **** --label Compound
 ```
