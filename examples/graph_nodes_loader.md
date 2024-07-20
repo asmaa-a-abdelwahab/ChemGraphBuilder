@@ -1,4 +1,4 @@
-# The `GraphDataLoader` class is usable from Python code, Jupyter notebooks, and the command line interface.
+# The `GraphNodesLoader` class is usable from Python code, and the command line interface.
 
 ### Usage in Different Contexts
 
@@ -14,21 +14,6 @@ password = "****"
 label = "Compound"  # you can add other labels such as (BioAssay, Gene, Protein)
 
 graph_nodes_loader = GraphNodesLoader(uri, username, password)
-graph_nodes_loader.load_data_for_node_type(label)
-```
-
-#### 2. **Jupyter Notebooks**
-
-```python
-from chemgraphbuilder.graph_nodes_loader import GraphNodesLoader
-
-# User-provided connection details and label
-uri = "****"
-username = "****"
-password = "****"
-label = "Compound"  # Example label
-
-graph_nodes_loader = GraphDataLoader(uri, username, password)
 graph_nodes_loader.load_data_for_node_type(label)
 ```
 
