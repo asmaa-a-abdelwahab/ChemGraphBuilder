@@ -7,7 +7,7 @@ This module collects and processes relationship data for different types of rela
 - Assay_Compound
 - Assay_Enzyme
 - Gene_Enzyme
-- Compound_Enzyme
+- Compound_Gene
 - Compound_Similarity
 - Compound_Cooccurrence
 - Compound_Transformation
