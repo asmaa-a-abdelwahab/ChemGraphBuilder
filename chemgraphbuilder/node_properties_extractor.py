@@ -1,4 +1,3 @@
-
 import os
 import requests
 import pandas as pd
@@ -73,43 +72,6 @@ class NodePropertiesExtractor:
         self._sep = sep
         self.enzyme_list = enzyme_list
         self._enzyme_count = len(enzyme_list)
-
-
-    def create_data_directories(self):
-        """
-        Creates the directory structure needed to store fetched data, ensuring that
-        all required folders are present before data retrieval and saving operations begin.
-
-        This method checks for the existence of specified directories and creates them if
-        they do not exist. The directories created include the main 'Data' folder and
-        subfolders for storing different types of extracted properties such as 'Nodes',
-        'Compound_Properties', 'Gene_Properties', 'Assay_Properties', and 'Protein_Properties'.
-
-        Side Effects:
-            - Creates directories on the file system if they do not already exist.
-
-        Example:
-            >>> extractor = NodePropertiesExtractor(['CYP2D6', 'CYP3A4'])
-            >>> extractor.create_data_directories()
-            This will ensure that the 'Data/Nodes', 'Data/Nodes/Compound_Properties',
-            'Data/Nodes/Gene_Properties', 'Data/Nodes/Assay_Properties', and
-            'Data/Nodes/Protein_Properties' directories exist.
-        """
-        # List of directories to create
-        directories = [
-            'Data',
-            'Data/Nodes',
-            'Data/Nodes/Compound_Properties'
-        ]
-
-        # Iterate through the directories list and create each one if it doesn't exist
-        for directory in directories:
-            if not os.path.exists(directory):
-                os.makedirs(directory)
-                print(f"Created directory: {directory}")
-            else:
-                print(f"Directory already exists: {directory}")
-
 
     def _make_request(self, url):
         """
