@@ -17,7 +17,7 @@ graph_nodes_loader = GraphNodesLoader(uri, username, password)
 graph_nodes_loader.load_data_for_node_type(label)
 ```
 
-#### 3. **Command Line**
+#### 2. **Command Line**
 
 After installing the package using `pip install .` or `pip install chemgraphbuilder`, you can use the command-line interface:
 
