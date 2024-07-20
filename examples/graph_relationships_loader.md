@@ -2,6 +2,16 @@
 
 ### Usage in Different Contexts
 
+#### **Available Relationships**
+- `Assay_Gene`
+- `Assay_Compound`
+- `Compound_Gene`
+- `Compound_Transformation`
+- `Gene_Enzyme`
+- `Compound_Similarities`
+- `Cpd_Cpd_CoOccurence`
+- `Cpd_Gene_CoOccurence`
+
 #### 1. **Python Code**
 
 ```python

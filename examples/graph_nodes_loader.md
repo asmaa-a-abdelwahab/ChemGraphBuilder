@@ -2,6 +2,12 @@
 
 ### Usage in Different Contexts
 
+#### **Available Relationships**
+- `Compound`
+- `BioAssay`
+- `Gene`
+- `Protein`
+
 #### 1. **Python Code**
 
 ```python
