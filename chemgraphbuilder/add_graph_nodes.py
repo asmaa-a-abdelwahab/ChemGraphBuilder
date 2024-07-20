@@ -101,6 +101,11 @@ class AddGraphNodes(Neo4jBase):
         str
             A Cypher query string.
         """
+        # Create an index for the unique_property
+        create_index_query = f"CREATE INDEX IF NOT EXISTS FOR (n:{label}) ON (n.{unique_property})"
+        self.logger.debug(create_index_query)
+        yield create_index_query
+
         for unique_id, properties in node_dict.items():
             unique_id = f'"{unique_id}"' if isinstance(unique_id, str) else unique_id
             query = f"MERGE (n:{label} {{{unique_property}: {unique_id}}})"
@@ -228,7 +233,7 @@ class AddGraphNodes(Neo4jBase):
     def public_generate_property_string(self, value):
         """
         Public method to access the protected _generate_property_string method for testing.
-        
+
         Parameters:
         -----------
         value : Any
