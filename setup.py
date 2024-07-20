@@ -2,12 +2,22 @@ from setuptools import setup, find_packages
 
 setup(
     name='chemgraphbuilder',
-    version='0.1',
+    version='0.1.0',
     packages=find_packages(),
     install_requires=[
-        'neo4j',
-        'pandas'
+        "beautifulsoup4",
+        "matplotlib",
+        "numpy",
+        "pandas",
+        "neo4j",
+        "requests",
+        "xmltodict",
+        "setuptools",
     ],
+    author='Asmaa Ali Abdelwahab',
+    author_email='asmaa.a.abdelwahab@gmail.com',
+    description='A package to build chemical knowledge graphs using data from PubChem and Neo4j',
+    url='https://github.com/yourusername/chemgraphbuilder',
     entry_points={
         'console_scripts': [
             'setup-data-folder=chemgraphbuilder.setup_data_folder:main'

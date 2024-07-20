@@ -1,0 +1,1106 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.1">
+<title>chemgraphbuilder.node_properties_extractor API documentation</title>
+<meta name="description" content="">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+})</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>chemgraphbuilder.node_properties_extractor</code></h1>
+</header>
+<section id="section-intro">
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="chemgraphbuilder.node_properties_extractor.NodePropertiesExtractor"><code class="flex name class">
+<span>class <span class="ident">NodePropertiesExtractor</span></span>
+<span>(</span><span>enzyme_list, base_url='https://pubchem.ncbi.nlm.nih.gov/rest/pug/assay/target/genesymbol', sep=',')</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Extracts data from PubChem to build knowledge graphs in Neo4j, focusing on nodes representing chemical
+entities and their relationships. This class serves as a bridge between the PubChem database and Neo4j,
+allowing users to query chemical data and construct a graph-based representation of chemical compounds,
+their assays, related genes, and proteins.</p>
+<p>The primary functionality revolves around fetching detailed information about specified enzymes from PubChem,
+including assay data, gene properties, protein properties, and compound properties. It processes this data into
+a structured format suitable for knowledge graph construction, specifically tailored for use with Neo4j databases.</p>
+<h2 id="attributes">Attributes</h2>
+<dl>
+<dt><strong><code>enzyme_list</code></strong> :&ensp;<code>list</code> of <code>str</code></dt>
+<dd>Enzymes to query in the PubChem database.</dd>
+<dt><strong><code>_base_url</code></strong> :&ensp;<code>str</code></dt>
+<dd>Base URL for the PubChem API requests.</dd>
+<dt><strong><code>_sep</code></strong> :&ensp;<code>str</code></dt>
+<dd>Delimiter for parsing CSV data from PubChem.</dd>
+<dt><strong><code>_enzyme_count</code></strong> :&ensp;<code>int</code></dt>
+<dd>Number of enzymes in the enzyme_list, calculated at initialization.</dd>
+</dl>
+<h2 id="parameters">Parameters</h2>
+<p>enzyme_list (list of str): List of enzyme names for which assay data will be fetched from PubChem.
+base_url (str, optional): Base URL for PubChem API requests. Defaults to the assay target genesymbol endpoint.
+sep (str, optional): Separator used for parsing CSV data returned by PubChem. Defaults to ','.</p>
+<p>Usage Example:
+&gt;&gt;&gt; enzyme_list = ['CYP2D6', 'CYP3A4']
+&gt;&gt;&gt; extractor = NodePropertiesExtractor(enzyme_list)
+&gt;&gt;&gt; df = extractor.run()
+This example initiates the extractor with a list of enzymes, fetches their data from PubChem,
+processes it, and potentially prepares it for knowledge graph construction in Neo4j.</p>
+<h2 id="note">Note</h2>
+<p>To fully utilize this class, ensure you have network access to the PubChem API for data retrieval and
+a Neo4j database instance for knowledge graph construction. The class methods facilitate data extraction
+and processing, but integrating the output into Neo4j requires additional steps outside the scope of this class.</p>
+<p>Initializes a NodePropertiesExtractor instance, setting up the base URL for API requests, the separator for CSV parsing,
+and the list of enzymes to query from the PubChem database.</p>
+<h2 id="parameters_1">Parameters</h2>
+<p>enzyme_list (list of str): A list of enzyme names for which to fetch assay data.
+base_url (str, optional): The base URL for PubChem API requests.
+Default is set to the assay target genesymbol endpoint.
+sep (str, optional): The delimiter to use for parsing CSV files returned by PubChem. Defaults to ','.</p>
+<h2 id="attributes_1">Attributes</h2>
+<dl>
+<dt><strong><code>_base_url</code></strong> :&ensp;<code>str</code></dt>
+<dd>Stores the base URL for API requests.</dd>
+<dt><strong><code>_sep</code></strong> :&ensp;<code>str</code></dt>
+<dd>Stores the delimiter for parsing CSV data.</dd>
+<dt><strong><code>enzyme_list</code></strong> :&ensp;<code>list</code> of <code>str</code></dt>
+<dd>Stores the list of enzyme names provided during initialization.</dd>
+<dt><strong><code>_enzyme_count</code></strong> :&ensp;<code>int</code></dt>
+<dd>The number of enzymes in the enzyme_list.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class NodePropertiesExtractor:
+    &#34;&#34;&#34;
+    Extracts data from PubChem to build knowledge graphs in Neo4j, focusing on nodes representing chemical
+    entities and their relationships. This class serves as a bridge between the PubChem database and Neo4j,
+    allowing users to query chemical data and construct a graph-based representation of chemical compounds,
+    their assays, related genes, and proteins.
+
+    The primary functionality revolves around fetching detailed information about specified enzymes from PubChem,
+    including assay data, gene properties, protein properties, and compound properties. It processes this data into
+    a structured format suitable for knowledge graph construction, specifically tailored for use with Neo4j databases.
+
+    Attributes:
+        enzyme_list (list of str): Enzymes to query in the PubChem database.
+        _base_url (str): Base URL for the PubChem API requests.
+        _sep (str): Delimiter for parsing CSV data from PubChem.
+        _enzyme_count (int): Number of enzymes in the enzyme_list, calculated at initialization.
+
+    Parameters:
+        enzyme_list (list of str): List of enzyme names for which assay data will be fetched from PubChem.
+        base_url (str, optional): Base URL for PubChem API requests. Defaults to the assay target genesymbol endpoint.
+        sep (str, optional): Separator used for parsing CSV data returned by PubChem. Defaults to &#39;,&#39;.
+
+    Usage Example:
+        &gt;&gt;&gt; enzyme_list = [&#39;CYP2D6&#39;, &#39;CYP3A4&#39;]
+        &gt;&gt;&gt; extractor = NodePropertiesExtractor(enzyme_list)
+        &gt;&gt;&gt; df = extractor.run()
+        This example initiates the extractor with a list of enzymes, fetches their data from PubChem,
+        processes it, and potentially prepares it for knowledge graph construction in Neo4j.
+
+    Note:
+        To fully utilize this class, ensure you have network access to the PubChem API for data retrieval and
+        a Neo4j database instance for knowledge graph construction. The class methods facilitate data extraction
+        and processing, but integrating the output into Neo4j requires additional steps outside the scope of this class.
+    &#34;&#34;&#34;
+
+    _REQUEST_TIMEOUT = 30  # in seconds
+    _CONCURRENT_REQUEST_LIMIT = 2
+    _RETRY_ATTEMPTS = 3  # number of times to retry a failed request
+
+    def __init__(self, enzyme_list, base_url=&#34;https://pubchem.ncbi.nlm.nih.gov/rest/pug/assay/target/genesymbol&#34;, sep=&#34;,&#34;):
+        &#34;&#34;&#34;
+        Initializes a NodePropertiesExtractor instance, setting up the base URL for API requests, the separator for CSV parsing,
+        and the list of enzymes to query from the PubChem database.
+
+        Parameters:
+            enzyme_list (list of str): A list of enzyme names for which to fetch assay data.
+            base_url (str, optional): The base URL for PubChem API requests.
+                                    Default is set to the assay target genesymbol endpoint.
+            sep (str, optional): The delimiter to use for parsing CSV files returned by PubChem. Defaults to &#39;,&#39;.
+
+        Attributes:
+            _base_url (str): Stores the base URL for API requests.
+            _sep (str): Stores the delimiter for parsing CSV data.
+            enzyme_list (list of str): Stores the list of enzyme names provided during initialization.
+            _enzyme_count (int): The number of enzymes in the enzyme_list.
+        &#34;&#34;&#34;
+        self._base_url = base_url
+        self._sep = sep
+        self.enzyme_list = enzyme_list
+        self._enzyme_count = len(enzyme_list)
+
+    def _make_request(self, url):
+        &#34;&#34;&#34;
+        Sends an HTTP GET request to a specified URL with built-in retry logic. If the request fails,
+        it retries the request up to a predefined number of attempts with exponential backoff to handle potential
+        temporary network or server issues.
+
+        The method attempts to gracefully handle server-side errors (HTTP 4XX/5XX responses) by raising an exception
+        if the response status code indicates an error. For client-side errors (e.g., connectivity issues), it logs a warning
+        and retries the request.
+
+        Parameters:
+            url (str): The complete URL to which the HTTP GET request is sent.
+
+        Returns:
+            requests.Response: The response object from the server if the request is successfully completed.
+
+        Raises:
+            requests.RequestException: If the request fails to complete successfully after the maximum number of retry attempts.
+        &#34;&#34;&#34;
+        for attempt in range(self._RETRY_ATTEMPTS):
+            try:
+                response = requests.get(url, timeout=self._REQUEST_TIMEOUT)
+                response.raise_for_status()  # Checks for HTTP errors
+                return response
+            except requests.RequestException as e:
+                logging.warning(f&#34;Attempt {attempt + 1} of {self._RETRY_ATTEMPTS} failed for URL: {url}. Error: {e}&#34;)
+                if attempt + 1 == self._RETRY_ATTEMPTS:
+                    raise  # All attempts failed; re-raise the last exception
+                time.sleep(2 ** attempt)  # Exponential backoff
+
+
+    def get_enzyme_assays(self, enzyme):
+        &#34;&#34;&#34;
+        Fetches assay data for a specified enzyme from the PubChem database and returns it as a pandas DataFrame.
+
+        This method constructs a URL to query the PubChem database for concise assay data related to the given enzyme.
+        It processes the CSV response into a DataFrame, which includes various assay data points provided by PubChem.
+
+        Parameters:
+            enzyme (str): The name of the enzyme for which assay data is requested. This name is used in the API query.
+
+        Returns:
+            pd.DataFrame: A DataFrame containing the assay data fetched from PubChem for the specified enzyme. The DataFrame
+                        includes columns based on the CSV response from PubChem, such as assay ID, results, and conditions.
+                        Returns None if no data is available or if an error occurs during data fetching or processing.
+
+        Raises:
+            requests.RequestException: If an error occurs during the HTTP request to the PubChem API.
+            pd.errors.EmptyDataError: If the response from PubChem contains no data.
+
+        Example:
+            &gt;&gt;&gt; extractor = NodePropertiesExtractor([&#39;enzyme&#39;])
+            &gt;&gt;&gt; extractor.create_data_directories()
+            &gt;&gt;&gt; enzyme_assays_df = extractor.get_enzyme_assays(&#39;enzyme&#39;)
+            &gt;&gt;&gt; print(enzyme_assays_df.head())
+        &#34;&#34;&#34;
+        assays_url = f&#34;{self._base_url}/{enzyme}/concise/CSV&#34;
+        logging.info(f&#34;Fetching assays for enzyme: {enzyme}&#34;)
+
+        response = self._make_request(assays_url)
+
+        assays_csv_string = response.text
+        assays_csv_string_io = StringIO(assays_csv_string)
+        try:
+            assays_df = pd.read_csv(assays_csv_string_io, sep=self._sep, low_memory=False)
+            logging.info(f&#34;Assays DataFrame for enzyme {enzyme} has shape: {assays_df.shape}&#34;)
+            return assays_df
+        except pd.errors.EmptyDataError:
+            logging.warning(f&#34;No data available for enzyme {enzyme}.&#34;)
+            return None
+
+
+    def _process_enzymes(self, enzyme_list):
+        &#34;&#34;&#34;
+        Iterates over a list of enzyme names, fetching assay data for each enzyme and aggregating the results into a list of DataFrames.
+
+        This method calls `get_enzyme_assays` for each enzyme in the provided list, collecting the assay data (if available)
+        into a list of pandas DataFrames. This list can then be used for further processing or analysis.
+
+        Parameters:
+            enzyme_list (list of str): A list containing the names of enzymes for which to fetch assay data.
+
+        Returns:
+            list of pd.DataFrame: A list containing a pandas DataFrame for each enzyme for which assay data was successfully
+                                fetched and processed. Each DataFrame includes the assay data from PubChem for that enzyme.
+                                If no data is available for an enzyme, it is omitted from the list.
+        &#34;&#34;&#34;
+        df_list = [self.get_enzyme_assays(enzyme) for enzyme in enzyme_list]
+        return [df for df in df_list if df is not None]
+
+
+    def _concatenate_data(self, df_list):
+        &#34;&#34;&#34;
+        Concatenates a list of pandas DataFrames into a single DataFrame. This method is useful for aggregating
+        data fetched from multiple sources or APIs into a unified structure. If the list is empty, it returns None
+        to indicate that no data was aggregated.
+
+        Parameters:
+            df_list (List[pd.DataFrame]): A list of pandas DataFrames to concatenate. These DataFrames should
+                                        have the same structure (columns) to ensure proper concatenation.
+
+        Returns:
+            pd.DataFrame or None: A single concatenated DataFrame comprising all rows from the input DataFrames,
+                                indexed continuously. Returns None if the input list is empty, indicating there
+                                is no data to concatenate.
+        &#34;&#34;&#34;
+        if df_list:
+            return pd.concat(df_list, ignore_index=True)
+        return None
+
+
+    def run(self):
+        &#34;&#34;&#34;
+        Orchestrates the process of fetching, filtering, and aggregating assay data from PubChem for a predefined list of enzymes.
+
+        This method iteratively queries PubChem for assay data corresponding to each enzyme specified in the `enzyme_list` attribute during class initialization. It performs the following steps for each enzyme:
+        1. Constructs a query URL and fetches assay data from PubChem.
+        2. Filters the fetched data based on predefined criteria (e.g., containing specific substrings in the assay name).
+        3. Aggregates the filtered data into a single pandas DataFrame.
+        4. Identifies enzymes for which data could not be fetched or were excluded based on filtering criteria, logging their names.
+
+        The final aggregated DataFrame, containing assay data for all successfully processed enzymes, is then saved to a CSV file. This method facilitates the extraction and preprocessing of chemical assay data for further analysis or integration into knowledge graphs.
+
+        Note:
+            - This method relies on the successful response from PubChem for each enzyme query.
+            - Enzymes with no available data or failing to meet the filtering criteria are excluded from the final DataFrame.
+            - The output CSV file is saved in the current working directory with the name &#39;Data/AllDataConnected.csv&#39;.
+
+        Returns:
+            pd.DataFrame: A DataFrame containing the aggregated and filtered assay data for the specified enzymes.
+                        Columns in the DataFrame correspond to the assay data fields returned by PubChem, subject to
+                        the filtering criteria applied within this method.
+
+        Raises:
+            requests.RequestException: If there is an issue with fetching data from PubChem, such as a network problem or
+                                    an invalid response.
+
+        Example:
+            Assuming `enzyme_list` was set to [&#39;CYP2D6&#39;, &#39;CYP3A4&#39;] during class initialization:
+
+            &gt;&gt;&gt; extractor = NodePropertiesExtractor([&#39;CYP2D6&#39;, &#39;CYP3A4&#39;])
+            &gt;&gt;&gt; extractor.create_data_directories()
+            &gt;&gt;&gt; result_df = extractor.run()
+            &gt;&gt;&gt; print(result_df.head())
+
+            This will fetch and process assay data for &#39;CYP2D6&#39; and &#39;CYP3A4&#39;, returning a DataFrame with the processed data.
+        &#34;&#34;&#34;
+
+        # Initialize an empty list to store enzymes with successful responses
+        enzymes_with_response = []
+
+        # Keep a copy of the original list to identify removed enzymes later
+        original_enzyme_list = self.enzyme_list.copy()
+
+        for enzyme in self.enzyme_list:
+            # Formulate the URL
+            url = f&#34;{self._base_url}/{enzyme}/concise/CSV&#34;
+
+            try:
+                response = requests.get(url)
+                # Check for a successful response (status code 200)
+                if response.status_code == 200:
+                    enzymes_with_response.append(enzyme)  # Keep the enzyme in the new list
+            except requests.RequestException:
+                # If there&#39;s an exception, skip adding the enzyme to the new list
+                pass
+
+        # Update the enzyme list with only the enzymes that had a successful response
+        self.enzyme_list = enzymes_with_response
+
+        # Identify and print the removed enzymes
+        removed_enzymes = [enzyme for enzyme in original_enzyme_list if enzyme not in enzymes_with_response]
+        if removed_enzymes:
+            print(&#34;These enzymes were removed because their names aren&#39;t correct:&#34;, &#34;[&#34;, &#34;, &#34;.join(removed_enzymes), &#34;]&#34;)
+
+        df_list = self._process_enzymes(self.enzyme_list)
+        df = self._concatenate_data(df_list)
+        substrings_to_filter = [&#39;CYP&#39;, &#39;Cytochrome&#39;]
+        pattern = &#39;|&#39;.join(substrings_to_filter)
+        df = df[df[&#39;Assay Name&#39;].str.contains(pattern, case=False, na=False)]
+        df.to_csv(&#39;Data/AllDataConnected.csv&#39;, index=False)
+        return df
+
+
+    def _fetch_gene_details(self, gene_id):
+        &#34;&#34;&#34;
+        Fetches gene details in parallel using the PubChem API.
+
+        Args:
+            gene_id (int): The gene ID for fetching details.
+
+        Returns:
+            tuple: Contains gene ID, symbol, taxonomy, taxonomy ID, and synonyms.
+        &#34;&#34;&#34;
+        BASE_URL = &#34;https://pubchem.ncbi.nlm.nih.gov/rest/pug&#34;
+        url = f&#34;{BASE_URL}/gene/geneid/{int(gene_id)}/summary/JSON&#34;
+        try:
+            response = self._make_request(url)
+            data = response.json()
+
+            # Extracting the necessary details
+            symbol = data[&#39;GeneSummaries&#39;][&#39;GeneSummary&#39;][0].get(&#39;Symbol&#39;, None)
+            taxonomy = data[&#39;GeneSummaries&#39;][&#39;GeneSummary&#39;][0].get(&#39;Taxonomy&#39;, None)
+            taxonomy_id = data[&#39;GeneSummaries&#39;][&#39;GeneSummary&#39;][0].get(&#39;TaxonomyID&#39;, None)
+            synonyms = data[&#39;GeneSummaries&#39;][&#39;GeneSummary&#39;][0].get(&#39;Synonym&#39;, None)
+            # print(type(synonyms))
+            return gene_id, symbol, taxonomy, taxonomy_id, synonyms
+        except Exception as e:
+            logging.error(f&#34;Error fetching details for gene_id {gene_id}: {e}&#34;)
+            return gene_id, None, None, None, None
+
+
+    def extract_gene_properties(self, main_data):
+        &#34;&#34;&#34;
+        Extracts and processes gene properties from a given data source, specifically targeting genes
+        relevant to the study (e.g., CYP enzymes) and records their details in a structured DataFrame.
+
+        This method reads gene data from a CSV file specified by `main_data`, queries the PubChem database
+        for additional properties of each unique gene ID found in the file, and compiles these properties
+        into a new DataFrame. It focuses on fetching details like gene symbols, taxonomy, taxonomy IDs, and
+        synonyms for each gene. The final DataFrame is filtered to include only genes of particular interest
+        (e.g., certain CYP enzymes) and saved to a separate CSV file for further analysis or use.
+
+        Parameters:
+            main_data (str): Path to a CSV file containing main data was which generated after running
+                            `extractor.run()`.
+
+        Returns:
+            pd.DataFrame: A DataFrame containing the compiled gene properties, including GeneID, Symbol,
+                        Taxonomy, Taxonomy ID, and Synonyms, filtered to include only specified genes
+                        of interest. This DataFrame is also saved to &#39;Data/Nodes/Gene_Properties.csv&#39;.
+
+        Raises:
+            Exception: If there&#39;s an issue reading the initial CSV file or fetching gene details from PubChem,
+                    details of the exception are logged, and the method proceeds to process the next gene ID.
+
+        Example:
+            &gt;&gt;&gt; extractor = NodePropertiesExtractor([&#39;CYP2D6&#39;, &#39;CYP3A4&#39;])
+            &gt;&gt;&gt; extractor.create_data_directories()
+            &gt;&gt;&gt; extractor.run()
+            &gt;&gt;&gt; gene_properties_df = extractor.extract_gene_properties(&#39;Data/AllDataConnected.csv&#39;)
+            &gt;&gt;&gt; print(gene_properties_df.head())
+
+            This would read gene IDs from &#39;Data/AllDataConnected.csv&#39;, fetch their properties from PubChem,
+            and compile the details into a DataFrame, filtering for specified genes of interest and saving
+            the results to &#39;Data/Nodes/Gene_Properties.csv&#39;.
+
+        Note:
+            The method filters the resulting DataFrame to include only genes with symbols in the predefined
+            enzyme_list. Adjust this list as necessary to match the focus of your study or application.
+        &#34;&#34;&#34;
+        df = pd.read_csv(main_data)
+        df_gene = pd.DataFrame(columns=[&#39;GeneID&#39;, &#39;Symbol&#39;, &#39;Taxonomy&#39;, &#39;Taxonomy ID&#39;, &#39;Synonyms&#39;])
+
+        unique_gene_ids = df[&#39;Target GeneID&#39;].unique().tolist()
+
+        gene_details = []
+
+        for gene_id in unique_gene_ids:
+            try:
+                gene_id, symbol, taxonomy, taxonomy_id, synonyms = self._fetch_gene_details(gene_id)
+                gene_details.append({
+                    &#39;GeneID&#39;: gene_id,
+                    &#39;Symbol&#39;: symbol,
+                    &#39;Taxonomy&#39;: taxonomy,
+                    &#39;Taxonomy ID&#39;: taxonomy_id,
+                    &#39;Synonyms&#39;: str(synonyms)
+                })
+            except Exception as exc:
+                logging.error(f&#34;Error occurred while processing gene_id {gene_id}: {exc}&#34;)
+                gene_details.append({
+                    &#39;GeneID&#39;: gene_id,
+                    &#39;Symbol&#39;: None,
+                    &#39;Taxonomy&#39;: None,
+                    &#39;Taxonomy ID&#39;: None,
+                    &#39;Synonyms&#39;: None
+                })
+
+        # Now create the DataFrame from the list of dictionaries
+        df_gene = pd.DataFrame(gene_details)
+        n = self._enzyme_count
+        gene_ids = df[&#39;Target GeneID&#39;].value_counts().head(n).index.tolist()
+        df_gene = df_gene[df_gene[&#39;GeneID&#39;].isin([int(item) for item in gene_ids])]
+        df_gene.to_csv(&#39;Data/Nodes/Gene_Properties.csv&#39;, sep=&#39;,&#39;, index=False)
+        return df_gene
+
+
+    def _fetch_assay_details(self, aid):
+        &#34;&#34;&#34;
+        Fetches assay details from the PubChem API for a given assay ID.
+
+        Args:
+            aid (int): The assay ID to fetch details for.
+
+        Returns:
+            dict: A dictionary containing assay details like AID, SourceName, SourceID, Name, and Description.
+                  Returns None if an error occurs during fetching or parsing.
+        &#34;&#34;&#34;
+        BASE_URL = &#34;https://pubchem.ncbi.nlm.nih.gov/rest/pug&#34;
+        url = f&#34;{BASE_URL}/assay/aid/{aid}/summary/XML&#34;  # Constructing the API URL
+        response = self._make_request(url)  # Making the API request
+        xml_data = response.text  # Getting the response text
+
+        try:
+            # Parsing the XML response
+            data_dict = xmltodict.parse(xml_data)
+            properties = [&#39;AID&#39;, &#39;SourceName&#39;, &#39;SourceID&#39;, &#39;Name&#39;, &#39;Description&#39;]
+            assay_data = {}
+            # Extracting required properties from the parsed XML
+            for prop in properties:
+                assay_data[prop] = data_dict.get(&#39;AssaySummaries&#39;, {}).get(&#39;AssaySummary&#39;, {}).get(prop, None)
+            return assay_data
+        except Exception as e:
+            logging.error(f&#34;Error parsing XML for AID {aid}: {e}&#34;)
+            return None
+
+
+    def extract_assay_properties(self, main_data):
+        &#34;&#34;&#34;
+        Extracts detailed properties of assays from PubChem for each unique assay ID found in the input data file.
+
+        This method processes an input CSV file containing assay IDs (AID) and performs concurrent HTTP requests to
+        fetch detailed assay properties from the PubChem database. The retrieved details include assay type, activity name,
+        source name, source ID, name, and description. These properties are compiled into a new DataFrame, which is then
+        saved to a CSV file for further analysis or use.
+
+        The method employs a ThreadPoolExecutor to manage concurrent requests efficiently, improving the performance
+        when dealing with a large number of assay IDs. Errors encountered during data fetching are logged, and the
+        process continues with the next assay ID, ensuring the method&#39;s robustness.
+
+        Parameters:
+            main_data (str): Path to a CSV file containing main data was which generated after running
+                            `extractor.run()`.
+
+        Returns:
+            pd.DataFrame: A DataFrame containing the fetched assay properties, including columns for AID, Assay Type,
+                        Activity Name, SourceName, SourceID, Name, and Description. This DataFrame is saved to
+                        &#39;Data/Nodes/Assay_Properties.csv&#39; in the current working directory.
+
+        Raises:
+            ValueError: If the input CSV file is empty or does not contain the &#39;AID&#39; column.
+
+        Example:
+            &gt;&gt;&gt; extractor = NodePropertiesExtractor([&#39;CYP2D6&#39;, &#39;CYP3A4&#39;])
+            &gt;&gt;&gt; extractor.create_data_directories()
+            &gt;&gt;&gt; extractor.run()
+            &gt;&gt;&gt; assay_properties_df = extractor.extract_assay_properties(&#39;Data/AllDataConnected.csv&#39;)
+            &gt;&gt;&gt; print(assay_properties_df.head())
+
+            This example reads assay IDs from &#39;Data/AllDataConnected.csv&#39;, queries PubChem for their detailed properties,
+            and compiles the results into a DataFrame, which is also saved to &#39;Data/Nodes/Assay_Properties.csv&#39;.
+
+        Note:
+            This method requires network access to the PubChem API and assumes the availability of a valid &#39;AID&#39; column
+            in the input CSV file. Ensure the input file path is correct and accessible to avoid errors during processing.
+        &#34;&#34;&#34;
+
+        df = pd.read_csv(main_data)
+
+        # Check if the DataFrame is valid
+        if df.empty or &#39;AID&#39; not in df.columns:
+            logging.error(&#34;DataFrame is empty or does not contain &#39;AID&#39; column.&#34;)
+            return pd.DataFrame()
+
+        unique_aids = df[&#39;AID&#39;].unique().tolist()  # Extracting unique assay IDs
+
+        columns = [&#39;AID&#39;, &#39;Assay Type&#39;, &#39;Activity Name&#39;, &#39;SourceName&#39;, &#39;SourceID&#39;, &#39;Name&#39;, &#39;Description&#39;]
+        assay_df = pd.DataFrame(columns=columns)  # Initializing a DataFrame to store assay properties
+
+        # Using ThreadPoolExecutor for concurrent fetching of assay details
+        with concurrent.futures.ThreadPoolExecutor(max_workers=self._CONCURRENT_REQUEST_LIMIT) as executor:
+            future_to_aid = {executor.submit(self._fetch_assay_details, aid): aid for aid in unique_aids}
+
+            # Iterating over completed futures
+            for future in concurrent.futures.as_completed(future_to_aid):
+                aid = future_to_aid[future]
+                try:
+                    assay_data = future.result()  # Fetching the result from the future
+                    if assay_data:
+                        # Preparing a new row with the fetched data
+                        new_row = {
+                            &#39;AID&#39;: aid,
+                            &#39;Assay Type&#39;: df.loc[df[&#39;AID&#39;] == aid, &#39;Assay Type&#39;].iloc[0],
+                            &#39;Activity Name&#39;: df.loc[df[&#39;AID&#39;] == aid, &#39;Activity Name&#39;].iloc[0],
+                            **assay_data
+                        }
+                        # Adding the new row to the DataFrame
+                        assay_df = pd.concat([assay_df, pd.DataFrame([new_row])], ignore_index=True)
+                except Exception as exc:
+                    # Logging any errors encountered during the fetch
+                    logging.error(f&#34;Error occurred while processing AID {aid}: {exc}&#34;)
+
+        # Saving the updated DataFrame to a CSV file
+        assay_df.to_csv(&#39;Data/Nodes/Assay_Properties.csv&#39;, sep=&#39;,&#39;, index=False)
+        return assay_df
+
+
+    def extract_protein_properties(self, main_data):
+        &#34;&#34;&#34;
+        Extracts and compiles protein properties from the NCBI protein database based on accession numbers.
+
+        Given a CSV file specified by `main_data`, this method reads protein accession numbers and performs web
+        scraping on the NCBI protein database pages to extract protein titles. The method constructs a URL for
+        each accession number, sends a request to retrieve the page content, and parses the HTML to find the
+        protein title. The extracted titles, along with their corresponding accession numbers and URLs, are
+        compiled into a DataFrame. This DataFrame is saved to a CSV file, providing a structured summary of
+        protein properties for further analysis or use.
+
+        Parameters:
+            main_data (str): Path to a CSV file containing main data was which generated after running
+                            `extractor.run()`.
+
+        Returns:
+            pd.DataFrame: A DataFrame with columns &#39;RefSeq Accession&#39;, &#39;URL&#39;, and &#39;Description&#39;, where
+                        &#39;Description&#39; contains the title of the protein extracted from its NCBI page.
+                        This DataFrame is saved to &#39;Data/Nodes/Protein_Properties.csv&#39; in the current
+                        working directory.
+
+        Raises:
+            Exception: If there&#39;s an issue reading the initial CSV file or querying the NCBI database,
+                    details of the exception are logged. The method continues processing the next
+                    accession number, ensuring robustness against individual failures.
+
+        Example:
+            Assuming &#39;protein_data.csv&#39; contains a column &#39;Target Accession&#39; with accession numbers:
+
+            &gt;&gt;&gt; extractor = NodePropertiesExtractor([&#39;CYP2D6&#39;, &#39;CYP3A4&#39;])
+            &gt;&gt;&gt; extractor.create_data_directories()
+            &gt;&gt;&gt; extractor.run() # you need to run this only once
+            &gt;&gt;&gt; protein_properties_df = extractor.extract_protein_properties(&#39;Data/AllDataConnected.csv&#39;)
+            &gt;&gt;&gt; print(protein_properties_df.head())
+
+            This would read accession numbers from &#39;Data/AllDataConnected.csv&#39;, scrape their titles from the
+            NCBI protein database, and compile the results into a DataFrame, which is also saved to
+            &#39;Data/Nodes/Protein_Properties.csv&#39;.
+
+        Note:
+            This method requires internet access to query the NCBI protein database. Ensure the input file
+            path is correct and accessible to avoid errors during processing. Web scraping is dependent on
+            the structure of the web page; changes to the NCBI protein database pages may require updates
+            to the scraping logic.
+        &#34;&#34;&#34;
+
+        # Initialize a list to store the extracted data
+        data = []
+
+        n = self._enzyme_count
+        df = pd.read_csv(main_data)
+        gene_ids = df[&#39;Target GeneID&#39;].value_counts().head(n).index.tolist()
+        df = df[df[&#39;Target GeneID&#39;].isin([int(item) for item in gene_ids])]
+        Accessions = df[&#39;Target Accession&#39;].unique().tolist()
+        # Iterate over each protein accession number in the DataFrame
+        for accession in Accessions:
+            # Construct the URL to query the NCBI protein database
+            url = f&#34;https://www.ncbi.nlm.nih.gov/protein/{accession}&#34;
+
+            try:
+                # Send an HTTP request to the URL
+                response = requests.get(url)
+
+                # Parse the HTML content of the response
+                soup = BeautifulSoup(response.text, &#39;html.parser&#39;)
+
+                # Extract the title from the parsed HTML
+                title = soup.title.string if soup.title else &#39;Title Not Found&#39;
+
+                # Append the extracted data to the list
+                data.append({&#39;RefSeq Accession&#39;: accession, &#39;URL&#39;: url, &#39;Description&#39;: title})
+            except Exception as e:
+                # In case of an error, log the error message
+                data.append({&#39;RefSeq Accession&#39;: accession, &#39;URL&#39;: url, &#39;Description&#39;: f&#39;Error: {e}&#39;})
+
+        # Convert the list of data into a DataFrame
+        protein_df = pd.DataFrame(data)
+
+        # Save the DataFrame to a CSV file
+        protein_df.to_csv(&#39;Data/Nodes/Protein_Properties.csv&#39;, sep=&#39;,&#39;, index=False)
+
+        # Return the DataFrame
+        return protein_df
+
+
+    def fetch_data(self, cid):
+        &#34;&#34;&#34;
+        Retrieves detailed chemical compound properties for a specified Compound ID (CID) from the PubChem database.
+
+        This method constructs a query URL to fetch a wide range of properties for the given CID from PubChem, including
+        molecular formula, molecular weight, canonical and isomeric SMILES, InChI codes, physicochemical properties, and
+        more. If the CID is valid and data is available, it returns a pandas DataFrame containing these properties. This
+        method also generates a URL to retrieve the structure image of the compound as a 2D PNG image, adding it as a
+        column in the DataFrame. In cases where the CID is NaN or an error occurs during data retrieval, an empty DataFrame
+        is returned.
+
+        Parameters:
+            cid (int or float): The Compound ID for which to fetch data. Can be an integer or NaN.
+
+        Returns:
+            pd.DataFrame: A DataFrame containing the fetched properties for the given CID. The DataFrame includes
+                        columns for each property fetched from PubChem, along with a &#39;StructureImage2DURL&#39; column
+                        containing the URL to the compound&#39;s structure image. Returns an empty DataFrame if the CID
+                        is NaN or if any error occurs during the fetch operation.
+
+        Raises:
+            Exception: Logs an error message if the request to PubChem fails or if the response cannot be processed
+                    into a DataFrame.
+
+        Example:
+            &gt;&gt;&gt; extractor = NodePropertiesExtractor([&#39;CYP2D6&#39;, &#39;CYP3A4&#39;])
+            &gt;&gt;&gt; extractor.create_data_directories()
+            &gt;&gt;&gt; compound_data_df = extractor.fetch_data(2244)
+            &gt;&gt;&gt; print(compound_data_df.head())
+
+            This example fetches the properties for the compound with CID 2244 from PubChem and prints the first few rows
+            of the resulting DataFrame.
+
+        Note:
+            This method requires an active internet connection to access the PubChem database. Ensure that the CID provided
+            is valid and not NaN to avoid fetching errors. The structure and availability of data fields are subject to the
+            current state of the PubChem database and may vary.
+        &#34;&#34;&#34;
+        if pd.isna(cid):
+            return pd.DataFrame()  # Return an empty DataFrame for NaN CIDs
+
+        cid = int(cid)  # Convert CID to integer
+        url = (f&#34;https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/{cid}/property/&#34;
+               &#34;MolecularFormula,MolecularWeight,CanonicalSMILES,IsomericSMILES,InChI,&#34;
+               &#34;InChIKey,IUPACName,Title,XLogP,ExactMass,MonoisotopicMass,TPSA,Complexity,&#34;
+               &#34;Charge,HBondDonorCount,HBondAcceptorCount,RotatableBondCount,HeavyAtomCount,&#34;
+               &#34;IsotopeAtomCount,AtomStereoCount,DefinedAtomStereoCount,UndefinedAtomStereoCount,&#34;
+               &#34;BondStereoCount,DefinedBondStereoCount,UndefinedBondStereoCount,CovalentUnitCount,&#34;
+               &#34;PatentCount,PatentFamilyCount,LiteratureCount,Volume3D,XStericQuadrupole3D,&#34;
+               &#34;YStericQuadrupole3D,ZStericQuadrupole3D,FeatureCount3D,FeatureAcceptorCount3D,&#34;
+               &#34;FeatureDonorCount3D,FeatureAnionCount3D,FeatureCationCount3D,FeatureRingCount3D,&#34;
+               &#34;FeatureHydrophobeCount3D,ConformerModelRMSD3D,EffectiveRotorCount3D,ConformerCount3D,&#34;
+               &#34;Fingerprint2D/CSV&#34;)
+        try:
+            response = requests.get(url)
+            response.raise_for_status()
+            compound_data = pd.read_csv(StringIO(response.text), sep=&#39;,&#39;, low_memory=False)
+            compound_data[&#39;StructureImage2DURL&#39;] = f&#34;https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/{cid}/PNG&#34;
+            return compound_data
+        except Exception as e:
+            logging.error(f&#34;Error processing CID {cid}: {e}&#34;)
+            return pd.DataFrame()  # Return an empty DataFrame in case of error
+
+
+    def extract_compound_properties(self, main_data):
+        &#34;&#34;&#34;
+        Extracts and aggregates compound properties from PubChem for a list of compounds associated with specific genes.
+
+        This method processes a CSV file specified by `main_data`, which contains gene identifiers and their associated
+        compound IDs (CIDs). It selects compounds related to the top `n` most frequently occurring genes in the dataset,
+        where `n` is determined by the instance&#39;s `_enzyme_count` attribute. The method then fetches detailed compound
+        properties from PubChem in chunks, using concurrent requests to improve efficiency and manage the load on the
+        PubChem API. The fetched compound properties are aggregated into a single DataFrame and saved to multiple CSV files,
+        one for each chunk of compound IDs processed.
+
+        Parameters:
+            main_data (str): Path to a CSV file containing main data was which generated after running
+                            `extractor.run()`.
+
+        Side Effects:
+            - Saves the aggregated compound properties to CSV files in the current working directory. The files are named
+            &#39;Data/Nodes/Compound_Properties/Chunk_{i}.csv&#39;, where `{i}` is the chunk index.
+
+        Returns:
+            None: This method does not return a value. Instead, it saves the fetched compound data directly to CSV files.
+
+        Raises:
+            Exception: Logs an error and continues processing the next CID if an error occurs while fetching data for a specific CID.
+
+        Example:
+            &gt;&gt;&gt; extractor = NodePropertiesExtractor([&#39;CYP2D6&#39;, &#39;CYP3A4&#39;])
+            &gt;&gt;&gt; extractor.create_data_directories()
+            &gt;&gt;&gt; extractor.extract_compound_properties(&#39;Data/AllDataConnected.csv&#39;)
+            This will read &#39;Data/AllDataConnected.csv&#39;, filter for compounds associated with the top n genes, fetch their properties
+            from PubChem, and save the results into multiple CSV files for each chunk of compounds processed.
+
+        Note:
+            - Ensure that the &#39;main_data&#39; CSV file exists and is accessible at the specified path.
+            - The method automatically handles NaN values in the &#39;CID&#39; column and excludes them from processing.
+            - The `enzyme_count` attribute determines the number of top genes for which compound properties will be fetched.
+            - Internet access is required to fetch compound data from the PubChem API.
+            - The method employs a `ThreadPoolExecutor` with a configurable number of workers (default is len(enzyme_list)) to parallelize
+            requests, which can be adjusted based on system capabilities and API rate limits.
+        &#34;&#34;&#34;
+
+        n = self._enzyme_count
+        df = pd.read_csv(main_data)
+        gene_ids = df[&#39;Target GeneID&#39;].value_counts().head(n).index.tolist()
+        df = df[df[&#39;Target GeneID&#39;].isin([int(item) for item in gene_ids])]
+        df = df.dropna(subset=[&#39;CID&#39;])
+        IDs = df[&#39;CID&#39;].unique().tolist()
+
+        # Define chunk size and calculate number of chunks
+        chunk_size = 10000
+        num_chunks = math.ceil(len(IDs) / chunk_size)
+
+        for i in range(num_chunks):
+            # Calculate start and end indices for each chunk
+            start_index = i * chunk_size
+            end_index = start_index + chunk_size
+
+            # Extract chunk of CIDs
+            chunk_cids = IDs[start_index:end_index]
+            # chunk_cids = [x for x in chunk_cids if not np.isnan(x)]
+
+            # Use ThreadPoolExecutor to parallelize requests for the chunk
+            with ThreadPoolExecutor(max_workers=5) as executor:
+                future_to_cid = {executor.submit(self.fetch_data, cid): cid for cid in chunk_cids}
+                results = []
+
+                for future in as_completed(future_to_cid):
+                    cid = future_to_cid[future]
+                    try:
+                        data = future.result()
+                        results.append(data)
+                    except Exception as e:
+                        logging.error(f&#34;Error processing CID {cid}: {e}&#34;)
+
+            # Concatenate results for the current chunk
+            chunk_df = pd.concat(results, ignore_index=True)
+
+            # Save the concatenated DataFrame to a CSV file for the chunk
+            chunk_df.to_csv(f&#39;Data/Nodes/Compound_Properties/Chunk_{i}.csv&#39;, sep=&#39;,&#39;, index=False)
+
+        return</code></pre>
+</details>
+<h3>Methods</h3>
+<dl>
+<dt id="chemgraphbuilder.node_properties_extractor.NodePropertiesExtractor.extract_assay_properties"><code class="name flex">
+<span>def <span class="ident">extract_assay_properties</span></span>(<span>self, main_data)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Extracts detailed properties of assays from PubChem for each unique assay ID found in the input data file.</p>
+<p>This method processes an input CSV file containing assay IDs (AID) and performs concurrent HTTP requests to
+fetch detailed assay properties from the PubChem database. The retrieved details include assay type, activity name,
+source name, source ID, name, and description. These properties are compiled into a new DataFrame, which is then
+saved to a CSV file for further analysis or use.</p>
+<p>The method employs a ThreadPoolExecutor to manage concurrent requests efficiently, improving the performance
+when dealing with a large number of assay IDs. Errors encountered during data fetching are logged, and the
+process continues with the next assay ID, ensuring the method's robustness.</p>
+<h2 id="parameters">Parameters</h2>
+<p>main_data (str): Path to a CSV file containing main data was which generated after running
+<code>extractor.run()</code>.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>pd.DataFrame</code></dt>
+<dd>A DataFrame containing the fetched assay properties, including columns for AID, Assay Type,
+Activity Name, SourceName, SourceID, Name, and Description. This DataFrame is saved to
+'Data/Nodes/Assay_Properties.csv' in the current working directory.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>ValueError</code></dt>
+<dd>If the input CSV file is empty or does not contain the 'AID' column.</dd>
+</dl>
+<h2 id="example">Example</h2>
+<pre><code class="language-python-repl">&gt;&gt;&gt; extractor = NodePropertiesExtractor(['CYP2D6', 'CYP3A4'])
+&gt;&gt;&gt; extractor.create_data_directories()
+&gt;&gt;&gt; extractor.run()
+&gt;&gt;&gt; assay_properties_df = extractor.extract_assay_properties('Data/AllDataConnected.csv')
+&gt;&gt;&gt; print(assay_properties_df.head())
+</code></pre>
+<p>This example reads assay IDs from 'Data/AllDataConnected.csv', queries PubChem for their detailed properties,
+and compiles the results into a DataFrame, which is also saved to 'Data/Nodes/Assay_Properties.csv'.</p>
+<h2 id="note">Note</h2>
+<p>This method requires network access to the PubChem API and assumes the availability of a valid 'AID' column
+in the input CSV file. Ensure the input file path is correct and accessible to avoid errors during processing.</p></div>
+</dd>
+<dt id="chemgraphbuilder.node_properties_extractor.NodePropertiesExtractor.extract_compound_properties"><code class="name flex">
+<span>def <span class="ident">extract_compound_properties</span></span>(<span>self, main_data)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Extracts and aggregates compound properties from PubChem for a list of compounds associated with specific genes.</p>
+<p>This method processes a CSV file specified by <code>main_data</code>, which contains gene identifiers and their associated
+compound IDs (CIDs). It selects compounds related to the top <code>n</code> most frequently occurring genes in the dataset,
+where <code>n</code> is determined by the instance's <code>_enzyme_count</code> attribute. The method then fetches detailed compound
+properties from PubChem in chunks, using concurrent requests to improve efficiency and manage the load on the
+PubChem API. The fetched compound properties are aggregated into a single DataFrame and saved to multiple CSV files,
+one for each chunk of compound IDs processed.</p>
+<h2 id="parameters">Parameters</h2>
+<p>main_data (str): Path to a CSV file containing main data was which generated after running
+<code>extractor.run()</code>.</p>
+<p>Side Effects:
+- Saves the aggregated compound properties to CSV files in the current working directory. The files are named
+'Data/Nodes/Compound_Properties/Chunk_{i}.csv', where <code>{i}</code> is the chunk index.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>None</code></dt>
+<dd>This method does not return a value. Instead, it saves the fetched compound data directly to CSV files.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>Exception</code></dt>
+<dd>Logs an error and continues processing the next CID if an error occurs while fetching data for a specific CID.</dd>
+</dl>
+<h2 id="example">Example</h2>
+<pre><code class="language-python-repl">&gt;&gt;&gt; extractor = NodePropertiesExtractor(['CYP2D6', 'CYP3A4'])
+&gt;&gt;&gt; extractor.create_data_directories()
+&gt;&gt;&gt; extractor.extract_compound_properties('Data/AllDataConnected.csv')
+This will read 'Data/AllDataConnected.csv', filter for compounds associated with the top n genes, fetch their properties
+from PubChem, and save the results into multiple CSV files for each chunk of compounds processed.
+</code></pre>
+<h2 id="note">Note</h2>
+<ul>
+<li>Ensure that the 'main_data' CSV file exists and is accessible at the specified path.</li>
+<li>The method automatically handles NaN values in the 'CID' column and excludes them from processing.</li>
+<li>The <code>enzyme_count</code> attribute determines the number of top genes for which compound properties will be fetched.</li>
+<li>Internet access is required to fetch compound data from the PubChem API.</li>
+<li>The method employs a <code>ThreadPoolExecutor</code> with a configurable number of workers (default is len(enzyme_list)) to parallelize
+requests, which can be adjusted based on system capabilities and API rate limits.</li>
+</ul></div>
+</dd>
+<dt id="chemgraphbuilder.node_properties_extractor.NodePropertiesExtractor.extract_gene_properties"><code class="name flex">
+<span>def <span class="ident">extract_gene_properties</span></span>(<span>self, main_data)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Extracts and processes gene properties from a given data source, specifically targeting genes
+relevant to the study (e.g., CYP enzymes) and records their details in a structured DataFrame.</p>
+<p>This method reads gene data from a CSV file specified by <code>main_data</code>, queries the PubChem database
+for additional properties of each unique gene ID found in the file, and compiles these properties
+into a new DataFrame. It focuses on fetching details like gene symbols, taxonomy, taxonomy IDs, and
+synonyms for each gene. The final DataFrame is filtered to include only genes of particular interest
+(e.g., certain CYP enzymes) and saved to a separate CSV file for further analysis or use.</p>
+<h2 id="parameters">Parameters</h2>
+<p>main_data (str): Path to a CSV file containing main data was which generated after running
+<code>extractor.run()</code>.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>pd.DataFrame</code></dt>
+<dd>A DataFrame containing the compiled gene properties, including GeneID, Symbol,
+Taxonomy, Taxonomy ID, and Synonyms, filtered to include only specified genes
+of interest. This DataFrame is also saved to 'Data/Nodes/Gene_Properties.csv'.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>Exception</code></dt>
+<dd>If there's an issue reading the initial CSV file or fetching gene details from PubChem,
+details of the exception are logged, and the method proceeds to process the next gene ID.</dd>
+</dl>
+<h2 id="example">Example</h2>
+<pre><code class="language-python-repl">&gt;&gt;&gt; extractor = NodePropertiesExtractor(['CYP2D6', 'CYP3A4'])
+&gt;&gt;&gt; extractor.create_data_directories()
+&gt;&gt;&gt; extractor.run()
+&gt;&gt;&gt; gene_properties_df = extractor.extract_gene_properties('Data/AllDataConnected.csv')
+&gt;&gt;&gt; print(gene_properties_df.head())
+</code></pre>
+<p>This would read gene IDs from 'Data/AllDataConnected.csv', fetch their properties from PubChem,
+and compile the details into a DataFrame, filtering for specified genes of interest and saving
+the results to 'Data/Nodes/Gene_Properties.csv'.</p>
+<h2 id="note">Note</h2>
+<p>The method filters the resulting DataFrame to include only genes with symbols in the predefined
+enzyme_list. Adjust this list as necessary to match the focus of your study or application.</p></div>
+</dd>
+<dt id="chemgraphbuilder.node_properties_extractor.NodePropertiesExtractor.extract_protein_properties"><code class="name flex">
+<span>def <span class="ident">extract_protein_properties</span></span>(<span>self, main_data)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Extracts and compiles protein properties from the NCBI protein database based on accession numbers.</p>
+<p>Given a CSV file specified by <code>main_data</code>, this method reads protein accession numbers and performs web
+scraping on the NCBI protein database pages to extract protein titles. The method constructs a URL for
+each accession number, sends a request to retrieve the page content, and parses the HTML to find the
+protein title. The extracted titles, along with their corresponding accession numbers and URLs, are
+compiled into a DataFrame. This DataFrame is saved to a CSV file, providing a structured summary of
+protein properties for further analysis or use.</p>
+<h2 id="parameters">Parameters</h2>
+<p>main_data (str): Path to a CSV file containing main data was which generated after running
+<code>extractor.run()</code>.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>pd.DataFrame</code></dt>
+<dd>A DataFrame with columns 'RefSeq Accession', 'URL', and 'Description', where
+'Description' contains the title of the protein extracted from its NCBI page.
+This DataFrame is saved to 'Data/Nodes/Protein_Properties.csv' in the current
+working directory.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>Exception</code></dt>
+<dd>If there's an issue reading the initial CSV file or querying the NCBI database,
+details of the exception are logged. The method continues processing the next
+accession number, ensuring robustness against individual failures.</dd>
+</dl>
+<h2 id="example">Example</h2>
+<p>Assuming 'protein_data.csv' contains a column 'Target Accession' with accession numbers:</p>
+<pre><code class="language-python-repl">&gt;&gt;&gt; extractor = NodePropertiesExtractor(['CYP2D6', 'CYP3A4'])
+&gt;&gt;&gt; extractor.create_data_directories()
+&gt;&gt;&gt; extractor.run() # you need to run this only once
+&gt;&gt;&gt; protein_properties_df = extractor.extract_protein_properties('Data/AllDataConnected.csv')
+&gt;&gt;&gt; print(protein_properties_df.head())
+</code></pre>
+<p>This would read accession numbers from 'Data/AllDataConnected.csv', scrape their titles from the
+NCBI protein database, and compile the results into a DataFrame, which is also saved to
+'Data/Nodes/Protein_Properties.csv'.</p>
+<h2 id="note">Note</h2>
+<p>This method requires internet access to query the NCBI protein database. Ensure the input file
+path is correct and accessible to avoid errors during processing. Web scraping is dependent on
+the structure of the web page; changes to the NCBI protein database pages may require updates
+to the scraping logic.</p></div>
+</dd>
+<dt id="chemgraphbuilder.node_properties_extractor.NodePropertiesExtractor.fetch_data"><code class="name flex">
+<span>def <span class="ident">fetch_data</span></span>(<span>self, cid)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Retrieves detailed chemical compound properties for a specified Compound ID (CID) from the PubChem database.</p>
+<p>This method constructs a query URL to fetch a wide range of properties for the given CID from PubChem, including
+molecular formula, molecular weight, canonical and isomeric SMILES, InChI codes, physicochemical properties, and
+more. If the CID is valid and data is available, it returns a pandas DataFrame containing these properties. This
+method also generates a URL to retrieve the structure image of the compound as a 2D PNG image, adding it as a
+column in the DataFrame. In cases where the CID is NaN or an error occurs during data retrieval, an empty DataFrame
+is returned.</p>
+<h2 id="parameters">Parameters</h2>
+<p>cid (int or float): The Compound ID for which to fetch data. Can be an integer or NaN.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>pd.DataFrame</code></dt>
+<dd>A DataFrame containing the fetched properties for the given CID. The DataFrame includes
+columns for each property fetched from PubChem, along with a 'StructureImage2DURL' column
+containing the URL to the compound's structure image. Returns an empty DataFrame if the CID
+is NaN or if any error occurs during the fetch operation.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>Exception</code></dt>
+<dd>Logs an error message if the request to PubChem fails or if the response cannot be processed
+into a DataFrame.</dd>
+</dl>
+<h2 id="example">Example</h2>
+<pre><code class="language-python-repl">&gt;&gt;&gt; extractor = NodePropertiesExtractor(['CYP2D6', 'CYP3A4'])
+&gt;&gt;&gt; extractor.create_data_directories()
+&gt;&gt;&gt; compound_data_df = extractor.fetch_data(2244)
+&gt;&gt;&gt; print(compound_data_df.head())
+</code></pre>
+<p>This example fetches the properties for the compound with CID 2244 from PubChem and prints the first few rows
+of the resulting DataFrame.</p>
+<h2 id="note">Note</h2>
+<p>This method requires an active internet connection to access the PubChem database. Ensure that the CID provided
+is valid and not NaN to avoid fetching errors. The structure and availability of data fields are subject to the
+current state of the PubChem database and may vary.</p></div>
+</dd>
+<dt id="chemgraphbuilder.node_properties_extractor.NodePropertiesExtractor.get_enzyme_assays"><code class="name flex">
+<span>def <span class="ident">get_enzyme_assays</span></span>(<span>self, enzyme)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Fetches assay data for a specified enzyme from the PubChem database and returns it as a pandas DataFrame.</p>
+<p>This method constructs a URL to query the PubChem database for concise assay data related to the given enzyme.
+It processes the CSV response into a DataFrame, which includes various assay data points provided by PubChem.</p>
+<h2 id="parameters">Parameters</h2>
+<p>enzyme (str): The name of the enzyme for which assay data is requested. This name is used in the API query.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>pd.DataFrame</code></dt>
+<dd>A DataFrame containing the assay data fetched from PubChem for the specified enzyme. The DataFrame
+includes columns based on the CSV response from PubChem, such as assay ID, results, and conditions.
+Returns None if no data is available or if an error occurs during data fetching or processing.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>requests.RequestException</code></dt>
+<dd>If an error occurs during the HTTP request to the PubChem API.</dd>
+<dt><code>pd.errors.EmptyDataError</code></dt>
+<dd>If the response from PubChem contains no data.</dd>
+</dl>
+<h2 id="example">Example</h2>
+<pre><code class="language-python-repl">&gt;&gt;&gt; extractor = NodePropertiesExtractor(['enzyme'])
+&gt;&gt;&gt; extractor.create_data_directories()
+&gt;&gt;&gt; enzyme_assays_df = extractor.get_enzyme_assays('enzyme')
+&gt;&gt;&gt; print(enzyme_assays_df.head())
+</code></pre></div>
+</dd>
+<dt id="chemgraphbuilder.node_properties_extractor.NodePropertiesExtractor.run"><code class="name flex">
+<span>def <span class="ident">run</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Orchestrates the process of fetching, filtering, and aggregating assay data from PubChem for a predefined list of enzymes.</p>
+<p>This method iteratively queries PubChem for assay data corresponding to each enzyme specified in the <code>enzyme_list</code> attribute during class initialization. It performs the following steps for each enzyme:
+1. Constructs a query URL and fetches assay data from PubChem.
+2. Filters the fetched data based on predefined criteria (e.g., containing specific substrings in the assay name).
+3. Aggregates the filtered data into a single pandas DataFrame.
+4. Identifies enzymes for which data could not be fetched or were excluded based on filtering criteria, logging their names.</p>
+<p>The final aggregated DataFrame, containing assay data for all successfully processed enzymes, is then saved to a CSV file. This method facilitates the extraction and preprocessing of chemical assay data for further analysis or integration into knowledge graphs.</p>
+<h2 id="note">Note</h2>
+<ul>
+<li>This method relies on the successful response from PubChem for each enzyme query.</li>
+<li>Enzymes with no available data or failing to meet the filtering criteria are excluded from the final DataFrame.</li>
+<li>The output CSV file is saved in the current working directory with the name 'Data/AllDataConnected.csv'.</li>
+</ul>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>pd.DataFrame</code></dt>
+<dd>A DataFrame containing the aggregated and filtered assay data for the specified enzymes.
+Columns in the DataFrame correspond to the assay data fields returned by PubChem, subject to
+the filtering criteria applied within this method.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>requests.RequestException</code></dt>
+<dd>If there is an issue with fetching data from PubChem, such as a network problem or
+an invalid response.</dd>
+</dl>
+<h2 id="example">Example</h2>
+<p>Assuming <code>enzyme_list</code> was set to ['CYP2D6', 'CYP3A4'] during class initialization:</p>
+<pre><code class="language-python-repl">&gt;&gt;&gt; extractor = NodePropertiesExtractor(['CYP2D6', 'CYP3A4'])
+&gt;&gt;&gt; extractor.create_data_directories()
+&gt;&gt;&gt; result_df = extractor.run()
+&gt;&gt;&gt; print(result_df.head())
+</code></pre>
+<p>This will fetch and process assay data for 'CYP2D6' and 'CYP3A4', returning a DataFrame with the processed data.</p></div>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="chemgraphbuilder" href="index.html">chemgraphbuilder</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="chemgraphbuilder.node_properties_extractor.NodePropertiesExtractor" href="#chemgraphbuilder.node_properties_extractor.NodePropertiesExtractor">NodePropertiesExtractor</a></code></h4>
+<ul class="">
+<li><code><a title="chemgraphbuilder.node_properties_extractor.NodePropertiesExtractor.extract_assay_properties" href="#chemgraphbuilder.node_properties_extractor.NodePropertiesExtractor.extract_assay_properties">extract_assay_properties</a></code></li>
+<li><code><a title="chemgraphbuilder.node_properties_extractor.NodePropertiesExtractor.extract_compound_properties" href="#chemgraphbuilder.node_properties_extractor.NodePropertiesExtractor.extract_compound_properties">extract_compound_properties</a></code></li>
+<li><code><a title="chemgraphbuilder.node_properties_extractor.NodePropertiesExtractor.extract_gene_properties" href="#chemgraphbuilder.node_properties_extractor.NodePropertiesExtractor.extract_gene_properties">extract_gene_properties</a></code></li>
+<li><code><a title="chemgraphbuilder.node_properties_extractor.NodePropertiesExtractor.extract_protein_properties" href="#chemgraphbuilder.node_properties_extractor.NodePropertiesExtractor.extract_protein_properties">extract_protein_properties</a></code></li>
+<li><code><a title="chemgraphbuilder.node_properties_extractor.NodePropertiesExtractor.fetch_data" href="#chemgraphbuilder.node_properties_extractor.NodePropertiesExtractor.fetch_data">fetch_data</a></code></li>
+<li><code><a title="chemgraphbuilder.node_properties_extractor.NodePropertiesExtractor.get_enzyme_assays" href="#chemgraphbuilder.node_properties_extractor.NodePropertiesExtractor.get_enzyme_assays">get_enzyme_assays</a></code></li>
+<li><code><a title="chemgraphbuilder.node_properties_extractor.NodePropertiesExtractor.run" href="#chemgraphbuilder.node_properties_extractor.NodePropertiesExtractor.run">run</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.1</a>.</p>
+</footer>
+</body>
+</html>

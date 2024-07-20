@@ -1,0 +1,450 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.1">
+<title>chemgraphbuilder.relationship_data_processor API documentation</title>
+<meta name="description" content="">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+})</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>chemgraphbuilder.relationship_data_processor</code></h1>
+</header>
+<section id="section-intro">
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="chemgraphbuilder.relationship_data_processor.RelationshipDataProcessor"><code class="flex name class">
+<span>class <span class="ident">RelationshipDataProcessor</span></span>
+<span>(</span><span>path)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>A class to process relationship data from multiple CSV files, clean the data,
+merge it into a single CSV file, and perform additional data processing.</p>
+<p>Attributes:
+path (str): The path to the directory containing the CSV files.
+output_files (dict): A dictionary to store unique headers and corresponding output file paths.
+csv_files (list): A list of all CSV files to be processed.
+processed_csv_files (list): A list of processed CSV files.</p>
+<p>Initialize the RelationshipDataProcessor with the specified path.</p>
+<p>Parameters:
+path (str): The path to the directory containing the CSV files.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class RelationshipDataProcessor:
+    &#34;&#34;&#34;
+    A class to process relationship data from multiple CSV files, clean the data,
+    merge it into a single CSV file, and perform additional data processing.
+
+    Attributes:
+    path (str): The path to the directory containing the CSV files.
+    output_files (dict): A dictionary to store unique headers and corresponding output file paths.
+    csv_files (list): A list of all CSV files to be processed.
+    processed_csv_files (list): A list of processed CSV files.
+    &#34;&#34;&#34;
+
+    def __init__(self, path):
+        &#34;&#34;&#34;
+        Initialize the RelationshipDataProcessor with the specified path.
+
+        Parameters:
+        path (str): The path to the directory containing the CSV files.
+        &#34;&#34;&#34;
+        self.path = path
+        self.output_files = {}
+        self.csv_files = glob.glob(os.path.join(path, &#34;AID_*.csv&#34;))
+        self.processed_csv_files = glob.glob(os.path.join(path, &#34;Assay_Compound_Relationship*.csv&#34;))
+
+    def process_files(self):
+        &#34;&#34;&#34;
+        Process all CSV files by reading, cleaning, merging, and formatting the data.
+        &#34;&#34;&#34;
+        self._process_individual_files()
+        print(&#34;Step 1: Individual files processed and cleaned.&#34;)
+
+        self._filter_and_combine_data()
+        print(&#34;Step 2: Data filtered and combined successfully.&#34;)
+
+        self._clean_and_save_final_data()
+        print(&#34;Step 3: Final data processing and merging completed.&#34;)
+
+    def _process_individual_files(self):
+        &#34;&#34;&#34;
+        Process all individual CSV files: read, clean, and save them based on their headers.
+        &#34;&#34;&#34;
+        for file in self.csv_files:
+            with open(file, &#39;r&#39;, encoding=&#39;utf-8&#39;) as f:
+                header = next(f).strip()
+                num_columns = len(header.split(&#39;,&#39;))
+
+                if header not in self.output_files:
+                    output_filename = f&#34;{self.path}/Assay_Compound_Relationship{len(self.output_files)}_cols-{num_columns}.csv&#34;
+                    self.output_files[header] = output_filename
+                    with open(output_filename, &#39;w&#39;, encoding=&#39;utf-8&#39;) as f_out:
+                        f_out.write(header + &#39;\n&#39;)
+
+            df = pd.read_csv(file)
+            df = df[header.split(&#39;,&#39;)]
+            df.dropna(subset=[&#39;CID&#39;], inplace=True)
+            df.dropna(axis=1, how=&#39;all&#39;, inplace=True)
+            df.to_csv(self.output_files[header], mode=&#39;a&#39;, index=False, header=False)
+
+    def _filter_and_combine_data(self):
+        &#34;&#34;&#34;
+        Filter and format the merged data by selecting specific columns and saving it to a final output file.
+        &#34;&#34;&#34;
+
+        output_file = os.path.join(self.path, &#39;Assay_Compound_DataSet.csv&#39;)
+
+        unique_column_names = self._get_filtered_columns()
+
+        # Create and write the header of the output file if not exists
+        file_exists = os.path.isfile(output_file)
+        if file_exists:
+            os.remove(output_file)
+        pd.DataFrame(columns=unique_column_names).to_csv(output_file, index=False)
+
+        # Read each file, adjust columns, and append to the CSV
+        for file in self.processed_csv_files:
+            try:
+                # Load just the column names first
+                df_headers = pd.read_csv(file, nrows=0)
+                df_headers.columns = [col.lower() for col in df_headers.columns]
+
+                # Check and handle duplicate column names
+                if df_headers.columns.duplicated().any():
+                    df_headers = df_headers.loc[:, ~df_headers.columns.duplicated()]
+                    print(f&#34;Duplicated columns removed from {file}&#34;)
+
+                # Load the data in chunks using the cleaned column names
+                for df in pd.read_csv(file, chunksize=10000, names=df_headers.columns, header=0):
+                    # Reindex to the union of columns, filling missing ones with NaNs
+                    df = df.reindex(columns=unique_column_names)
+                    # Append to the output file
+                    df.to_csv(output_file, mode=&#39;a&#39;, header=False, index=False)
+
+                print(f&#34;Successfully processed and appended data from {file}&#34;)
+            except Exception as e:
+                print(f&#34;Error processing file {file}: {e}&#34;)
+
+        print(f&#34;Data appended successfully to {output_file}&#34;)
+
+    def _get_filtered_columns(self):
+        &#34;&#34;&#34;
+        Determine the columns to be included in the final output file based on specific keywords.
+
+        Returns:
+        list: A list of filtered columns.
+        &#34;&#34;&#34;
+        all_columns = set()
+        for file in self.processed_csv_files:
+            df = pd.read_csv(file, nrows=0)
+            df.columns = [col.lower() for col in df.columns]
+            all_columns.update(df.columns)
+
+        keywords = [&#39;id&#39;, &#39;outcome&#39;, &#39;phenotype&#39;, &#39;activity_url&#39;]
+        filtered_columns = sorted([col for col in all_columns if any(keyword in col for keyword in keywords)])
+        print(f&#34;Filtered columns: {filtered_columns}&#34;)
+        return filtered_columns
+
+    def _get_filtered_columns(self):
+        &#34;&#34;&#34;
+        Determine the columns to be included in the final output file based on specific keywords.
+
+        Returns:
+        list: A list of filtered columns.
+        &#34;&#34;&#34;
+        all_columns = set()
+        for file in self.processed_csv_files:
+            df = pd.read_csv(file, nrows=0)
+            df.columns = [col.lower() for col in df.columns]
+            all_columns.update(df.columns)
+
+        keywords = [&#39;id&#39;, &#39;outcome&#39;, &#39;phenotype&#39;, &#39;activity_url&#39;,&#39;activity direction&#39;]
+        filtered_columns = sorted([col for col in all_columns if any(keyword in col for keyword in keywords)])
+        print(f&#34;Filtered columns: {filtered_columns}&#34;)
+        return filtered_columns
+
+    def _clean_and_save_final_data(self):
+        &#34;&#34;&#34;
+        Clean and save the processed dataset.
+        &#34;&#34;&#34;
+        final_file_path = os.path.join(self.path, &#39;Assay_Compound_DataSet.csv&#39;)
+        if os.path.exists(final_file_path):
+            dataset = pd.read_csv(final_file_path)
+            # print(dataset.columns)
+            dataset.dropna(subset=[&#39;aid&#39;, &#39;cid&#39;], how=&#39;any&#39;, axis=0, inplace=True)
+
+            phenotype_cols = [col for col in dataset.columns if col.startswith(&#39;phenotype&#39;)]
+            dataset[&#39;measured_activity&#39;] = dataset[phenotype_cols].apply(self.most_frequent, axis=1)
+            dataset = dataset.drop(columns=phenotype_cols)
+            dataset.rename(columns={
+                &#39;activity_outcome&#39;: &#39;Activity Outcome&#39;,
+                &#39;activity_url&#39;: &#39;Activity URL&#39;,
+                &#39;measured_activity&#39;: &#39;Phenotype&#39;,
+                &#39;activity direction&#39;: &#39;Activity Direction&#39;,
+                &#39;aid&#39;: &#39;AID&#39;,
+                &#39;cid&#39;: &#39;CID&#39;
+            }, inplace=True)
+
+            AllDataConnected = pd.read_csv(&#39;Data/AllDataConnected.csv&#39;)
+
+            # Process the dataset
+            merged_df = dataset.merge(AllDataConnected, on=[&#39;AID&#39;, &#39;CID&#39;, &#39;Activity Outcome&#39;], how=&#39;left&#39;)
+            merged_df.drop([&#39;PubMed ID&#39;, &#39;RNAi&#39;], axis=1, inplace=True)
+            merged_df.dropna(axis=1, how=&#39;all&#39;, inplace=True)
+            merged_df = merged_df.groupby([&#39;Activity Outcome&#39;, &#39;Assay Name&#39;]).apply(self.propagate_phenotype).reset_index(drop=True)
+            merged_df = merged_df[merged_df[&#39;Target GeneID&#39;].isin([1576, 1565, 1559, 1557, 1544])]
+            merged_df[&#39;AID&#39;] = merged_df[&#39;AID&#39;].astype(int)
+            merged_df[&#39;CID&#39;] = merged_df[&#39;CID&#39;].astype(int)
+            merged_df[&#39;Target GeneID&#39;] = merged_df[&#39;Target GeneID&#39;].astype(int)
+            merged_df[&#39;Activity URL&#39;] = merged_df.apply(lambda row: f&#34;https://pubchem.ncbi.nlm.nih.gov/bioassay/{row[&#39;AID&#39;]}#sid={row[&#39;SID&#39;]}&#34;, axis=1)
+            # Additional processing for determining labels and activity
+            merged_df = self._determine_labels_and_activity(merged_df)
+            Assay_Cpd = merged_df[[&#39;AID&#39;, &#39;CID&#39;, &#39;Activity Outcome&#39;, &#39;Activity URL&#39;,
+                                   &#39;Activity Direction&#39;, &#39;Phenotype&#39;,
+                                   &#39;Activity Value [uM]&#39;, &#39;Activity Name&#39;]]
+            Assay_Cpd.to_csv(&#39;Data/Relationships/Assay_Compound_Relationship.csv&#39;, index=False)
+
+            Cpd_Enzyme = merged_df[[&#39;CID&#39;, &#39;Target GeneID&#39;, &#39;Activity&#39;, &#39;AID&#39;]]
+            Cpd_Enzyme.to_csv(&#39;Data/Relationships/Compound_Gene_Relationship.csv&#39;, index=False)
+        else:
+            print(f&#34;File {final_file_path} does not exist. No data to process.&#34;)
+
+    @staticmethod
+    def most_frequent(row):
+        &#34;&#34;&#34;
+        Find the most frequent string value in a row, excluding NaNs and non-string types.
+
+        Parameters:
+        row (Series): The row of data.
+
+        Returns:
+        str or None: The most frequent string value, or None if no strings are found.
+        &#34;&#34;&#34;
+        values = row.dropna()
+        string_values = values[values.apply(lambda x: isinstance(x, str))]
+        return string_values.mode()[0] if not string_values.empty else None
+
+    @staticmethod
+    def propagate_phenotype(group):
+        &#34;&#34;&#34;
+        Propagate non-null values within each group for the &#39;Phenotype&#39; column.
+
+        Parameters:
+        group (DataFrame): The group of data.
+
+        Returns:
+        DataFrame: The group with propagated &#39;Phenotype&#39; values.
+        &#34;&#34;&#34;
+        phenotype_value = group[&#39;Phenotype&#39;].dropna().unique()
+        if len(phenotype_value) &gt; 0:
+            group[&#39;Phenotype&#39;] = phenotype_value[0]
+        return group
+
+    def _determine_labels_and_activity(self, merged_df):
+        &#34;&#34;&#34;
+        Determine the labels and activity based on keywords in the assay names.
+        &#34;&#34;&#34;
+
+        # Define the mapping values
+        inhibitor_keywords = [
+            &#39;inhibition&#39;, &#39;reversible inhibition&#39;, &#39;time dependent inhibition&#39;,
+            &#39;inhibitory activity&#39;, &#39;time-dependent inhibition&#39;, &#39;time dependent irreversible inhibition&#39;,
+            &#39;inhibitory concentration&#39;, &#39;inhibitory effect&#39;, &#39;inhibitory potency&#39;,
+            &#39;concentration required to inhibit&#39;, &#39;competitive inhibition&#39;, &#39;cyp inhibition&#39;,
+            &#39;irreversible inhibition&#39;, &#39;mechanism based inhibition&#39;, &#39;mixed inhibition&#39;,
+            &#39;mixed type inhibition&#39;, &#39;inhibitory constant&#39;, &#39;antagonistic activity&#39;, &#39;selectivity&#39;,
+            &#39;s1p4 agonists&#39;, &#39;small molecule antagonists&#39;, &#39;displacement&#39;, &#39;mediated midazolam 1-hydroxylation&#39;,
+            &#39;time/nadph-dependent inhibition&#39;, &#39;reversal inhibition&#39;, &#39;mechanism-based inhibition&#39;,
+            &#39;mechanism based time dependent inhibition&#39;, &#39;reversible competitive inhibition&#39;,
+            &#39;predictive competitive inhibition&#39;,&#39;noncompetitive inhibition&#39;, &#39;in vitro inhibitory&#39;,
+            &#39;in vitro inhibition&#39;, &#39;inhibition of&#39;, &#39;direct inhibition&#39;,&#39;enzyme inhibition&#39;, &#39;dndi&#39;,
+            &#39;inhibition assay&#39;
+        ]
+
+        ligand_keywords = [
+            &#39;binding affinity&#39;, &#39;spectral binding&#39;, &#39;interaction with&#39;, &#39;bind&#39;,
+            &#39;covalent binding affinity&#39;, &#39;apparent binding affinity&#39;
+        ]
+
+        inhibitor_substrate_keywords = [
+            &#39;inhibitors and substrates&#39;
+        ]
+
+        inhibitor_activator_modulator_keywords = [
+            &#39;apoprotein formation&#39;, &#39;panel assay&#39;, &#39;eurofins-panlabs enzyme assay&#39;
+        ]
+
+        substrate_keywords = [
+            &#39;drug metabolism&#39;, &#39;prodrug&#39;, &#39;metabolic&#39;, &#39;oxidation&#39;, &#39;substrate activity&#39;,
+            &#39;michaelis-menten&#39;, &#39;metabolic stability&#39;, &#39;bioactivation&#39;, &#39;drug level&#39;,
+            &#39;enzyme-mediated drug depletion&#39;, &#39;enzyme-mediated compound formation&#39;,
+            &#39;phenotyping&#39;, &#39;activity of human recombinant cyp&#39;, &#39;activity of recombinant cyp&#39;,
+            &#39;activity at cyp&#39;, &#39;enzyme-mediated drug metabolism&#39;
+        ]
+
+        inactivator_keywords = [
+            &#39;inactivator&#39;, &#39;inactivation of&#39;, &#39;mechanism based inactivation of&#39;, &#39;inactivators&#39;,
+            &#39;metabolism dependent inactivation&#39;
+        ]
+
+        activator_keywords = [
+            &#39;assay for activators&#39;, &#39;activation of&#39;, &#39;activators of&#39;
+        ]
+
+        inducer_keywords = [
+            &#39;induction of&#39;, &#39;inducer&#39;, &#39;inducers&#39;, &#39;time-dependant induction&#39;
+        ]
+
+        # Combine all keywords into a single list for easy checking
+        all_keywords = (inhibitor_keywords + ligand_keywords + inhibitor_substrate_keywords +
+                        inhibitor_activator_modulator_keywords + substrate_keywords +
+                        inactivator_keywords + activator_keywords + inducer_keywords)
+
+        # Define a dictionary to map each keyword to its corresponding label
+        keyword_to_label = {
+            **{keyword: &#39;Inhibitor&#39; for keyword in inhibitor_keywords},
+            **{keyword: &#39;Inhibitor/Substrate&#39; for keyword in inhibitor_substrate_keywords},
+            **{keyword: &#39;Inhibitor/Inducer/Modulator&#39; for keyword in inhibitor_activator_modulator_keywords},
+            **{keyword: &#39;Substrate&#39; for keyword in substrate_keywords},
+            **{keyword: &#39;Inactivator&#39; for keyword in inactivator_keywords},
+            **{keyword: &#39;Activator&#39; for keyword in activator_keywords},
+            **{keyword: &#39;Inducer&#39; for keyword in inducer_keywords},
+            **{keyword: &#39;Ligand&#39; for keyword in ligand_keywords},
+        }
+
+        # Function to determine the appropriate label based on the first keyword appearance in the assay name
+        def determine_active_label(assay_name):
+            assay_name_lower = assay_name.lower()
+            first_keyword = None
+            first_position = len(assay_name_lower)  # Start with the maximum length of the assay name
+
+            for keyword in all_keywords:
+                position = assay_name_lower.find(keyword)
+                if 0 &lt;= position &lt; first_position:  # Check if keyword is found and is the earliest one so far
+                    first_keyword = keyword
+                    first_position = position
+
+            if first_keyword:
+                return keyword_to_label[first_keyword]
+            return &#39;Inhibitor/Inducer/Modulator&#39;
+
+        # Set default activity to None
+        merged_df[&#39;Activity&#39;] = None
+
+        # Handle Inactive outcomes
+        inactive_mask = merged_df[&#39;Activity Outcome&#39;] == &#39;Inactive&#39;
+        merged_df.loc[inactive_mask, &#39;Activity&#39;] = &#39;Inactive&#39;
+
+        # Handle Active outcomes
+        active_mask = merged_df[&#39;Activity Outcome&#39;] == &#39;Active&#39;
+        if active_mask.any():
+            merged_df.loc[active_mask, &#39;Activity&#39;] = merged_df.loc[active_mask, &#39;Assay Name&#39;].apply(determine_active_label)
+            merged_df.loc[active_mask &amp; merged_df[&#39;Activity Name&#39;].isin([&#39;Km&#39;, &#39;Drug metabolism&#39;]), &#39;Activity&#39;] = &#39;Substrate&#39;
+
+            # Apply the changes to the &#39;Activity&#39; column based on the combined conditions
+            substrate_pattern = r&#39;(activity of.*oxidation)|(activity at cyp.*phenotyping)|(activity at human recombinant cyp.*formation)|(activity at recombinant cyp.*formation)&#39;
+            merged_df.loc[active_mask &amp; merged_df[&#39;Assay Name&#39;].str.contains(substrate_pattern, case=False, regex=True), &#39;Activity&#39;] = &#39;Substrate&#39;
+
+            ActIndMod_pattern = r&#39;(effect on cyp)|(effect on human recombinant cyp)|(effect on recombinant cyp)|(effect on human cyp)&#39;
+            merged_df.loc[active_mask &amp; merged_df[&#39;Assay Name&#39;].str.contains(ActIndMod_pattern, case=False, regex=True), &#39;Activity&#39;] = &#39;Inhibitor/Inducer/Modulator&#39;
+
+            inducer_pattern = r&#39;(effect on cyp.*induction)|(induction of.*)&#39;
+            merged_df.loc[active_mask &amp; merged_df[&#39;Assay Name&#39;].str.contains(inducer_pattern, case=False, regex=True), &#39;Activity&#39;] = &#39;Inducer&#39;
+
+            merged_df.loc[active_mask &amp; merged_df[&#39;Activity Direction&#39;].str.contains(&#39;decreasing&#39;, case=False), &#39;Activity&#39;] = &#39;Inhibitor&#39;
+            merged_df.loc[active_mask &amp; merged_df[&#39;Activity Direction&#39;].str.contains(&#39;increasing&#39;, case=False), &#39;Activity&#39;] = &#39;Activator&#39;
+            merged_df.loc[active_mask &amp; (merged_df[&#39;AID&#39;] == 1215398), &#39;Activity&#39;] = &#39;Inactivator&#39;
+
+        return merged_df</code></pre>
+</details>
+<h3>Static methods</h3>
+<dl>
+<dt id="chemgraphbuilder.relationship_data_processor.RelationshipDataProcessor.most_frequent"><code class="name flex">
+<span>def <span class="ident">most_frequent</span></span>(<span>row)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Find the most frequent string value in a row, excluding NaNs and non-string types.</p>
+<p>Parameters:
+row (Series): The row of data.</p>
+<p>Returns:
+str or None: The most frequent string value, or None if no strings are found.</p></div>
+</dd>
+<dt id="chemgraphbuilder.relationship_data_processor.RelationshipDataProcessor.propagate_phenotype"><code class="name flex">
+<span>def <span class="ident">propagate_phenotype</span></span>(<span>group)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Propagate non-null values within each group for the 'Phenotype' column.</p>
+<p>Parameters:
+group (DataFrame): The group of data.</p>
+<p>Returns:
+DataFrame: The group with propagated 'Phenotype' values.</p></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="chemgraphbuilder.relationship_data_processor.RelationshipDataProcessor.process_files"><code class="name flex">
+<span>def <span class="ident">process_files</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Process all CSV files by reading, cleaning, merging, and formatting the data.</p></div>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="chemgraphbuilder" href="index.html">chemgraphbuilder</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="chemgraphbuilder.relationship_data_processor.RelationshipDataProcessor" href="#chemgraphbuilder.relationship_data_processor.RelationshipDataProcessor">RelationshipDataProcessor</a></code></h4>
+<ul class="">
+<li><code><a title="chemgraphbuilder.relationship_data_processor.RelationshipDataProcessor.most_frequent" href="#chemgraphbuilder.relationship_data_processor.RelationshipDataProcessor.most_frequent">most_frequent</a></code></li>
+<li><code><a title="chemgraphbuilder.relationship_data_processor.RelationshipDataProcessor.process_files" href="#chemgraphbuilder.relationship_data_processor.RelationshipDataProcessor.process_files">process_files</a></code></li>
+<li><code><a title="chemgraphbuilder.relationship_data_processor.RelationshipDataProcessor.propagate_phenotype" href="#chemgraphbuilder.relationship_data_processor.RelationshipDataProcessor.propagate_phenotype">propagate_phenotype</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.1</a>.</p>
+</footer>
+</body>
+</html>

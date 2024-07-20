@@ -1,0 +1,465 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.1">
+<title>chemgraphbuilder.add_graph_nodes API documentation</title>
+<meta name="description" content="Module for adding node data from CSV files to a Neo4j database …">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+})</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>chemgraphbuilder.add_graph_nodes</code></h1>
+</header>
+<section id="section-intro">
+<p>Module for adding node data from CSV files to a Neo4j database.</p>
+<p>This module provides a class and methods to read node data from CSV files
+and add them to a Neo4j database, including creating uniqueness constraints
+and generating Cypher queries.</p>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="chemgraphbuilder.add_graph_nodes.AddGraphNodes"><code class="flex name class">
+<span>class <span class="ident">AddGraphNodes</span></span>
+<span>(</span><span>driver)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>A class used to add node data from a CSV file or a directory of CSV files to a Neo4j database.</p>
+<h2 id="methods">Methods:</h2>
+<p>create_uniqueness_constraint(driver, label, unique_property):
+Create a uniqueness constraint for the unique property of nodes in Neo4j.
+generate_cypher_queries(node_dict, label, unique_property):
+Generate Cypher queries to update nodes in Neo4j based on the data from the CSV file.
+execute_queries(queries):
+Execute a list of provided Cypher queries against the Neo4j database.
+read_csv_file(file_path, unique_property):
+Read data from a CSV file and extract node properties.
+combine_csv_files(input_directory):
+Combine multiple CSV files with the same columns into a single DataFrame.
+process_and_add_nodes(file_path, label, unique_property):
+Process the CSV file and add node data to the Neo4j database.
+process_and_add_nodes_from_directory(directory_path, label, unique_property):
+Combine CSV files from a directory and add node data to the Neo4j database.</p>
+<p>Initializes the AddGraphNodes class with a Neo4j driver.</p>
+<h2 id="parameters">Parameters:</h2>
+<p>driver : neo4j.GraphDatabase.driver
+A driver instance to connect to the Neo4j database.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class AddGraphNodes(Neo4jBase):
+    &#34;&#34;&#34;
+    A class used to add node data from a CSV file or a directory of CSV files to a Neo4j database.
+
+    Methods:
+    --------
+    create_uniqueness_constraint(driver, label, unique_property):
+        Create a uniqueness constraint for the unique property of nodes in Neo4j.
+    generate_cypher_queries(node_dict, label, unique_property):
+        Generate Cypher queries to update nodes in Neo4j based on the data from the CSV file.
+    execute_queries(queries):
+        Execute a list of provided Cypher queries against the Neo4j database.
+    read_csv_file(file_path, unique_property):
+        Read data from a CSV file and extract node properties.
+    combine_csv_files(input_directory):
+        Combine multiple CSV files with the same columns into a single DataFrame.
+    process_and_add_nodes(file_path, label, unique_property):
+        Process the CSV file and add node data to the Neo4j database.
+    process_and_add_nodes_from_directory(directory_path, label, unique_property):
+        Combine CSV files from a directory and add node data to the Neo4j database.
+    &#34;&#34;&#34;
+
+    def __init__(self, driver):
+        &#34;&#34;&#34;
+        Initializes the AddGraphNodes class with a Neo4j driver.
+
+        Parameters:
+        -----------
+        driver : neo4j.GraphDatabase.driver
+            A driver instance to connect to the Neo4j database.
+        &#34;&#34;&#34;
+        super().__init__()
+        self.driver = driver
+        self.logger.info(&#34;AddGraphNodes class initialized.&#34;)
+
+    @staticmethod
+    def create_uniqueness_constraint(driver, label, unique_property):
+        &#34;&#34;&#34;
+        Create a uniqueness constraint for the unique property of nodes in Neo4j.
+
+        Parameters:
+        -----------
+        driver : neo4j.GraphDatabase.driver
+            A driver instance to connect to the Neo4j database.
+        label : str
+            The label of the node.
+        unique_property : str
+            The unique property of the node.
+        &#34;&#34;&#34;
+        constraint_query = (
+            f&#34;CREATE CONSTRAINT IF NOT EXISTS FOR (n:{label}) &#34;
+            f&#34;REQUIRE n.{unique_property} IS UNIQUE&#34;
+        )
+        with driver.session() as session:
+            try:
+                session.run(constraint_query)
+                logging.info(
+                    &#34;Uniqueness constraint created successfully on %s property of %s nodes.&#34;,
+                    unique_property, label)
+            except Exception as e:
+                logging.error(&#34;Failed to create uniqueness constraint: %s&#34;, e)
+
+    @staticmethod
+    def _generate_property_string(value):
+        if isinstance(value, (int, float)):
+            return value
+        try:
+            return float(value)
+        except (TypeError, ValueError):
+            escaped_value = &#34;&#39;&#34; + str(value).replace(&#34;&#39;&#34;, &#34;\\&#39;&#34;).replace(&#34;\n&#34;, &#34;\\n&#34;) + &#34;&#39;&#34;
+            return escaped_value
+
+    def generate_cypher_queries(self, node_dict, label, unique_property):
+        &#34;&#34;&#34;
+        Generate Cypher queries for updating Neo4j based on the provided node data dictionary.
+
+        Parameters:
+        -----------
+        node_dict : dict
+            A dictionary with unique identifiers as keys and node data as values.
+        label : str
+            The label of the node.
+        unique_property : str
+            The unique property of the node.
+
+        Yields:
+        -------
+        str
+            A Cypher query string.
+        &#34;&#34;&#34;
+        # Create an index for the unique_property
+        create_index_query = f&#34;CREATE INDEX IF NOT EXISTS FOR (n:{label}) ON (n.{unique_property})&#34;
+        self.logger.debug(create_index_query)
+        yield create_index_query
+
+        for unique_id, properties in node_dict.items():
+            unique_id = f&#39;&#34;{unique_id}&#34;&#39; if isinstance(unique_id, str) else unique_id
+            query = f&#34;MERGE (n:{label} {{{unique_property}: {unique_id}}})&#34;
+            set_clauses = [
+                f&#34;n.{prop.replace(&#39; &#39;, &#39;&#39;)} = {self._generate_property_string(value)}&#34;
+                for prop, value in properties.items()
+            ]
+            if set_clauses:
+                query += &#34; SET &#34; + &#34;, &#34;.join(set_clauses)
+            else:
+                query += &#34;;&#34;
+            self.logger.debug(query)
+            yield query
+        self.logger.info(&#34;Cypher queries generated successfully.&#34;)
+
+    def execute_queries(self, queries):
+        &#34;&#34;&#34;
+        Execute the provided list of Cypher queries against the Neo4j database.
+
+        Parameters:
+        -----------
+        queries : list
+            A list of Cypher query strings to execute.
+        &#34;&#34;&#34;
+        self.logger.info(&#34;Executing Cypher queries...&#34;)
+        with self.driver.session() as session:
+            self.logger.info(&#34;Executing Cypher queries Started....&#34;)
+            for query in queries:
+                try:
+                    session.run(query)
+                except Exception as e:
+                    self.logger.error(&#34;Failed to execute query: %s&#34;, e)
+        self.logger.info(&#34;All queries executed.&#34;)
+
+    def read_csv_file(self, file_path, unique_property):
+        &#34;&#34;&#34;
+        Read data from a CSV file and extract node properties.
+
+        Parameters:
+        -----------
+        file_path : str
+            The path to the CSV file.
+        unique_property : str
+            The column name that serves as the unique identifier for the nodes.
+
+        Returns:
+        --------
+        dict
+            A dictionary with unique identifiers as keys and extracted data as values.
+        &#34;&#34;&#34;
+        self.logger.info(&#34;Reading data from CSV file: %s&#34;, file_path)
+        df = pd.read_csv(file_path).dropna(subset=[unique_property], how=&#39;any&#39;)
+        node_dict = {
+            row[unique_property]: row.drop(labels=[unique_property]).to_dict()
+            for _, row in df.iterrows()
+        }
+        self.logger.info(&#34;Successfully read data for %d nodes from CSV.&#34;, len(node_dict))
+        return node_dict
+
+    def combine_csv_files(self, input_directory):
+        &#34;&#34;&#34;
+        Combine multiple CSV files with the same columns into a single DataFrame.
+
+        Parameters:
+        -----------
+        input_directory : str
+            The directory containing the CSV files to be combined.
+
+        Returns:
+        --------
+        DataFrame
+            A combined DataFrame containing data from all the CSV files.
+        &#34;&#34;&#34;
+        self.logger.info(&#34;Combining CSV files from directory: %s&#34;, input_directory)
+        dfs = [
+            pd.read_csv(os.path.join(input_directory, file))
+            for file in os.listdir(input_directory)
+            if file.endswith(&#34;.csv&#34;)
+        ]
+        combined_df = pd.concat(dfs, ignore_index=True)
+        self.logger.info(&#34;Successfully combined %d CSV files.&#34;, len(dfs))
+        return combined_df
+
+    def process_and_add_nodes(self, file_path, label, unique_property):
+        &#34;&#34;&#34;
+        Process the CSV file and add node data to the Neo4j database.
+
+        Parameters:
+        -----------
+        file_path : str
+            The path to the CSV file.
+        label : str
+            The label of the node.
+        unique_property : str
+            The unique property of the node.
+        &#34;&#34;&#34;
+        self.logger.info(&#34;Processing and adding nodes from file: %s&#34;, file_path)
+        node_dict = self.read_csv_file(file_path, unique_property)
+        queries = list(self.generate_cypher_queries(node_dict, label, unique_property))
+        self.execute_queries(queries)
+        self.logger.info(&#34;Successfully processed and added nodes from file: %s&#34;, file_path)
+
+    def process_and_add_nodes_from_directory(self, directory_path, label, unique_property):
+        &#34;&#34;&#34;
+        Combine CSV files from a directory and add node data to the Neo4j database.
+
+        Parameters:
+        -----------
+        directory_path : str
+            The path to the directory containing the CSV files.
+        label : str
+            The label of the node.
+        unique_property : str
+            The unique property of the node.
+        &#34;&#34;&#34;
+        self.logger.info(&#34;Processing and adding nodes from directory: %s&#34;, directory_path)
+        combined_df = self.combine_csv_files(directory_path)
+        temp_file = os.path.join(directory_path, &#34;combined_temp.csv&#34;)
+        combined_df.to_csv(temp_file, index=False)
+        self.process_and_add_nodes(temp_file, label, unique_property)
+        os.remove(temp_file)
+        self.logger.info(&#34;Successfully processed and added nodes from directory: %s&#34;,
+                         directory_path)
+
+    def public_generate_property_string(self, value):
+        &#34;&#34;&#34;
+        Public method to access the protected _generate_property_string method for testing.
+
+        Parameters:
+        -----------
+        value : Any
+            The value to be formatted.
+
+        Returns:
+        --------
+        str
+            The formatted property string.
+        &#34;&#34;&#34;
+        return self._generate_property_string(value)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="chemgraphbuilder.neo4jdriver.Neo4jBase" href="neo4jdriver.html#chemgraphbuilder.neo4jdriver.Neo4jBase">Neo4jBase</a></li>
+</ul>
+<h3>Static methods</h3>
+<dl>
+<dt id="chemgraphbuilder.add_graph_nodes.AddGraphNodes.create_uniqueness_constraint"><code class="name flex">
+<span>def <span class="ident">create_uniqueness_constraint</span></span>(<span>driver, label, unique_property)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Create a uniqueness constraint for the unique property of nodes in Neo4j.</p>
+<h2 id="parameters">Parameters:</h2>
+<p>driver : neo4j.GraphDatabase.driver
+A driver instance to connect to the Neo4j database.
+label : str
+The label of the node.
+unique_property : str
+The unique property of the node.</p></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="chemgraphbuilder.add_graph_nodes.AddGraphNodes.combine_csv_files"><code class="name flex">
+<span>def <span class="ident">combine_csv_files</span></span>(<span>self, input_directory)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Combine multiple CSV files with the same columns into a single DataFrame.</p>
+<h2 id="parameters">Parameters:</h2>
+<p>input_directory : str
+The directory containing the CSV files to be combined.</p>
+<h2 id="returns">Returns:</h2>
+<p>DataFrame
+A combined DataFrame containing data from all the CSV files.</p></div>
+</dd>
+<dt id="chemgraphbuilder.add_graph_nodes.AddGraphNodes.execute_queries"><code class="name flex">
+<span>def <span class="ident">execute_queries</span></span>(<span>self, queries)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Execute the provided list of Cypher queries against the Neo4j database.</p>
+<h2 id="parameters">Parameters:</h2>
+<p>queries : list
+A list of Cypher query strings to execute.</p></div>
+</dd>
+<dt id="chemgraphbuilder.add_graph_nodes.AddGraphNodes.generate_cypher_queries"><code class="name flex">
+<span>def <span class="ident">generate_cypher_queries</span></span>(<span>self, node_dict, label, unique_property)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Generate Cypher queries for updating Neo4j based on the provided node data dictionary.</p>
+<h2 id="parameters">Parameters:</h2>
+<p>node_dict : dict
+A dictionary with unique identifiers as keys and node data as values.
+label : str
+The label of the node.
+unique_property : str
+The unique property of the node.</p>
+<h2 id="yields">Yields:</h2>
+<p>str
+A Cypher query string.</p></div>
+</dd>
+<dt id="chemgraphbuilder.add_graph_nodes.AddGraphNodes.process_and_add_nodes"><code class="name flex">
+<span>def <span class="ident">process_and_add_nodes</span></span>(<span>self, file_path, label, unique_property)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Process the CSV file and add node data to the Neo4j database.</p>
+<h2 id="parameters">Parameters:</h2>
+<p>file_path : str
+The path to the CSV file.
+label : str
+The label of the node.
+unique_property : str
+The unique property of the node.</p></div>
+</dd>
+<dt id="chemgraphbuilder.add_graph_nodes.AddGraphNodes.process_and_add_nodes_from_directory"><code class="name flex">
+<span>def <span class="ident">process_and_add_nodes_from_directory</span></span>(<span>self, directory_path, label, unique_property)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Combine CSV files from a directory and add node data to the Neo4j database.</p>
+<h2 id="parameters">Parameters:</h2>
+<p>directory_path : str
+The path to the directory containing the CSV files.
+label : str
+The label of the node.
+unique_property : str
+The unique property of the node.</p></div>
+</dd>
+<dt id="chemgraphbuilder.add_graph_nodes.AddGraphNodes.public_generate_property_string"><code class="name flex">
+<span>def <span class="ident">public_generate_property_string</span></span>(<span>self, value)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Public method to access the protected _generate_property_string method for testing.</p>
+<h2 id="parameters">Parameters:</h2>
+<p>value : Any
+The value to be formatted.</p>
+<h2 id="returns">Returns:</h2>
+<p>str
+The formatted property string.</p></div>
+</dd>
+<dt id="chemgraphbuilder.add_graph_nodes.AddGraphNodes.read_csv_file"><code class="name flex">
+<span>def <span class="ident">read_csv_file</span></span>(<span>self, file_path, unique_property)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Read data from a CSV file and extract node properties.</p>
+<h2 id="parameters">Parameters:</h2>
+<p>file_path : str
+The path to the CSV file.
+unique_property : str
+The column name that serves as the unique identifier for the nodes.</p>
+<h2 id="returns">Returns:</h2>
+<p>dict
+A dictionary with unique identifiers as keys and extracted data as values.</p></div>
+</dd>
+</dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="chemgraphbuilder.neo4jdriver.Neo4jBase" href="neo4jdriver.html#chemgraphbuilder.neo4jdriver.Neo4jBase">Neo4jBase</a></b></code>:
+<ul class="hlist">
+<li><code><a title="chemgraphbuilder.neo4jdriver.Neo4jBase.close" href="neo4jdriver.html#chemgraphbuilder.neo4jdriver.Neo4jBase.close">close</a></code></li>
+<li><code><a title="chemgraphbuilder.neo4jdriver.Neo4jBase.connect_to_neo4j" href="neo4jdriver.html#chemgraphbuilder.neo4jdriver.Neo4jBase.connect_to_neo4j">connect_to_neo4j</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="chemgraphbuilder" href="index.html">chemgraphbuilder</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="chemgraphbuilder.add_graph_nodes.AddGraphNodes" href="#chemgraphbuilder.add_graph_nodes.AddGraphNodes">AddGraphNodes</a></code></h4>
+<ul class="">
+<li><code><a title="chemgraphbuilder.add_graph_nodes.AddGraphNodes.combine_csv_files" href="#chemgraphbuilder.add_graph_nodes.AddGraphNodes.combine_csv_files">combine_csv_files</a></code></li>
+<li><code><a title="chemgraphbuilder.add_graph_nodes.AddGraphNodes.create_uniqueness_constraint" href="#chemgraphbuilder.add_graph_nodes.AddGraphNodes.create_uniqueness_constraint">create_uniqueness_constraint</a></code></li>
+<li><code><a title="chemgraphbuilder.add_graph_nodes.AddGraphNodes.execute_queries" href="#chemgraphbuilder.add_graph_nodes.AddGraphNodes.execute_queries">execute_queries</a></code></li>
+<li><code><a title="chemgraphbuilder.add_graph_nodes.AddGraphNodes.generate_cypher_queries" href="#chemgraphbuilder.add_graph_nodes.AddGraphNodes.generate_cypher_queries">generate_cypher_queries</a></code></li>
+<li><code><a title="chemgraphbuilder.add_graph_nodes.AddGraphNodes.process_and_add_nodes" href="#chemgraphbuilder.add_graph_nodes.AddGraphNodes.process_and_add_nodes">process_and_add_nodes</a></code></li>
+<li><code><a title="chemgraphbuilder.add_graph_nodes.AddGraphNodes.process_and_add_nodes_from_directory" href="#chemgraphbuilder.add_graph_nodes.AddGraphNodes.process_and_add_nodes_from_directory">process_and_add_nodes_from_directory</a></code></li>
+<li><code><a title="chemgraphbuilder.add_graph_nodes.AddGraphNodes.public_generate_property_string" href="#chemgraphbuilder.add_graph_nodes.AddGraphNodes.public_generate_property_string">public_generate_property_string</a></code></li>
+<li><code><a title="chemgraphbuilder.add_graph_nodes.AddGraphNodes.read_csv_file" href="#chemgraphbuilder.add_graph_nodes.AddGraphNodes.read_csv_file">read_csv_file</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.1</a>.</p>
+</footer>
+</body>
+</html>
