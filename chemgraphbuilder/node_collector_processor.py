@@ -35,7 +35,7 @@ from chemgraphbuilder.node_data_processor import NodeDataProcessor
 
 logging.basicConfig(level=logging.INFO)
 
-class NodesCollectorProcessor:
+class NodeCollectorProcessor:
     """
     A class to collect and process data for different types of nodes using NodePropertiesExtractor and NodeDataProcessor.
     """

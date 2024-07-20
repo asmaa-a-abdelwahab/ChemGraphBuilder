@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import glob
 
-class NodeDataPreprocessor:
+class NodeDataProcessor:
     def __init__(self, data_dir: str):
         """
         Initializes the NodeDataPreprocessor with a directory path to manage the data files.
@@ -41,7 +41,7 @@ class NodeDataPreprocessor:
         The processed data is saved for further use in gene-related analyses.
         """
         df = pd.read_csv(f'{self.data_dir}/Nodes/Gene_Properties.csv')
-        df.rename(columns={"Symbol": "GeneSymbol", "Taxonomy": "TaxonomyID",
+        df.rename(columns={"Symbol": "GeneSymbol", "Taxonomy ID": "TaxonomyID",
                            "Synonyms": "GeneSynonyms"}, inplace=True)
         df['GeneID'] = df['GeneID'].astype('Int64')
         df.to_csv(f'{self.data_dir}/Nodes/Gene_Properties_Processed.csv', index=False)
