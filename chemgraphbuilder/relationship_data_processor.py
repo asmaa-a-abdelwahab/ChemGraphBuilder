@@ -30,11 +30,11 @@ class RelationshipDataProcessor:
         """
         Process all CSV files by reading, cleaning, merging, and formatting the data.
         """
-        # self._process_individual_files()
-        # print("Step 1: Individual files processed and cleaned.")
+        self._process_individual_files()
+        print("Step 1: Individual files processed and cleaned.")
 
-        # self._filter_and_combine_data()
-        # print("Step 2: Data filtered and combined successfully.")
+        self._filter_and_combine_data()
+        print("Step 2: Data filtered and combined successfully.")
 
         self._clean_and_save_final_data()
         print("Step 3: Final data processing and merging completed.")
@@ -153,6 +153,7 @@ class RelationshipDataProcessor:
                 'activity_outcome': 'Activity Outcome',
                 'activity_url': 'Activity URL',
                 'measured_activity': 'Phenotype',
+                'activity direction': 'Activity Direction',
                 'aid': 'AID',
                 'cid': 'CID'
             }, inplace=True)
@@ -171,8 +172,13 @@ class RelationshipDataProcessor:
             merged_df['Activity URL'] = merged_df.apply(lambda row: f"https://pubchem.ncbi.nlm.nih.gov/bioassay/{row['AID']}#sid={row['SID']}", axis=1)
             # Additional processing for determining labels and activity
             merged_df = self._determine_labels_and_activity(merged_df)
-            merged_df.to_csv('Data/Relationships/Assay_Compound_Relationship/Assay_Compound_DataSet_Processed.csv', index=False)
+            Assay_Cpd = merged_df[['AID', 'CID', 'Activity Outcome', 'Activity URL',
+                                   'Activity Direction', 'Phenotype',
+                                   'Activity Value [uM]', 'Activity Name']]
+            Assay_Cpd.to_csv('Data/Relationships/Assay_Compound_Relationship.csv', index=False)
 
+            Cpd_Enzyme = merged_df[['CID', 'Target GeneID', 'Activity', 'AID']]
+            Cpd_Enzyme.to_csv('Data/Relationships/Compound_Gene_Relationship.csv', index=False)
         else:
             print(f"File {final_file_path} does not exist. No data to process.")
 
@@ -277,7 +283,6 @@ class RelationshipDataProcessor:
             **{keyword: 'Activator' for keyword in activator_keywords},
             **{keyword: 'Inducer' for keyword in inducer_keywords},
             **{keyword: 'Ligand' for keyword in ligand_keywords},
-            **{keyword: 'Inhibitor/Ligand' for keyword in inhibitor_ligand_keywords}
         }
 
         # Function to determine the appropriate label based on the first keyword appearance in the assay name
@@ -319,8 +324,8 @@ class RelationshipDataProcessor:
             inducer_pattern = r'(effect on cyp.*induction)|(induction of.*)'
             merged_df.loc[active_mask & merged_df['Assay Name'].str.contains(inducer_pattern, case=False, regex=True), 'Activity'] = 'Inducer'
 
-            merged_df.loc[active_mask & merged_df['activity direction'].str.contains('decreasing', case=False), 'Activity'] = 'Inhibitor'
-            merged_df.loc[active_mask & merged_df['activity direction'].str.contains('increasing', case=False), 'Activity'] = 'Activator'
+            merged_df.loc[active_mask & merged_df['Activity Direction'].str.contains('decreasing', case=False), 'Activity'] = 'Inhibitor'
+            merged_df.loc[active_mask & merged_df['Activity Direction'].str.contains('increasing', case=False), 'Activity'] = 'Activator'
             merged_df.loc[active_mask & (merged_df['AID'] == 1215398), 'Activity'] = 'Inactivator'
 
         return merged_df
