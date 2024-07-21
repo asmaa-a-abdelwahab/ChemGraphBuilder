@@ -1,7 +1,6 @@
 """
 GraphRelationshipsLoader class for loading graph relationships into a Neo4j database.
 """
-import os
 import logging
 import argparse
 from neo4j import GraphDatabase

@@ -1,7 +1,8 @@
 """
 Module to load data into a Neo4j graph database for different node types.
 
-This module provides the GraphDataLoader class, which allows loading data for specific node types into a Neo4j database.
+This module provides the GraphDataLoader class, which allows loading data for
+specific node types into a Neo4j database.
 Users can provide the connection details and node label to load the data.
 
 Classes:
@@ -11,6 +12,7 @@ Functions:
     main: Main function to parse command-line arguments and load data for the specified node type.
 """
 
+import logging
 import argparse
 from neo4j import GraphDatabase
 from chemgraphbuilder.add_graph_nodes import AddGraphNodes
@@ -36,6 +38,8 @@ class GraphNodesLoader:
             password (str): The password for the Neo4j database.
         """
         self.driver = GraphDatabase.driver(uri, auth=(username, password))
+        self.logger = logging.getLogger(__name__)  # Define the logger
+        self.logger.info("GraphNodesLoader class initialized.")
         self.node_data_adder = AddGraphNodes(self.driver)
         self.label_mapping = {
             "Compound": {
@@ -89,7 +93,7 @@ class GraphNodesLoader:
             label (str): The label of the node.
         """
         if label not in self.label_mapping:
-            self.logger.error(f"No mapping found for label: {label}")
+            self.logger.error("No mapping found for label: %s", label)
             return
 
         unique_property = self.label_mapping[label]["unique_property"]
