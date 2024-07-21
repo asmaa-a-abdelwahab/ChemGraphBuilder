@@ -1,17 +1,53 @@
-import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
+"""
+node_data_processor.py
+
+This module provides the NodeDataProcessor class, which is responsible for
+preprocessing various types of node data (assays, proteins, genes, and compounds)
+for use in chemical knowledge graph construction. The preprocessing includes
+renaming columns, consolidating multiple files, and saving the processed data
+in a consistent format. This step ensures uniformity and ease of access for
+subsequent data analysis and integration processes.
+
+Classes:
+    NodeDataProcessor: Handles preprocessing of assay, protein, gene, and compound data.
+
+Example Usage:
+    >>> processor = NodeDataProcessor(data_dir='path/to/data')
+    >>> processor.preprocess_assays()
+    >>> processor.preprocess_proteins()
+    >>> processor.preprocess_genes()
+    >>> processor.preprocess_compounds()
+"""
 import glob
+import pandas as pd
 
 class NodeDataProcessor:
+    """
+    NodeDataProcessor is responsible for preprocessing various types of node data
+    (assays, proteins, genes, and compounds) by renaming columns, consolidating
+    multiple files, and saving the processed data. This preprocessing step is 
+    crucial for ensuring uniformity and ease of access in subsequent analysis
+    and integration processes.
+
+    Attributes:
+        data_dir (str): The directory where the node data files are stored.
+    
+    Methods:
+        preprocess_assays(): Processes and renames columns in assay data.
+        preprocess_proteins(): Processes and renames columns in protein data.
+        preprocess_genes(): Processes and renames columns in gene data.
+        preprocess_compounds(): Consolidates and renames columns in compound data.
+    """
+
     def __init__(self, data_dir: str):
         """
-        Initializes the NodeDataPreprocessor with a directory path to manage the data files.
+        Initializes the NodeDataProcessor with a directory path to manage the data files.
 
         Args:
             data_dir (str): The directory where the node data files are stored.
         """
         self.data_dir = data_dir
+
 
     def preprocess_assays(self):
         """
@@ -25,6 +61,7 @@ class NodeDataProcessor:
                            "Description": "AssayDescription"}, inplace=True)
         df.to_csv(f'{self.data_dir}/Nodes/Assay_Properties_Processed.csv', index=False)
 
+
     def preprocess_proteins(self):
         """
         Processes the protein data by renaming columns and saving the processed data.
@@ -34,6 +71,7 @@ class NodeDataProcessor:
         df.rename(columns={"ID": "ProteinID", "Name": "ProteinName",
                            "Description": "ProteinDescription"}, inplace=True)
         df.to_csv(f'{self.data_dir}/Nodes/Protein_Properties_Processed.csv', index=False)
+
 
     def preprocess_genes(self):
         """
@@ -45,6 +83,7 @@ class NodeDataProcessor:
                            "Synonyms": "GeneSynonyms"}, inplace=True)
         df['GeneID'] = df['GeneID'].astype('Int64')
         df.to_csv(f'{self.data_dir}/Nodes/Gene_Properties_Processed.csv', index=False)
+
 
     def preprocess_compounds(self):
         """

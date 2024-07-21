@@ -1,3 +1,23 @@
+"""
+relationship_data_processor.py
+
+This module provides the RelationshipDataProcessor class, which processes
+relationship data from multiple CSV files, cleans the data, merges it into a
+single CSV file, and performs additional data processing.
+
+The primary purpose of this module is to facilitate the extraction, cleaning,
+and merging of assay-compound relationship data from various sources into a
+cohesive dataset that can be used for further analysis and research.
+
+Classes:
+    RelationshipDataProcessor: Handles the processing and merging of
+    relationship data from multiple CSV files.
+
+Example Usage:
+    >>> processor = RelationshipDataProcessor('/path/to/data')
+    >>> processor.process_files()
+"""
+
 import os
 import glob
 import pandas as pd
@@ -9,7 +29,8 @@ class RelationshipDataProcessor:
 
     Attributes:
     path (str): The path to the directory containing the CSV files.
-    output_files (dict): A dictionary to store unique headers and corresponding output file paths.
+    output_files (dict): A dictionary to store unique headers and corresponding 
+    output file paths.
     csv_files (list): A list of all CSV files to be processed.
     processed_csv_files (list): A list of processed CSV files.
     """
@@ -24,17 +45,18 @@ class RelationshipDataProcessor:
         self.path = path
         self.output_files = {}
         self.csv_files = glob.glob(os.path.join(path, "AID_*.csv"))
-        self.processed_csv_files = glob.glob(os.path.join(path, "Assay_Compound_Relationship*.csv"))
+        self.processed_csv_files = glob.glob(os.path.join(path,
+                                                          "Assay_Compound_Relationship*.csv"))
 
     def process_files(self):
         """
         Process all CSV files by reading, cleaning, merging, and formatting the data.
         """
-        self._process_individual_files()
-        print("Step 1: Individual files processed and cleaned.")
+        # self._process_individual_files()
+        # print("Step 1: Individual files processed and cleaned.")
 
-        self._filter_and_combine_data()
-        print("Step 2: Data filtered and combined successfully.")
+        # self._filter_and_combine_data()
+        # print("Step 2: Data filtered and combined successfully.")
 
         self._clean_and_save_final_data()
         print("Step 3: Final data processing and merging completed.")
@@ -62,7 +84,8 @@ class RelationshipDataProcessor:
 
     def _filter_and_combine_data(self):
         """
-        Filter and format the merged data by selecting specific columns and saving it to a final output file.
+        Filter and format the merged data by selecting specific columns and 
+        saving it to a final output file.
         """
 
         output_file = os.path.join(self.path, 'Assay_Compound_DataSet.csv')
@@ -88,7 +111,8 @@ class RelationshipDataProcessor:
                     print(f"Duplicated columns removed from {file}")
 
                 # Load the data in chunks using the cleaned column names
-                for df in pd.read_csv(file, chunksize=10000, names=df_headers.columns, header=0):
+                for df in pd.read_csv(file, chunksize=10000,
+                                      names=df_headers.columns, header=0):
                     # Reindex to the union of columns, filling missing ones with NaNs
                     df = df.reindex(columns=unique_column_names)
                     # Append to the output file
@@ -102,7 +126,8 @@ class RelationshipDataProcessor:
 
     def _get_filtered_columns(self):
         """
-        Determine the columns to be included in the final output file based on specific keywords.
+        Determine the columns to be included in the final output file based on 
+        specific keywords.
 
         Returns:
         list: A list of filtered columns.
@@ -153,7 +178,6 @@ class RelationshipDataProcessor:
                 'activity_outcome': 'Activity Outcome',
                 'activity_url': 'Activity URL',
                 'measured_activity': 'Phenotype',
-                'activity direction': 'Activity Direction',
                 'aid': 'AID',
                 'cid': 'CID'
             }, inplace=True)
@@ -161,7 +185,9 @@ class RelationshipDataProcessor:
             AllDataConnected = pd.read_csv('Data/AllDataConnected.csv')
 
             # Process the dataset
-            merged_df = dataset.merge(AllDataConnected, on=['AID', 'CID', 'Activity Outcome'], how='left')
+            merged_df = dataset.merge(AllDataConnected,
+                                      on=['AID', 'CID', 'Activity Outcome'],
+                                      how='left')
             merged_df.drop(['PubMed ID', 'RNAi'], axis=1, inplace=True)
             merged_df.dropna(axis=1, how='all', inplace=True)
             merged_df = merged_df.groupby(['Activity Outcome', 'Assay Name']).apply(self.propagate_phenotype).reset_index(drop=True)
@@ -172,20 +198,16 @@ class RelationshipDataProcessor:
             merged_df['Activity URL'] = merged_df.apply(lambda row: f"https://pubchem.ncbi.nlm.nih.gov/bioassay/{row['AID']}#sid={row['SID']}", axis=1)
             # Additional processing for determining labels and activity
             merged_df = self._determine_labels_and_activity(merged_df)
-            Assay_Cpd = merged_df[['AID', 'CID', 'Activity Outcome', 'Activity URL',
-                                   'Activity Direction', 'Phenotype',
-                                   'Activity Value [uM]', 'Activity Name']]
-            Assay_Cpd.to_csv('Data/Relationships/Assay_Compound_Relationship.csv', index=False)
+            merged_df.to_csv('Data/Relationships/Assay_Compound_Relationship/Assay_Compound_DataSet_Processed.csv', index=False)
 
-            Cpd_Enzyme = merged_df[['CID', 'Target GeneID', 'Activity', 'AID']]
-            Cpd_Enzyme.to_csv('Data/Relationships/Compound_Gene_Relationship.csv', index=False)
         else:
             print(f"File {final_file_path} does not exist. No data to process.")
 
     @staticmethod
     def most_frequent(row):
         """
-        Find the most frequent string value in a row, excluding NaNs and non-string types.
+        Find the most frequent string value in a row, excluding NaNs and 
+        non-string types.
 
         Parameters:
         row (Series): The row of data.
@@ -256,8 +278,8 @@ class RelationshipDataProcessor:
         ]
 
         inactivator_keywords = [
-            'inactivator', 'inactivation of', 'mechanism based inactivation of', 'inactivators',
-            'metabolism dependent inactivation'
+            'inactivator', 'inactivation of', 'mechanism based inactivation of',
+            'inactivators', 'metabolism dependent inactivation'
         ]
 
         activator_keywords = [
@@ -324,8 +346,8 @@ class RelationshipDataProcessor:
             inducer_pattern = r'(effect on cyp.*induction)|(induction of.*)'
             merged_df.loc[active_mask & merged_df['Assay Name'].str.contains(inducer_pattern, case=False, regex=True), 'Activity'] = 'Inducer'
 
-            merged_df.loc[active_mask & merged_df['Activity Direction'].str.contains('decreasing', case=False), 'Activity'] = 'Inhibitor'
-            merged_df.loc[active_mask & merged_df['Activity Direction'].str.contains('increasing', case=False), 'Activity'] = 'Activator'
+            merged_df.loc[active_mask & merged_df['activity direction'].str.contains('decreasing', case=False), 'Activity'] = 'Inhibitor'
+            merged_df.loc[active_mask & merged_df['activity direction'].str.contains('increasing', case=False), 'Activity'] = 'Activator'
             merged_df.loc[active_mask & (merged_df['AID'] == 1215398), 'Activity'] = 'Inactivator'
 
         return merged_df
