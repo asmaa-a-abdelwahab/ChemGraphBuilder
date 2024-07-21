@@ -379,7 +379,11 @@ class NodePropertiesExtractor:
         try:
             # Parsing the XML response
             data_dict = xmltodict.parse(xml_data)
-            properties = ['AID', 'SourceName', 'SourceID', 'Name', 'Description']
+            properties = ['AID', 'SourceName', 'SourceID', 'Name', 'Description',
+                          'Protocol', 'Comment', 'Method', 'Target', 'CIDCountAll',
+                          'CIDCountActive', 'CIDCountInactive', 'CIDCountInconclusive',
+                          'CIDCountUnspecified', 'CIDCountProbe']
+
             assay_data = {}
             # Extracting required properties from the parsed XML
             for prop in properties:
@@ -439,7 +443,11 @@ class NodePropertiesExtractor:
 
         unique_aids = df['AID'].unique().tolist()  # Extracting unique assay IDs
 
-        columns = ['AID', 'Assay Type', 'Activity Name', 'SourceName', 'SourceID', 'Name', 'Description']
+        columns = ['AID', 'Assay Type', 'Activity Name', 'SourceName',
+                   'SourceID', 'Name', 'Description', 'Protocol',
+                   'Comment', 'Method', 'Target', 'CIDCountAll',
+                   'CIDCountActive', 'CIDCountInactive', 'CIDCountInconclusive', 
+                   'CIDCountUnspecified', 'CIDCountProbe']
         assay_df = pd.DataFrame(columns=columns)  # Initializing a DataFrame to store assay properties
 
         # Using ThreadPoolExecutor for concurrent fetching of assay details
