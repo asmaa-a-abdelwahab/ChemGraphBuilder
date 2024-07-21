@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Relationship Collector and Processor - ChemGraphBuilder</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Relationship Collector and Processor";
+        var mkdocs_page_input_path = "2.relationship_collector_processor.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> ChemGraphBuilder
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="" href="../about.md">About</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">ChemGraphBuilder</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Relationship Collector and Processor</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="relationship-collector-and-processor">Relationship Collector and Processor</h1>
+<p>This module collects and processes relationship data for different types of relationships using the <code>RelationshipPropertiesExtractor</code> and <code>RelationshipDataProcessor</code> classes.</p>
+<h2 id="available-relationship-types">Available Relationship Types</h2>
+<ul>
+<li>Assay_Compound</li>
+<li>Assay_Enzyme</li>
+<li>Gene_Enzyme</li>
+<li>Compound_Gene</li>
+<li>Compound_Similarity</li>
+<li>Compound_Cooccurrence</li>
+<li>Compound_Transformation</li>
+</ul>
+<h2 id="usage-examples">Usage Examples</h2>
+<h3 id="python">Python</h3>
+<p>To use the <code>RelationshipCollectorProcessor</code> class in Python, follow the example below:</p>
+<pre><code class="language-python">from relationship_collector_processor import RelationshipCollectorProcessor
+
+# Set the relationship type
+relationship_type = &quot;Assay_Compound&quot;  # Change to the desired relationship type
+
+# Initialize the collector
+collector = RelationshipCollectorProcessor(relationship_type=relationship_type)
+
+# Collect and process the relationship data
+collector.collect_relationship_data()
+</code></pre>
+<h3 id="command-line">Command Line</h3>
+<p>To collect and process relationship data from the command line, use the following command:</p>
+<pre><code class="language-sh"># Collect and process the relationship data for the specified relationship type
+collect-process-relationships --relationship_type Assay_Compound
+</code></pre>
+<p>Replace <code>Assay_Compound</code> with any of the available relationship types to collect different data.</p>
+              
+            </div>
+          </div><footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>
