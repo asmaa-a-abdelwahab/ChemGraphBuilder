@@ -17,7 +17,7 @@ setup(
     author='Asmaa Ali Abdelwahab',
     author_email='asmaa.a.abdelwahab@gmail.com',
     description='A package to build chemical knowledge graphs using data from PubChem and Neo4j',
-    url='https://github.com/yourusername/chemgraphbuilder',
+    url='https://github.com/asmaa-a-abdelwahab/ChemGraphBuilder',
     entry_points={
         'console_scripts': [
             'setup-data-folder=chemgraphbuilder.setup_data_folder:main'
