@@ -9,18 +9,22 @@
       
       
       
+        <link rel="prev" href="../2.relationship_collector_processor/">
       
       
-      <link rel="icon" href="/assets/images/favicon.png">
+        <link rel="next" href="../3.graph_nodes_loader/">
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
       <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.29">
     
     
       
-        <title>ChemGraphBuilder</title>
+        <title>Class_Documentation - ChemGraphBuilder</title>
       
     
     
-      <link rel="stylesheet" href="/assets/stylesheets/main.76a95c52.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.76a95c52.min.css">
       
       
 
@@ -39,9 +43,9 @@
       
     
     
-      <link rel="stylesheet" href="/assets/_mkdocstrings.css">
+      <link rel="stylesheet" href="../assets/_mkdocstrings.css">
     
-    <script>__md_scope=new URL("/",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
@@ -59,6 +63,11 @@
     <label class="md-overlay" for="__drawer"></label>
     <div data-md-component="skip">
       
+        
+        <a href="#relationship-collector-and-processor" class="md-skip">
+          Skip to content
+        </a>
+      
     </div>
     <div data-md-component="announce">
       
@@ -71,7 +80,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="/." title="ChemGraphBuilder" class="md-header__button md-logo" aria-label="ChemGraphBuilder" data-md-component="logo">
+    <a href=".." title="ChemGraphBuilder" class="md-header__button md-logo" aria-label="ChemGraphBuilder" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
@@ -91,7 +100,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              
+              Class_Documentation
             
           </span>
         </div>
@@ -129,7 +138,7 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="/." title="ChemGraphBuilder" class="md-nav__button md-logo" aria-label="ChemGraphBuilder" data-md-component="logo">
+    <a href=".." title="ChemGraphBuilder" class="md-nav__button md-logo" aria-label="ChemGraphBuilder" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
@@ -147,7 +156,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/." class="md-nav__link">
+      <a href=".." class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -164,17 +173,19 @@
       
   
   
+    
   
   
+  
     
     
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
         
           
           <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
@@ -188,7 +199,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_2">
             <span class="md-nav__icon md-icon"></span>
             Usage_Examples
@@ -202,7 +213,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/1.node_collector_processor/" class="md-nav__link">
+      <a href="../1.node_collector_processor/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -223,7 +234,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/node_collector_processor/" class="md-nav__link">
+      <a href="../node_collector_processor/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -244,7 +255,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/2.relationship_collector_processor/" class="md-nav__link">
+      <a href="../2.relationship_collector_processor/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -262,10 +273,30 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="/relationship_collector_processor/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Class_Documentation
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   <span class="md-ellipsis">
@@ -274,6 +305,68 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#available-relationship-types" class="md-nav__link">
+    <span class="md-ellipsis">
+      Available Relationship Types
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#usage-examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      Usage Examples
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Usage Examples">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#python" class="md-nav__link">
+    <span class="md-ellipsis">
+      Python
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#command-line" class="md-nav__link">
+    <span class="md-ellipsis">
+      Command Line
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -286,7 +379,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/3.graph_nodes_loader/" class="md-nav__link">
+      <a href="../3.graph_nodes_loader/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -307,7 +400,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/graph_nodes_loader/" class="md-nav__link">
+      <a href="../graph_nodes_loader/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -328,7 +421,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/4.graph_relationships_loader/" class="md-nav__link">
+      <a href="../4.graph_relationships_loader/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -349,7 +442,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/graph_relationships_loader/" class="md-nav__link">
+      <a href="../graph_relationships_loader/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -377,7 +470,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/about.md" class="md-nav__link">
+      <a href="../about.md" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -407,6 +500,58 @@
   
   
   
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#available-relationship-types" class="md-nav__link">
+    <span class="md-ellipsis">
+      Available Relationship Types
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#usage-examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      Usage Examples
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Usage Examples">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#python" class="md-nav__link">
+    <span class="md-ellipsis">
+      Python
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#command-line" class="md-nav__link">
+    <span class="md-ellipsis">
+      Command Line
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
   
 </nav>
                   </div>
@@ -418,8 +563,54 @@
             <div class="md-content" data-md-component="content">
               <article class="md-content__inner md-typeset">
                 
-  <h1>404 - Not found</h1>
+                  
 
+
+<h1 id="relationship-collector-and-processor">Relationship Collector and Processor</h1>
+<p>This module collects and processes relationship data for different types of relationships using the <code>RelationshipPropertiesExtractor</code> and <code>RelationshipDataProcessor</code> classes.</p>
+<h2 id="available-relationship-types">Available Relationship Types</h2>
+<ul>
+<li>Assay_Compound</li>
+<li>Assay_Enzyme</li>
+<li>Gene_Enzyme</li>
+<li>Compound_Gene</li>
+<li>Compound_Similarity</li>
+<li>Compound_Cooccurrence</li>
+<li>Compound_Transformation</li>
+</ul>
+<h2 id="usage-examples">Usage Examples</h2>
+<h3 id="python">Python</h3>
+<p>To use the <code>RelationshipCollectorProcessor</code> class in Python, follow the example below:</p>
+<pre><code class="language-python">from relationship_collector_processor import RelationshipCollectorProcessor
+
+# Set the relationship type
+relationship_type = &quot;Assay_Compound&quot;  # Change to the desired relationship type
+
+# Initialize the collector
+collector = RelationshipCollectorProcessor(relationship_type=relationship_type)
+
+# Collect and process the relationship data
+collector.collect_relationship_data()
+</code></pre>
+<h3 id="command-line">Command Line</h3>
+<p>To collect and process relationship data from the command line, use the following command:</p>
+<pre><code class="language-sh"># Collect and process the relationship data for the specified relationship type
+collect-process-relationships --relationship_type Assay_Compound
+</code></pre>
+<p>Replace <code>Assay_Compound</code> with any of the available relationship types to collect different data.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
               </article>
             </div>
           
@@ -453,10 +644,10 @@
     </div>
     
     
-    <script id="__config" type="application/json">{"base": "/", "features": [], "search": "/assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    <script id="__config" type="application/json">{"base": "..", "features": [], "search": "../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
-      <script src="/assets/javascripts/bundle.fe8b6f2b.min.js"></script>
+      <script src="../assets/javascripts/bundle.fe8b6f2b.min.js"></script>
       
     
   </body>
