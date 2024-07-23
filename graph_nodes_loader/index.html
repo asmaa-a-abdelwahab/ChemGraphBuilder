@@ -64,7 +64,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#the-graphnodesloader-class-is-usable-from-python-code-and-the-command-line-interface" class="md-skip">
+        <a href="#you-can-check-the-documentation-of-the-graphnodesloader-class-here" class="md-skip">
           Skip to content
         </a>
       
@@ -364,37 +364,55 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#usage-in-different-contexts" class="md-nav__link">
+  <a href="#chemgraphbuilder.graph_nodes_loader" class="md-nav__link">
     <span class="md-ellipsis">
-      Usage in Different Contexts
+      graph_nodes_loader
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Usage in Different Contexts">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#chemgraphbuilder.graph_nodes_loader.GraphNodesLoader" class="md-nav__link">
+    <span class="md-ellipsis">
+      GraphNodesLoader
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="GraphNodesLoader">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#available-relationships" class="md-nav__link">
+  <a href="#chemgraphbuilder.graph_nodes_loader.GraphNodesLoader.__init__" class="md-nav__link">
     <span class="md-ellipsis">
-      Available Relationships
+      __init__
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#1-python-code" class="md-nav__link">
+  <a href="#chemgraphbuilder.graph_nodes_loader.GraphNodesLoader.create_uniqueness_constraint" class="md-nav__link">
     <span class="md-ellipsis">
-      1. Python Code
+      create_uniqueness_constraint
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#2-command-line" class="md-nav__link">
+  <a href="#chemgraphbuilder.graph_nodes_loader.GraphNodesLoader.load_data_for_node_type" class="md-nav__link">
     <span class="md-ellipsis">
-      2. Command Line
+      load_data_for_node_type
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#chemgraphbuilder.graph_nodes_loader.GraphNodesLoader.process_and_add_nodes" class="md-nav__link">
+    <span class="md-ellipsis">
+      process_and_add_nodes
     </span>
   </a>
   
@@ -402,6 +420,15 @@
         
       </ul>
     </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#chemgraphbuilder.graph_nodes_loader.main" class="md-nav__link">
+    <span class="md-ellipsis">
+      main
+    </span>
+  </a>
   
 </li>
       
@@ -510,37 +537,55 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#usage-in-different-contexts" class="md-nav__link">
+  <a href="#chemgraphbuilder.graph_nodes_loader" class="md-nav__link">
     <span class="md-ellipsis">
-      Usage in Different Contexts
+      graph_nodes_loader
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Usage in Different Contexts">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#chemgraphbuilder.graph_nodes_loader.GraphNodesLoader" class="md-nav__link">
+    <span class="md-ellipsis">
+      GraphNodesLoader
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="GraphNodesLoader">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#available-relationships" class="md-nav__link">
+  <a href="#chemgraphbuilder.graph_nodes_loader.GraphNodesLoader.__init__" class="md-nav__link">
     <span class="md-ellipsis">
-      Available Relationships
+      __init__
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#1-python-code" class="md-nav__link">
+  <a href="#chemgraphbuilder.graph_nodes_loader.GraphNodesLoader.create_uniqueness_constraint" class="md-nav__link">
     <span class="md-ellipsis">
-      1. Python Code
+      create_uniqueness_constraint
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#2-command-line" class="md-nav__link">
+  <a href="#chemgraphbuilder.graph_nodes_loader.GraphNodesLoader.load_data_for_node_type" class="md-nav__link">
     <span class="md-ellipsis">
-      2. Command Line
+      load_data_for_node_type
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#chemgraphbuilder.graph_nodes_loader.GraphNodesLoader.process_and_add_nodes" class="md-nav__link">
+    <span class="md-ellipsis">
+      process_and_add_nodes
     </span>
   </a>
   
@@ -548,6 +593,15 @@
         
       </ul>
     </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#chemgraphbuilder.graph_nodes_loader.main" class="md-nav__link">
+    <span class="md-ellipsis">
+      main
+    </span>
+  </a>
   
 </li>
       
@@ -566,31 +620,798 @@
                   
 
 
-<h1 id="the-graphnodesloader-class-is-usable-from-python-code-and-the-command-line-interface">The <code>GraphNodesLoader</code> class is usable from Python code, and the command line interface.</h1>
-<h3 id="usage-in-different-contexts">Usage in Different Contexts</h3>
-<h4 id="available-relationships"><strong>Available Relationships</strong></h4>
-<ul>
-<li><code>Compound</code></li>
-<li><code>BioAssay</code></li>
-<li><code>Gene</code></li>
-<li><code>Protein</code></li>
-</ul>
-<h4 id="1-python-code">1. <strong>Python Code</strong></h4>
-<pre><code class="language-python">from chemgraphbuilder.graph_nodes_loader import GraphNodesLoader
+<h1 id="you-can-check-the-documentation-of-the-graphnodesloader-class-here">You can check the documentation of the <code>GraphNodesLoader</code> class here.</h1>
 
-# User-provided connection details and label
-uri = &quot;bolt://localhost:7687&quot;
-username = &quot;neo4j&quot;
-password = &quot;password&quot;
-label = &quot;Compound&quot;  # you can add other labels such as (BioAssay, Gene, Protein)
 
-graph_nodes_loader = GraphNodesLoader(uri, username, password)
-graph_nodes_loader.load_data_for_node_type(label)
-</code></pre>
-<h4 id="2-command-line">2. <strong>Command Line</strong></h4>
-<p>After installing the package using <code>pip install .</code> or <code>pip install chemgraphbuilder</code>, you can use the command-line interface:</p>
-<pre><code class="language-sh">load-graph-nodes --uri bolt://localhost:7687 --username neo4j --password password --label Compound
-</code></pre>
+<div class="doc doc-object doc-module">
+
+
+
+<a id="chemgraphbuilder.graph_nodes_loader"></a>
+    <div class="doc doc-contents first">
+
+      <p>Module to load data into a Neo4j graph database for different node types.</p>
+<p>This module provides the GraphDataLoader class, which allows loading data for
+specific node types into a Neo4j database.
+Users can provide the connection details and node label to load the data.</p>
+
+
+<p><span class="doc-section-title">Classes:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code><span title="chemgraphbuilder.graph_nodes_loader.GraphDataLoader">GraphDataLoader</span></code></td>
+            <td>
+              <div class="doc-md-description">
+                <p>Class to load data into a Neo4j graph database for different node types.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Functions:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+            <tr class="doc-section-item">
+              <td><code><a class="autorefs autorefs-internal" title="chemgraphbuilder.graph_nodes_loader.main" href="#chemgraphbuilder.graph_nodes_loader.main">main</a></code></td>
+              <td>
+                <div class="doc-md-description">
+                  <p>Main function to parse command-line arguments and load data for the specified node type.</p>
+                </div>
+              </td>
+            </tr>
+      </tbody>
+    </table>
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="chemgraphbuilder.graph_nodes_loader.GraphNodesLoader" class="doc doc-heading">
+            <code>GraphNodesLoader</code>
+
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+
+      <p>Class to load data into a Neo4j graph database for different node types.</p>
+
+
+<p><span class="doc-section-title">Attributes:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code><span title="chemgraphbuilder.graph_nodes_loader.GraphNodesLoader.driver">driver</span></code></td>
+            <td>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The Neo4j driver instance.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="chemgraphbuilder.graph_nodes_loader.GraphNodesLoader.node_data_adder">node_data_adder</span></code></td>
+            <td>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>An instance of the AddGraphNodes class.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="chemgraphbuilder.graph_nodes_loader.GraphNodesLoader.label_mapping">label_mapping</span></code></td>
+            <td>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A dictionary mapping node labels to their unique properties and file paths.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+              <details class="quote">
+                <summary>Source code in <code>chemgraphbuilder/graph_nodes_loader.py</code></summary>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 21</span>
+<span class="normal"> 22</span>
+<span class="normal"> 23</span>
+<span class="normal"> 24</span>
+<span class="normal"> 25</span>
+<span class="normal"> 26</span>
+<span class="normal"> 27</span>
+<span class="normal"> 28</span>
+<span class="normal"> 29</span>
+<span class="normal"> 30</span>
+<span class="normal"> 31</span>
+<span class="normal"> 32</span>
+<span class="normal"> 33</span>
+<span class="normal"> 34</span>
+<span class="normal"> 35</span>
+<span class="normal"> 36</span>
+<span class="normal"> 37</span>
+<span class="normal"> 38</span>
+<span class="normal"> 39</span>
+<span class="normal"> 40</span>
+<span class="normal"> 41</span>
+<span class="normal"> 42</span>
+<span class="normal"> 43</span>
+<span class="normal"> 44</span>
+<span class="normal"> 45</span>
+<span class="normal"> 46</span>
+<span class="normal"> 47</span>
+<span class="normal"> 48</span>
+<span class="normal"> 49</span>
+<span class="normal"> 50</span>
+<span class="normal"> 51</span>
+<span class="normal"> 52</span>
+<span class="normal"> 53</span>
+<span class="normal"> 54</span>
+<span class="normal"> 55</span>
+<span class="normal"> 56</span>
+<span class="normal"> 57</span>
+<span class="normal"> 58</span>
+<span class="normal"> 59</span>
+<span class="normal"> 60</span>
+<span class="normal"> 61</span>
+<span class="normal"> 62</span>
+<span class="normal"> 63</span>
+<span class="normal"> 64</span>
+<span class="normal"> 65</span>
+<span class="normal"> 66</span>
+<span class="normal"> 67</span>
+<span class="normal"> 68</span>
+<span class="normal"> 69</span>
+<span class="normal"> 70</span>
+<span class="normal"> 71</span>
+<span class="normal"> 72</span>
+<span class="normal"> 73</span>
+<span class="normal"> 74</span>
+<span class="normal"> 75</span>
+<span class="normal"> 76</span>
+<span class="normal"> 77</span>
+<span class="normal"> 78</span>
+<span class="normal"> 79</span>
+<span class="normal"> 80</span>
+<span class="normal"> 81</span>
+<span class="normal"> 82</span>
+<span class="normal"> 83</span>
+<span class="normal"> 84</span>
+<span class="normal"> 85</span>
+<span class="normal"> 86</span>
+<span class="normal"> 87</span>
+<span class="normal"> 88</span>
+<span class="normal"> 89</span>
+<span class="normal"> 90</span>
+<span class="normal"> 91</span>
+<span class="normal"> 92</span>
+<span class="normal"> 93</span>
+<span class="normal"> 94</span>
+<span class="normal"> 95</span>
+<span class="normal"> 96</span>
+<span class="normal"> 97</span>
+<span class="normal"> 98</span>
+<span class="normal"> 99</span>
+<span class="normal">100</span>
+<span class="normal">101</span>
+<span class="normal">102</span>
+<span class="normal">103</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">GraphNodesLoader</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Class to load data into a Neo4j graph database for different node types.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        driver: The Neo4j driver instance.</span>
+<span class="sd">        node_data_adder: An instance of the AddGraphNodes class.</span>
+<span class="sd">        label_mapping: A dictionary mapping node labels to their unique properties and file paths.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uri</span><span class="p">,</span> <span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initializes the GraphDataLoader with Neo4j connection details.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            uri (str): The URI of the Neo4j database.</span>
+<span class="sd">            username (str): The username for the Neo4j database.</span>
+<span class="sd">            password (str): The password for the Neo4j database.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">driver</span> <span class="o">=</span> <span class="n">GraphDatabase</span><span class="o">.</span><span class="n">driver</span><span class="p">(</span><span class="n">uri</span><span class="p">,</span> <span class="n">auth</span><span class="o">=</span><span class="p">(</span><span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>  <span class="c1"># Define the logger</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;GraphNodesLoader class initialized.&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">node_data_adder</span> <span class="o">=</span> <span class="n">AddGraphNodes</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">label_mapping</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;Compound&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;unique_property&quot;</span><span class="p">:</span> <span class="s2">&quot;CompoundID&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;file_path&quot;</span><span class="p">:</span> <span class="s2">&quot;Data/Nodes/Compound_Properties_Processed.csv&quot;</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;BioAssay&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;unique_property&quot;</span><span class="p">:</span> <span class="s2">&quot;AssayID&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;file_path&quot;</span><span class="p">:</span> <span class="s2">&quot;Data/Nodes/Assay_Properties_Processed.csv&quot;</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;Gene&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;unique_property&quot;</span><span class="p">:</span> <span class="s2">&quot;GeneID&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;file_path&quot;</span><span class="p">:</span> <span class="s2">&quot;Data/Nodes/Gene_Properties_Processed.csv&quot;</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;Protein&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;unique_property&quot;</span><span class="p">:</span> <span class="s2">&quot;ProteinRefSeqAccession&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;file_path&quot;</span><span class="p">:</span> <span class="s2">&quot;Data/Nodes/Protein_Properties_Processed.csv&quot;</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+
+    <span class="k">def</span> <span class="nf">create_uniqueness_constraint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">unique_property</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates a uniqueness constraint for a given node label and property.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            label (str): The label of the node.</span>
+<span class="sd">            unique_property (str): The property to enforce uniqueness on.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">node_data_adder</span><span class="o">.</span><span class="n">create_uniqueness_constraint</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">,</span> <span class="n">unique_property</span><span class="o">=</span><span class="n">unique_property</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">process_and_add_nodes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_path</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">unique_property</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Processes and adds nodes from a CSV file to the Neo4j database.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            file_path (str): The path to the CSV file containing node data.</span>
+<span class="sd">            label (str): The label of the node.</span>
+<span class="sd">            unique_property (str): The unique property of the node.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">node_data_adder</span><span class="o">.</span><span class="n">process_and_add_nodes</span><span class="p">(</span>
+            <span class="n">file_path</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">,</span> <span class="n">unique_property</span><span class="o">=</span><span class="n">unique_property</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">load_data_for_node_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Loads data for a specific node type into the Neo4j database.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            label (str): The label of the node.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">label</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">label_mapping</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;No mapping found for label: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">label</span><span class="p">)</span>
+            <span class="k">return</span>
+
+        <span class="n">unique_property</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">label_mapping</span><span class="p">[</span><span class="n">label</span><span class="p">][</span><span class="s2">&quot;unique_property&quot;</span><span class="p">]</span>
+        <span class="n">file_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">label_mapping</span><span class="p">[</span><span class="n">label</span><span class="p">][</span><span class="s2">&quot;file_path&quot;</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">create_uniqueness_constraint</span><span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="n">unique_property</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">process_and_add_nodes</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">unique_property</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+              </details>
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="chemgraphbuilder.graph_nodes_loader.GraphNodesLoader.__init__" class="doc doc-heading">
+            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">uri</span><span class="p">,</span> <span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="p">)</span></code>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+      <p>Initializes the GraphDataLoader with Neo4j connection details.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>uri</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The URI of the Neo4j database.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>username</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The username for the Neo4j database.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>password</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The password for the Neo4j database.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+            <details class="quote">
+              <summary>Source code in <code>chemgraphbuilder/graph_nodes_loader.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">31</span>
+<span class="normal">32</span>
+<span class="normal">33</span>
+<span class="normal">34</span>
+<span class="normal">35</span>
+<span class="normal">36</span>
+<span class="normal">37</span>
+<span class="normal">38</span>
+<span class="normal">39</span>
+<span class="normal">40</span>
+<span class="normal">41</span>
+<span class="normal">42</span>
+<span class="normal">43</span>
+<span class="normal">44</span>
+<span class="normal">45</span>
+<span class="normal">46</span>
+<span class="normal">47</span>
+<span class="normal">48</span>
+<span class="normal">49</span>
+<span class="normal">50</span>
+<span class="normal">51</span>
+<span class="normal">52</span>
+<span class="normal">53</span>
+<span class="normal">54</span>
+<span class="normal">55</span>
+<span class="normal">56</span>
+<span class="normal">57</span>
+<span class="normal">58</span>
+<span class="normal">59</span>
+<span class="normal">60</span>
+<span class="normal">61</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uri</span><span class="p">,</span> <span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Initializes the GraphDataLoader with Neo4j connection details.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        uri (str): The URI of the Neo4j database.</span>
+<span class="sd">        username (str): The username for the Neo4j database.</span>
+<span class="sd">        password (str): The password for the Neo4j database.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">driver</span> <span class="o">=</span> <span class="n">GraphDatabase</span><span class="o">.</span><span class="n">driver</span><span class="p">(</span><span class="n">uri</span><span class="p">,</span> <span class="n">auth</span><span class="o">=</span><span class="p">(</span><span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="p">))</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>  <span class="c1"># Define the logger</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;GraphNodesLoader class initialized.&quot;</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">node_data_adder</span> <span class="o">=</span> <span class="n">AddGraphNodes</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">label_mapping</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;Compound&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;unique_property&quot;</span><span class="p">:</span> <span class="s2">&quot;CompoundID&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;file_path&quot;</span><span class="p">:</span> <span class="s2">&quot;Data/Nodes/Compound_Properties_Processed.csv&quot;</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;BioAssay&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;unique_property&quot;</span><span class="p">:</span> <span class="s2">&quot;AssayID&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;file_path&quot;</span><span class="p">:</span> <span class="s2">&quot;Data/Nodes/Assay_Properties_Processed.csv&quot;</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;Gene&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;unique_property&quot;</span><span class="p">:</span> <span class="s2">&quot;GeneID&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;file_path&quot;</span><span class="p">:</span> <span class="s2">&quot;Data/Nodes/Gene_Properties_Processed.csv&quot;</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;Protein&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;unique_property&quot;</span><span class="p">:</span> <span class="s2">&quot;ProteinRefSeqAccession&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;file_path&quot;</span><span class="p">:</span> <span class="s2">&quot;Data/Nodes/Protein_Properties_Processed.csv&quot;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="chemgraphbuilder.graph_nodes_loader.GraphNodesLoader.create_uniqueness_constraint" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">create_uniqueness_constraint</span><span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="n">unique_property</span><span class="p">)</span></code>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+      <p>Creates a uniqueness constraint for a given node label and property.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>label</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The label of the node.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>unique_property</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The property to enforce uniqueness on.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+            <details class="quote">
+              <summary>Source code in <code>chemgraphbuilder/graph_nodes_loader.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">63</span>
+<span class="normal">64</span>
+<span class="normal">65</span>
+<span class="normal">66</span>
+<span class="normal">67</span>
+<span class="normal">68</span>
+<span class="normal">69</span>
+<span class="normal">70</span>
+<span class="normal">71</span>
+<span class="normal">72</span>
+<span class="normal">73</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">create_uniqueness_constraint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">unique_property</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Creates a uniqueness constraint for a given node label and property.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        label (str): The label of the node.</span>
+<span class="sd">        unique_property (str): The property to enforce uniqueness on.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">node_data_adder</span><span class="o">.</span><span class="n">create_uniqueness_constraint</span><span class="p">(</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">,</span> <span class="n">unique_property</span><span class="o">=</span><span class="n">unique_property</span>
+    <span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="chemgraphbuilder.graph_nodes_loader.GraphNodesLoader.load_data_for_node_type" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">load_data_for_node_type</span><span class="p">(</span><span class="n">label</span><span class="p">)</span></code>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+      <p>Loads data for a specific node type into the Neo4j database.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>label</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The label of the node.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+            <details class="quote">
+              <summary>Source code in <code>chemgraphbuilder/graph_nodes_loader.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 88</span>
+<span class="normal"> 89</span>
+<span class="normal"> 90</span>
+<span class="normal"> 91</span>
+<span class="normal"> 92</span>
+<span class="normal"> 93</span>
+<span class="normal"> 94</span>
+<span class="normal"> 95</span>
+<span class="normal"> 96</span>
+<span class="normal"> 97</span>
+<span class="normal"> 98</span>
+<span class="normal"> 99</span>
+<span class="normal">100</span>
+<span class="normal">101</span>
+<span class="normal">102</span>
+<span class="normal">103</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">load_data_for_node_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Loads data for a specific node type into the Neo4j database.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        label (str): The label of the node.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">label</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">label_mapping</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;No mapping found for label: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">label</span><span class="p">)</span>
+        <span class="k">return</span>
+
+    <span class="n">unique_property</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">label_mapping</span><span class="p">[</span><span class="n">label</span><span class="p">][</span><span class="s2">&quot;unique_property&quot;</span><span class="p">]</span>
+    <span class="n">file_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">label_mapping</span><span class="p">[</span><span class="n">label</span><span class="p">][</span><span class="s2">&quot;file_path&quot;</span><span class="p">]</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">create_uniqueness_constraint</span><span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="n">unique_property</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">process_and_add_nodes</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">unique_property</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="chemgraphbuilder.graph_nodes_loader.GraphNodesLoader.process_and_add_nodes" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">process_and_add_nodes</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">unique_property</span><span class="p">)</span></code>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+      <p>Processes and adds nodes from a CSV file to the Neo4j database.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>file_path</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The path to the CSV file containing node data.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>label</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The label of the node.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>unique_property</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The unique property of the node.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+            <details class="quote">
+              <summary>Source code in <code>chemgraphbuilder/graph_nodes_loader.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">75</span>
+<span class="normal">76</span>
+<span class="normal">77</span>
+<span class="normal">78</span>
+<span class="normal">79</span>
+<span class="normal">80</span>
+<span class="normal">81</span>
+<span class="normal">82</span>
+<span class="normal">83</span>
+<span class="normal">84</span>
+<span class="normal">85</span>
+<span class="normal">86</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">process_and_add_nodes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_path</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">unique_property</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Processes and adds nodes from a CSV file to the Neo4j database.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        file_path (str): The path to the CSV file containing node data.</span>
+<span class="sd">        label (str): The label of the node.</span>
+<span class="sd">        unique_property (str): The unique property of the node.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">node_data_adder</span><span class="o">.</span><span class="n">process_and_add_nodes</span><span class="p">(</span>
+        <span class="n">file_path</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">,</span> <span class="n">unique_property</span><span class="o">=</span><span class="n">unique_property</span>
+    <span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="chemgraphbuilder.graph_nodes_loader.main" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">main</span><span class="p">()</span></code>
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+      <p>Main function to parse command-line arguments and load data for the specified node type.</p>
+
+            <details class="quote">
+              <summary>Source code in <code>chemgraphbuilder/graph_nodes_loader.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">106</span>
+<span class="normal">107</span>
+<span class="normal">108</span>
+<span class="normal">109</span>
+<span class="normal">110</span>
+<span class="normal">111</span>
+<span class="normal">112</span>
+<span class="normal">113</span>
+<span class="normal">114</span>
+<span class="normal">115</span>
+<span class="normal">116</span>
+<span class="normal">117</span>
+<span class="normal">118</span>
+<span class="normal">119</span>
+<span class="normal">120</span>
+<span class="normal">121</span>
+<span class="normal">122</span>
+<span class="normal">123</span>
+<span class="normal">124</span>
+<span class="normal">125</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Main function to parse command-line arguments and load data for the specified node type.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Load data into&quot;</span>
+                                                 <span class="s2">&quot;Neo4j graph database.&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--uri&#39;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s1">&#39;URI for the Neo4j database&#39;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--username&#39;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Username for the Neo4j database&#39;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--password&#39;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Password for the Neo4j database&#39;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--label&#39;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Label of the node&#39;</span><span class="p">)</span>
+
+    <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
+
+    <span class="c1"># Create an instance of GraphDataLoader and load data for the specified node type</span>
+    <span class="n">graph_nodes_loader</span> <span class="o">=</span> <span class="n">GraphNodesLoader</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">uri</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">username</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">password</span><span class="p">)</span>
+    <span class="n">graph_nodes_loader</span><span class="o">.</span><span class="n">load_data_for_node_type</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">label</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
 
 
 
