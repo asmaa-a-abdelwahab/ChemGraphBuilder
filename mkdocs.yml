@@ -1,5 +1,17 @@
 site_name: ChemGraphBuilder
 nav:
   - Home: index.md
+  - Usage_Examples:
+    - Step1_NodesCollectorProcessor: 1.node_collector_processor.md
+    - Class_Documentation: node_collector_processor.md
+    - Step2_RelationshipCollectorProcessor: 2.relationship_collector_processor.md
+    - Class_Documentation: relationship_collector_processor.md
+    - Step3_GraphNodesLoader: 3.graph_nodes_loader.md
+    - Class_Documentation: graph_nodes_loader.md
+    - Step4_GraphRelationshipsLoader: 4.graph_relationships_loader.md
+    - Class_Documentation: graph_relationships_loader.md
+  - Documentation: documentation.md
   - About: about.md
-theme: readthedocs
+theme: "material"
+plugins:
+  - mkdocstrings
