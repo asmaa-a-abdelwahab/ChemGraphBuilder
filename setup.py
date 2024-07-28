@@ -20,7 +20,7 @@ setup(
     url='https://github.com/asmaa-a-abdelwahab/ChemGraphBuilder',
     entry_points={
         'console_scripts': [
-            'setup-data-folder=chemgraphbuilder.setup_data_folder:main'
+            'setup-data-folder=chemgraphbuilder.setup_data_folder:main',
             'collect-process-nodes=chemgraphbuilder.node_collector_processor:main',
             'collect-process-relationships=chemgraphbuilder.relationship_collector_processor:main',
             'load-graph-nodes=chemgraphbuilder.graph_nodes_loader:main',
