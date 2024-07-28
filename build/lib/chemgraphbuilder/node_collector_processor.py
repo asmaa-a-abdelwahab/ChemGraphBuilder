@@ -45,22 +45,18 @@ class NodeCollectorProcessor:
         Collects and processes data based on the node type and saves it to the appropriate file.
         """
         if self.node_type == 'Compound':
-            self.extractor.create_data_directories()
             df = self.extractor.run()
             self.extractor.extract_compound_properties(main_data='Data/AllDataConnected.csv')
             self.processor.preprocess_compounds()
         elif self.node_type == 'BioAssay':
-            self.extractor.create_data_directories()
             df = self.extractor.run()
             self.extractor.extract_assay_properties(main_data='Data/AllDataConnected.csv')
             self.processor.preprocess_assays()
         elif self.node_type == 'Gene':
-            self.extractor.create_data_directories()
             df = self.extractor.run()
             self.extractor.extract_gene_properties(main_data='Data/AllDataConnected.csv')
             self.processor.preprocess_genes()
         elif self.node_type == 'Protein':
-            self.extractor.create_data_directories()
             df = self.extractor.run()
             self.extractor.extract_protein_properties(main_data='Data/AllDataConnected.csv')
             self.processor.preprocess_proteins()

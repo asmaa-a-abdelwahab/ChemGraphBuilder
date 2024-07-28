@@ -73,10 +73,6 @@ class SetupDataFolder:
         for folder in self.structure["Relationships"]:
             self.create_folder(os.path.join(relationships_path, folder))
 
-        # Change the current working directory to the base data directory
-        os.chdir(self.base_path)
-        print(f"Changed current directory to: {self.base_path}")
-
 def main():
     """
     Main function to set up the data directory.

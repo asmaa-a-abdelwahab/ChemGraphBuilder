@@ -31,7 +31,7 @@ class SetupDataFolder:
         self.data_folder = "Data"
         self.base_path = os.path.join(os.getcwd(), self.data_folder)
         self.structure = {
-            "Nodes": ["Compound_properties"],
+            "Nodes": ["Compound_Properties"],
             "Relationships": [
                 "Assay_Compound_Relationship",
                 "Compound_Similarities",
