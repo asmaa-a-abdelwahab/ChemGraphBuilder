@@ -540,19 +540,16 @@
 <pre><code class="language-python">from chemgraphbuilder.nodes_collector_processor import NodesCollectorProcessor
 from chemgraphbuilder.setup_data_folder import SetupDataFolder
 
-# Set the connection details and parameters
-uri = &quot;bolt://localhost:7689&quot;
-username = &quot;neo4j&quot;
-password = &quot;your_password&quot;
+
 node_type = &quot;Compound&quot;  # Change to &quot;BioAssay&quot;, &quot;Gene&quot;, or &quot;Protein&quot; as needed
 enzyme_list = ['CYP2D6', 'CYP3A4']
 
-# Initialize and setup the data directory
+# Initialize and setup the data directory before collecting any data
 setup_folder = SetupDataFolder()
 setup_folder.setup()
 
 # Initialize the collector
-collector = NodesCollectorProcessor(uri=uri, username=username, password=password, node_type=node_type, enzyme_list=enzyme_list)
+collector = NodesCollectorProcessor(node_type=node_type, enzyme_list=enzyme_list)
 
 # Collect and process the data
 collector.collect_and_process_data()
@@ -562,10 +559,11 @@ collector.close()
 </code></pre>
 <h3 id="command-line-interface-cli-example">Command Line Interface (CLI) Example</h3>
 <p>You can use the <code>NodesCollectorProcessor</code> class from the command line by executing the script with the necessary arguments:</p>
-<pre><code class="language-sh">setup-data-folder 
-collect-process-nodes --uri bolt://localhost:7689 --username neo4j --password your_password --node_type Compound --enzyme_list CYP2D6,CYP3A4
+<pre><code class="language-sh">setup-data-folder
+collect-process-nodes --node_type Compound --enzyme_list CYP2D6,CYP3A4
 </code></pre>
-<p>Make sure to replace <code>"your_password"</code> with the actual password for your Neo4j database. The <code>node_type</code> argument can be one of <code>"Compound"</code>, <code>"BioAssay"</code>, <code>"Gene"</code>, or <code>"Protein"</code>, depending on the type of data you want to collect. The <code>enzyme_list</code> should be a comma-separated string of enzyme names.</p>
+<p>The <code>node_type</code> argument can be one of <code>"Compound"</code>, <code>"BioAssay"</code>, <code>"Gene"</code>, or <code>"Protein"</code>, depending on the type of data you want to collect. 
+The <code>enzyme_list</code> should be a comma-separated string of enzyme names.</p>
 
 
 
