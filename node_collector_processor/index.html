@@ -285,17 +285,17 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#chemgraphbuilder.node_collector_processor.NodeCollectorProcessor" class="md-nav__link">
+  <a href="#chemgraphbuilder.node_collector_processor.NodesCollectorProcessor" class="md-nav__link">
     <span class="md-ellipsis">
-      NodeCollectorProcessor
+      NodesCollectorProcessor
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="NodeCollectorProcessor">
+    <nav class="md-nav" aria-label="NodesCollectorProcessor">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#chemgraphbuilder.node_collector_processor.NodeCollectorProcessor.__init__" class="md-nav__link">
+  <a href="#chemgraphbuilder.node_collector_processor.NodesCollectorProcessor.__init__" class="md-nav__link">
     <span class="md-ellipsis">
       __init__
     </span>
@@ -304,7 +304,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#chemgraphbuilder.node_collector_processor.NodeCollectorProcessor.close" class="md-nav__link">
+  <a href="#chemgraphbuilder.node_collector_processor.NodesCollectorProcessor.close" class="md-nav__link">
     <span class="md-ellipsis">
       close
     </span>
@@ -313,7 +313,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#chemgraphbuilder.node_collector_processor.NodeCollectorProcessor.collect_and_process_data" class="md-nav__link">
+  <a href="#chemgraphbuilder.node_collector_processor.NodesCollectorProcessor.collect_and_process_data" class="md-nav__link">
     <span class="md-ellipsis">
       collect_and_process_data
     </span>
@@ -551,17 +551,17 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#chemgraphbuilder.node_collector_processor.NodeCollectorProcessor" class="md-nav__link">
+  <a href="#chemgraphbuilder.node_collector_processor.NodesCollectorProcessor" class="md-nav__link">
     <span class="md-ellipsis">
-      NodeCollectorProcessor
+      NodesCollectorProcessor
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="NodeCollectorProcessor">
+    <nav class="md-nav" aria-label="NodesCollectorProcessor">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#chemgraphbuilder.node_collector_processor.NodeCollectorProcessor.__init__" class="md-nav__link">
+  <a href="#chemgraphbuilder.node_collector_processor.NodesCollectorProcessor.__init__" class="md-nav__link">
     <span class="md-ellipsis">
       __init__
     </span>
@@ -570,7 +570,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#chemgraphbuilder.node_collector_processor.NodeCollectorProcessor.close" class="md-nav__link">
+  <a href="#chemgraphbuilder.node_collector_processor.NodesCollectorProcessor.close" class="md-nav__link">
     <span class="md-ellipsis">
       close
     </span>
@@ -579,7 +579,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#chemgraphbuilder.node_collector_processor.NodeCollectorProcessor.collect_and_process_data" class="md-nav__link">
+  <a href="#chemgraphbuilder.node_collector_processor.NodesCollectorProcessor.collect_and_process_data" class="md-nav__link">
     <span class="md-ellipsis">
       collect_and_process_data
     </span>
@@ -629,8 +629,8 @@
     <div class="doc doc-contents first">
 
       <p>NodesCollectorProcessor Module</p>
-<p>This module provides the NodesCollectorProcessor class for collecting and processing data for different types of nodes 
-using the NodePropertiesExtractor and NodeDataProcessor classes. The collected data is intended for loading into 
+<p>This module provides the NodesCollectorProcessor class for collecting and processing data for different types of nodes
+using the NodePropertiesExtractor and NodeDataProcessor classes. The collected data is intended for loading into
 a Neo4j graph database. The module supports command-line interface (CLI) usage for ease of use.</p>
 
 
@@ -644,7 +644,7 @@ a Neo4j graph database. The module supports command-line interface (CLI) usage f
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code><span title="chemgraphbuilder.node_collector_processor.NodesCollectorProcessor">NodesCollectorProcessor</span></code></td>
+            <td><code><a class="autorefs autorefs-internal" title="chemgraphbuilder.node_collector_processor.NodesCollectorProcessor" href="#chemgraphbuilder.node_collector_processor.NodesCollectorProcessor">NodesCollectorProcessor</a></code></td>
             <td>
               <div class="doc-md-description">
                 <p>A class to collect and process data for different types of nodes.</p>
@@ -703,8 +703,8 @@ collector.close()
 
 
 
-<h2 id="chemgraphbuilder.node_collector_processor.NodeCollectorProcessor" class="doc doc-heading">
-            <code>NodeCollectorProcessor</code>
+<h2 id="chemgraphbuilder.node_collector_processor.NodesCollectorProcessor" class="doc doc-heading">
+            <code>NodesCollectorProcessor</code>
 
 
 </h2>
@@ -717,7 +717,8 @@ collector.close()
 
               <details class="quote">
                 <summary>Source code in <code>chemgraphbuilder/node_collector_processor.py</code></summary>
-                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">38</span>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">37</span>
+<span class="normal">38</span>
 <span class="normal">39</span>
 <span class="normal">40</span>
 <span class="normal">41</span>
@@ -766,8 +767,7 @@ collector.close()
 <span class="normal">84</span>
 <span class="normal">85</span>
 <span class="normal">86</span>
-<span class="normal">87</span>
-<span class="normal">88</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">NodeCollectorProcessor</span><span class="p">:</span>
+<span class="normal">87</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">NodesCollectorProcessor</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A class to collect and process data for different types of nodes using NodePropertiesExtractor and NodeDataProcessor.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -836,7 +836,7 @@ collector.close()
 <div class="doc doc-object doc-function">
 
 
-<h3 id="chemgraphbuilder.node_collector_processor.NodeCollectorProcessor.__init__" class="doc doc-heading">
+<h3 id="chemgraphbuilder.node_collector_processor.NodesCollectorProcessor.__init__" class="doc doc-heading">
             <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">uri</span><span class="p">,</span> <span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="p">,</span> <span class="n">node_type</span><span class="p">,</span> <span class="n">enzyme_list</span><span class="p">)</span></code>
 
 </h3>
@@ -933,7 +933,8 @@ collector.close()
 
             <details class="quote">
               <summary>Source code in <code>chemgraphbuilder/node_collector_processor.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">43</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">42</span>
+<span class="normal">43</span>
 <span class="normal">44</span>
 <span class="normal">45</span>
 <span class="normal">46</span>
@@ -946,8 +947,7 @@ collector.close()
 <span class="normal">53</span>
 <span class="normal">54</span>
 <span class="normal">55</span>
-<span class="normal">56</span>
-<span class="normal">57</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uri</span><span class="p">,</span> <span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="p">,</span> <span class="n">node_type</span><span class="p">,</span> <span class="n">enzyme_list</span><span class="p">):</span>
+<span class="normal">56</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uri</span><span class="p">,</span> <span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="p">,</span> <span class="n">node_type</span><span class="p">,</span> <span class="n">enzyme_list</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Initializes the NodesCollectorProcessor with Neo4j connection details, the node type to collect data for, and the list of enzymes.</span>
 
@@ -971,7 +971,7 @@ collector.close()
 <div class="doc doc-object doc-function">
 
 
-<h3 id="chemgraphbuilder.node_collector_processor.NodeCollectorProcessor.close" class="doc doc-heading">
+<h3 id="chemgraphbuilder.node_collector_processor.NodesCollectorProcessor.close" class="doc doc-heading">
             <code class="highlight language-python"><span class="n">close</span><span class="p">()</span></code>
 
 </h3>
@@ -983,9 +983,9 @@ collector.close()
 
             <details class="quote">
               <summary>Source code in <code>chemgraphbuilder/node_collector_processor.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">59</span>
-<span class="normal">60</span>
-<span class="normal">61</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">58</span>
+<span class="normal">59</span>
+<span class="normal">60</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Closes the connection to the Neo4j database.&quot;&quot;&quot;</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 </code></pre></div></td></tr></table></div>
@@ -997,7 +997,7 @@ collector.close()
 <div class="doc doc-object doc-function">
 
 
-<h3 id="chemgraphbuilder.node_collector_processor.NodeCollectorProcessor.collect_and_process_data" class="doc doc-heading">
+<h3 id="chemgraphbuilder.node_collector_processor.NodesCollectorProcessor.collect_and_process_data" class="doc doc-heading">
             <code class="highlight language-python"><span class="n">collect_and_process_data</span><span class="p">()</span></code>
 
 </h3>
@@ -1009,7 +1009,8 @@ collector.close()
 
             <details class="quote">
               <summary>Source code in <code>chemgraphbuilder/node_collector_processor.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">63</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">62</span>
+<span class="normal">63</span>
 <span class="normal">64</span>
 <span class="normal">65</span>
 <span class="normal">66</span>
@@ -1033,8 +1034,7 @@ collector.close()
 <span class="normal">84</span>
 <span class="normal">85</span>
 <span class="normal">86</span>
-<span class="normal">87</span>
-<span class="normal">88</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">collect_and_process_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="normal">87</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">collect_and_process_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Collects and processes data based on the node type and saves it to the appropriate file.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -1090,7 +1090,8 @@ collector.close()
 
             <details class="quote">
               <summary>Source code in <code>chemgraphbuilder/node_collector_processor.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 90</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 89</span>
+<span class="normal"> 90</span>
 <span class="normal"> 91</span>
 <span class="normal"> 92</span>
 <span class="normal"> 93</span>
@@ -1102,25 +1103,18 @@ collector.close()
 <span class="normal"> 99</span>
 <span class="normal">100</span>
 <span class="normal">101</span>
-<span class="normal">102</span>
-<span class="normal">103</span>
-<span class="normal">104</span>
-<span class="normal">105</span>
-<span class="normal">106</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+<span class="normal">102</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Main function to parse command-line arguments and collect data for the specified node type and enzyme list.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Collect data for different types of nodes.&quot;</span><span class="p">)</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--uri&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;The URI for the Neo4j database&#39;</span><span class="p">)</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--username&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;The username for the Neo4j database&#39;</span><span class="p">)</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--password&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;The password for the Neo4j database&#39;</span><span class="p">)</span>
     <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--node_type&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">choices</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Compound&#39;</span><span class="p">,</span> <span class="s1">&#39;BioAssay&#39;</span><span class="p">,</span> <span class="s1">&#39;Gene&#39;</span><span class="p">,</span> <span class="s1">&#39;Protein&#39;</span><span class="p">],</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;The type of node to collect data for&#39;</span><span class="p">)</span>
     <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--enzyme_list&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Comma-separated list of enzyme names to fetch data for&#39;</span><span class="p">)</span>
 
     <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
     <span class="n">enzyme_list</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">enzyme_list</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)</span>
 
-    <span class="n">collector</span> <span class="o">=</span> <span class="n">NodesCollectorProcessor</span><span class="p">(</span><span class="n">uri</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">uri</span><span class="p">,</span> <span class="n">username</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">password</span><span class="p">,</span> <span class="n">node_type</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">node_type</span><span class="p">,</span> <span class="n">enzyme_list</span><span class="o">=</span><span class="n">enzyme_list</span><span class="p">)</span>
+    <span class="n">collector</span> <span class="o">=</span> <span class="n">NodesCollectorProcessor</span><span class="p">(</span><span class="n">node_type</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">node_type</span><span class="p">,</span> <span class="n">enzyme_list</span><span class="o">=</span><span class="n">enzyme_list</span><span class="p">)</span>
     <span class="n">collector</span><span class="o">.</span><span class="n">collect_and_process_data</span><span class="p">()</span>
     <span class="n">collector</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 </code></pre></div></td></tr></table></div>
