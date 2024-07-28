@@ -25,7 +25,7 @@ class NodeCollectorProcessor:
     A class to collect and process data for different types of nodes using NodePropertiesExtractor and NodeDataProcessor.
     """
 
-    def __init__(self, uri, username, password, node_type, enzyme_list):
+    def __init__(self, node_type, enzyme_list):
         """
         Initializes the NodesCollectorProcessor with Neo4j connection details, the node type to collect data for, and the list of enzymes.
 
@@ -36,14 +36,9 @@ class NodeCollectorProcessor:
             node_type (str): The type of node to collect data for (e.g., 'Compound', 'BioAssay', 'Gene', 'Protein').
             enzyme_list (list of str): List of enzyme names for which assay data will be fetched from PubChem.
         """
-        self.driver = GraphDatabase.driver(uri, auth=(username, password))
         self.node_type = node_type
         self.extractor = NodePropertiesExtractor(enzyme_list=enzyme_list)
         self.processor = NodeDataProcessor(data_dir="Data")
-
-    def close(self):
-        """Closes the connection to the Neo4j database."""
-        self.driver.close()
 
     def collect_and_process_data(self):
         """
@@ -85,7 +80,6 @@ def main():
 
     collector = NodeCollectorProcessor(node_type=args.node_type, enzyme_list=enzyme_list)
     collector.collect_and_process_data()
-    collector.close()
 
 if __name__ == '__main__':
     main()
