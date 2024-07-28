@@ -14,3 +14,4 @@ Requires-Dist: neo4j
 Requires-Dist: requests
 Requires-Dist: xmltodict
 Requires-Dist: setuptools
+Requires-Dist: dask
