@@ -13,6 +13,7 @@ setup(
         "requests",
         "xmltodict",
         "setuptools",
+        "dask",
     ],
     author='Asmaa Ali Abdelwahab',
     author_email='asmaa.a.abdelwahab@gmail.com',
