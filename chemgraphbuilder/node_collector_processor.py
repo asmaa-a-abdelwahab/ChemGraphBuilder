@@ -1,29 +1,15 @@
 """
-NodesCollectorProcessor Module
+NodeCollectorProcessor Module
 
-This module provides the NodesCollectorProcessor class for collecting and processing data for different types of nodes
+This module provides the NodeCollectorProcessor class for collecting and processing data for different types of nodes
 using the NodePropertiesExtractor and NodeDataProcessor classes. The collected data is intended for loading into
 a Neo4j graph database. The module supports command-line interface (CLI) usage for ease of use.
 
 Classes:
-    NodesCollectorProcessor: A class to collect and process data for different types of nodes.
+    NodeCollectorProcessor: A class to collect and process data for different types of nodes.
 
 Functions:
     main: Main function to parse command-line arguments and collect data for the specified node type and enzyme list.
-
-Usage Example:
-    To use the module from the command line:
-    ```
-    python graph_data_collector.py --uri bolt://localhost:7689 --username neo4j --password your_password --node_type Compound --enzyme_list CYP2D6,CYP3A4
-    ```
-
-    To use the class in a Python script or Jupyter notebook:
-    ```
-    enzyme_list = ['CYP2D6', 'CYP3A4']
-    collector = NodesCollectorProcessor(uri="bolt://localhost:7689", username="neo4j", password="your_password", node_type="Compound", enzyme_list=enzyme_list)
-    collector.collect_and_process_data()
-    collector.close()
-    ```
 """
 
 import os
@@ -34,7 +20,7 @@ from chemgraphbuilder.node_data_processor import NodeDataProcessor
 
 logging.basicConfig(level=logging.INFO)
 
-class NodesCollectorProcessor:
+class NodeCollectorProcessor:
     """
     A class to collect and process data for different types of nodes using NodePropertiesExtractor and NodeDataProcessor.
     """
@@ -97,7 +83,7 @@ def main():
     args = parser.parse_args()
     enzyme_list = args.enzyme_list.split(',')
 
-    collector = NodesCollectorProcessor(node_type=args.node_type, enzyme_list=enzyme_list)
+    collector = NodeCollectorProcessor(node_type=args.node_type, enzyme_list=enzyme_list)
     collector.collect_and_process_data()
     collector.close()
 
