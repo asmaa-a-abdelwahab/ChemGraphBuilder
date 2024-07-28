@@ -1,219 +1,247 @@
 """
-relationship_data_processor.py
+Module for processing relationship data files using Dask and pandas.
 
-This module provides the RelationshipDataProcessor class, which processes
-relationship data from multiple CSV files, cleans the data, merges it into a
-single CSV file, and performs additional data processing.
-
-The primary purpose of this module is to facilitate the extraction, cleaning,
-and merging of assay-compound relationship data from various sources into a
-cohesive dataset that can be used for further analysis and research.
-
-Classes:
-    RelationshipDataProcessor: Handles the processing and merging of
-    relationship data from multiple CSV files.
-
-Example Usage:
-    >>> processor = RelationshipDataProcessor('/path/to/data')
-    >>> processor.process_files()
+This module includes the `RelationshipDataProcessor` class, which is used to
+load, filter, clean, and process data files related to assay-compound relationships.
 """
 
 import os
 import glob
+import dask
+import dask.dataframe as dd
 import pandas as pd
+import concurrent.futures
+import logging
+
+# Set up logging configuration
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 class RelationshipDataProcessor:
     """
-    A class to process relationship data from multiple CSV files, clean the data,
-    merge it into a single CSV file, and perform additional data processing.
+    A class to process relationship data files, filtering and augmenting the data.
 
     Attributes:
-    path (str): The path to the directory containing the CSV files.
-    output_files (dict): A dictionary to store unique headers and corresponding 
-    output file paths.
-    csv_files (list): A list of all CSV files to be processed.
-    processed_csv_files (list): A list of processed CSV files.
+        path (str): The directory path where the data files are stored.
+        csv_files (list): List of CSV files matching the pattern 'AID_*.csv'.
+        all_data_connected (dict): A dictionary containing additional data connected to assays.
     """
 
     def __init__(self, path):
         """
-        Initialize the RelationshipDataProcessor with the specified path.
+        Initializes the RelationshipDataProcessor with the specified path.
 
-        Parameters:
-        path (str): The path to the directory containing the CSV files.
+        Args:
+            path (str): The directory path containing the CSV files.
         """
         self.path = path
-        self.output_files = {}
         self.csv_files = glob.glob(os.path.join(path, "AID_*.csv"))
-        self.processed_csv_files = glob.glob(os.path.join(path,
-                                                          "Assay_Compound_Relationship*.csv"))
+        self.all_data_connected = self._load_all_data_connected('Data/AllDataConnected.csv')
+
+    def _load_all_data_connected(self, file_path):
+        """
+        Loads additional data from a specified file and organizes it into a dictionary.
+
+        Args:
+            file_path (str): The path to the file containing additional data.
+
+        Returns:
+            dict: A dictionary with keys as tuples of (aid, cid, activity_outcome)
+                  and values as dictionaries of additional information.
+        """
+        all_data_connected = {}
+        ddf = dd.read_csv(file_path, blocksize=20e6)
+        ddf.columns = [col.replace(' ', '_').lower() for col in ddf.columns]
+        ddf = ddf.dropna(subset=['aid', 'cid'], how='any')
+        partitions = ddf.to_delayed()
+        ddf = ddf.repartition(partition_size=10e5)
+
+        @dask.delayed
+        def process_partition(partition):
+            result = {}
+            partition = partition.dropna(subset=['aid', 'cid'], how='any')
+            for _, row in partition.iterrows():
+                key = (int(row['aid']), int(row['cid']), row['activity_outcome'])
+                result[key] = row.to_dict()
+            return result
+
+        results = dask.compute(*[process_partition(part) for part in partitions])
+        for result in results:
+            all_data_connected.update(result)
+
+        # Optionally save the dictionary to a file
+        with open("Data/Relationships/all_data_connected_dict.txt", "w") as file:
+            for key, value in all_data_connected.items():
+                file.write(f"{key}: {value}\n")
+
+        return all_data_connected
+
+    def _add_all_data_connected_info(self, row):
+        """
+        Adds additional information from all_data_connected to a row.
+
+        Args:
+            row (pd.Series): A row from a DataFrame.
+
+        Returns:
+            pd.Series: The updated row with additional data if available.
+        """
+        key = (int(row['aid']), int(row['cid']), row['activity_outcome'])
+        if key in self.all_data_connected:
+            additional_info = self.all_data_connected[key]
+            for col, val in additional_info.items():
+                row[col] = val
+        else:
+            logging.warning(f"Key {key} not found in all_data_connected.")
+        return row
+
+    def _get_filtered_columns(self):
+        """
+        Extracts unique column names from the CSV files and additional data.
+
+        Returns:
+            list: A list of unique column names.
+        """
+        all_columns = set()
+
+        # Extract additional columns from the all_data_connected dictionary
+        additional_columns = set()
+        for value in self.all_data_connected.values():
+            additional_columns.update(value.keys())
+
+        def read_columns(file):
+            try:
+                # Read only column names from the CSV file
+                df = pd.read_csv(file, nrows=0)
+                return set([col.replace(' ', '_').lower() for col in df.columns])
+            except Exception as e:
+                logging.error(f"Error reading {file}: {e}")
+                return set()
+
+        # Use ThreadPoolExecutor for concurrent reading of columns from multiple files
+        with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
+            results = list(executor.map(read_columns, self.csv_files))
+
+        for columns in results:
+            all_columns.update(columns)
+
+        all_columns.update(additional_columns)
+
+        # Save the combined columns to a file for reference
+        with open("Data/Relationships/all_columns.txt", "w") as file:
+            for item in all_columns:
+                file.write(f"{item}\n")
+
+        return list(all_columns)
 
     def process_files(self):
         """
-        Process all CSV files by reading, cleaning, merging, and formatting the data.
+        Processes the CSV files by filtering, cleaning, and augmenting data.
+
+        The processed data is saved to output files.
         """
-        # self._process_individual_files()
-        # print("Step 1: Individual files processed and cleaned.")
+        self._filter_and_clean_data()
+        logging.info("Data filtered, cleaned, and combined successfully.")
 
-        # self._filter_and_combine_data()
-        # print("Step 2: Data filtered and combined successfully.")
-
-        self._clean_and_save_final_data()
-        print("Step 3: Final data processing and merging completed.")
-
-    def _process_individual_files(self):
+    def _filter_and_clean_data(self):
         """
-        Process all individual CSV files: read, clean, and save them based on their headers.
+        Filters and cleans data from CSV files, then saves to output files.
         """
-        for file in self.csv_files:
-            with open(file, 'r', encoding='utf-8') as f:
-                header = next(f).strip()
-                num_columns = len(header.split(','))
+        output_file = os.path.join('Data/Relationships/Assay_Compound_Relationship.csv')
+        compound_gene_file = os.path.join('Data/Relationships/Compound_Gene_Relationship.csv')
 
-                if header not in self.output_files:
-                    output_filename = f"{self.path}/Assay_Compound_Relationship{len(self.output_files)}_cols-{num_columns}.csv"
-                    self.output_files[header] = output_filename
-                    with open(output_filename, 'w', encoding='utf-8') as f_out:
-                        f_out.write(header + '\n')
-
-            df = pd.read_csv(file)
-            df = df[header.split(',')]
-            df.dropna(subset=['CID'], inplace=True)
-            df.dropna(axis=1, how='all', inplace=True)
-            df.to_csv(self.output_files[header], mode='a', index=False, header=False)
-
-    def _filter_and_combine_data(self):
-        """
-        Filter and format the merged data by selecting specific columns and 
-        saving it to a final output file.
-        """
-
-        output_file = os.path.join(self.path, 'Assay_Compound_DataSet.csv')
-
-        unique_column_names = self._get_filtered_columns()
-
-        # Create and write the header of the output file if not exists
-        file_exists = os.path.isfile(output_file)
-        if file_exists:
+        if os.path.exists(output_file):
             os.remove(output_file)
+        if os.path.exists(compound_gene_file):
+            os.remove(compound_gene_file)
+
+        unique_column_names = self._get_filtered_columns()+['activity']
+
+        # Initialize output files with headers
         pd.DataFrame(columns=unique_column_names).to_csv(output_file, index=False)
+        pd.DataFrame(columns=['cid', 'target_geneid', 'activity', 'aid']).to_csv(compound_gene_file, index=False)
 
-        # Read each file, adjust columns, and append to the CSV
-        for file in self.processed_csv_files:
+        tasks = []
+        for i, file in enumerate(self.csv_files):
+            if i % 100 == 0:
+                logging.info(f"Processing file {i+1}/{len(self.csv_files)}: {file}")
+
+            tasks.append(dask.delayed(self._process_file)(file, unique_column_names, output_file, compound_gene_file))
+
+        dask.compute(*tasks)
+        logging.info(f"Processed {len(self.csv_files)} files")
+
+    def _process_file(self, file, unique_column_names, output_file, compound_gene_file):
+        """
+        Processes a single CSV file, applying filtering, cleaning, and adding data.
+
+        Args:
+            file (str): The file path to the CSV file.
+            unique_column_names (list): The list of unique column names to use.
+            output_file (str): The path to the output file for combined data.
+            compound_gene_file (str): The path to the output file for compound-gene relationships.
+        """
+        ddf = dd.read_csv(file, blocksize=10000, dtype={'ASSAYDATA_COMMENT': 'object'})
+        ddf.columns = [col.replace(' ', '_').lower() for col in ddf.columns]
+        ddf = ddf.dropna(subset=['cid'], how='any')
+
+        # Repartition to balance memory usage and performance
+        ddf = ddf.repartition(partition_size=1000)
+
+        phenotype_cols = [col for col in ddf.columns if col.startswith('phenotype')]
+
+        def process_partition(df):
             try:
-                # Load just the column names first
-                df_headers = pd.read_csv(file, nrows=0)
-                df_headers.columns = [col.lower() for col in df_headers.columns]
+                if isinstance(df, pd.Series):
+                    df = df.to_frame().T  # Convert to DataFrame if a Series is encountered
+                if df.columns.duplicated().any():
+                    df = df.loc[:, ~df.columns.duplicated()]
+                    logging.info("Duplicated columns removed from partition.")
+                df = df.reindex(columns=unique_column_names, fill_value=pd.NA)
+                df = df.dropna(subset=['aid', 'cid'], how='any')
 
-                # Check and handle duplicate column names
-                if df_headers.columns.duplicated().any():
-                    df_headers = df_headers.loc[:, ~df_headers.columns.duplicated()]
-                    print(f"Duplicated columns removed from {file}")
+                if not df.empty:
+                    df['measured_activity'] = df[phenotype_cols].apply(lambda row: row.mode()[0] if not row.mode().empty else None, axis=1)
 
-                # Load the data in chunks using the cleaned column names
-                for df in pd.read_csv(file, chunksize=10000,
-                                      names=df_headers.columns, header=0):
-                    # Reindex to the union of columns, filling missing ones with NaNs
-                    df = df.reindex(columns=unique_column_names)
-                    # Append to the output file
-                    df.to_csv(output_file, mode='a', header=False, index=False)
+                    df = df.apply(self._add_all_data_connected_info, axis=1)
 
-                print(f"Successfully processed and appended data from {file}")
+                    if any(col in df.columns for col in phenotype_cols) and df['activity_outcome'].notna().all():
+                        df = df.groupby(['activity_outcome', 'assay_name']).apply(self.propagate_phenotype).reset_index(drop=True)
+
+                    if 'target_geneid' not in df.columns:
+                        df['target_geneid'] = pd.NA
+
+                    if 'sid' in df.columns:
+                        df['activity_url'] = df.apply(lambda row: f"https://pubchem.ncbi.nlm.nih.gov/bioassay/{row['aid']}#sid={row['sid']}", axis=1)
+                    else:
+                        df['activity_url'] = pd.NA
+
+                    # Drop rows where both aid and cid are 1
+                    df = df[(df['aid'] != 1) | (df['cid'] != 1)]
+
+                    df = self._determine_labels_and_activity(df)
+
+                    logging.info(f"Processed partition with {len(df)} rows.")
+                    if not df.empty:
+                        # Write the processed data to the output files
+                        df.to_csv(output_file, mode='a', header=not os.path.exists(output_file), index=False)
+                        df[['cid', 'target_geneid', 'activity', 'aid']].to_csv(compound_gene_file, mode='a', header=not os.path.exists(compound_gene_file), index=False)
+                else:
+                    logging.info("No data to process after filtering.")
             except Exception as e:
-                print(f"Error processing file {file}: {e}")
+                logging.error(f"Error processing partition: {e}")
 
-        print(f"Data appended successfully to {output_file}")
-
-    def _get_filtered_columns(self):
-        """
-        Determine the columns to be included in the final output file based on 
-        specific keywords.
-
-        Returns:
-        list: A list of filtered columns.
-        """
-        all_columns = set()
-        for file in self.processed_csv_files:
-            df = pd.read_csv(file, nrows=0)
-            df.columns = [col.lower() for col in df.columns]
-            all_columns.update(df.columns)
-
-        keywords = ['id', 'outcome', 'phenotype', 'activity_url']
-        filtered_columns = sorted([col for col in all_columns if any(keyword in col for keyword in keywords)])
-        print(f"Filtered columns: {filtered_columns}")
-        return filtered_columns
-
-    def _get_filtered_columns(self):
-        """
-        Determine the columns to be included in the final output file based on specific keywords.
-
-        Returns:
-        list: A list of filtered columns.
-        """
-        all_columns = set()
-        for file in self.processed_csv_files:
-            df = pd.read_csv(file, nrows=0)
-            df.columns = [col.lower() for col in df.columns]
-            all_columns.update(df.columns)
-
-        keywords = ['id', 'outcome', 'phenotype', 'activity_url','activity direction']
-        filtered_columns = sorted([col for col in all_columns if any(keyword in col for keyword in keywords)])
-        print(f"Filtered columns: {filtered_columns}")
-        return filtered_columns
-
-    def _clean_and_save_final_data(self):
-        """
-        Clean and save the processed dataset.
-        """
-        final_file_path = os.path.join(self.path, 'Assay_Compound_DataSet.csv')
-        if os.path.exists(final_file_path):
-            dataset = pd.read_csv(final_file_path)
-            # print(dataset.columns)
-            dataset.dropna(subset=['aid', 'cid'], how='any', axis=0, inplace=True)
-
-            phenotype_cols = [col for col in dataset.columns if col.startswith('phenotype')]
-            dataset['measured_activity'] = dataset[phenotype_cols].apply(self.most_frequent, axis=1)
-            dataset = dataset.drop(columns=phenotype_cols)
-            dataset.rename(columns={
-                'activity_outcome': 'Activity Outcome',
-                'activity_url': 'Activity URL',
-                'measured_activity': 'Phenotype',
-                'aid': 'AID',
-                'cid': 'CID'
-            }, inplace=True)
-
-            AllDataConnected = pd.read_csv('Data/AllDataConnected.csv')
-
-            # Process the dataset
-            merged_df = dataset.merge(AllDataConnected,
-                                      on=['AID', 'CID', 'Activity Outcome'],
-                                      how='left')
-            merged_df.drop(['PubMed ID', 'RNAi'], axis=1, inplace=True)
-            merged_df.dropna(axis=1, how='all', inplace=True)
-            merged_df = merged_df.groupby(['Activity Outcome', 'Assay Name']).apply(self.propagate_phenotype).reset_index(drop=True)
-            merged_df = merged_df[merged_df['Target GeneID'].isin([1576, 1565, 1559, 1557, 1544])]
-            merged_df['AID'] = merged_df['AID'].astype(int)
-            merged_df['CID'] = merged_df['CID'].astype(int)
-            merged_df['Target GeneID'] = merged_df['Target GeneID'].astype(int)
-            merged_df['Activity URL'] = merged_df.apply(lambda row: f"https://pubchem.ncbi.nlm.nih.gov/bioassay/{row['AID']}#sid={row['SID']}", axis=1)
-            # Additional processing for determining labels and activity
-            merged_df = self._determine_labels_and_activity(merged_df)
-            merged_df.to_csv('Data/Relationships/Assay_Compound_Relationship/Assay_Compound_DataSet_Processed.csv', index=False)
-
-        else:
-            print(f"File {final_file_path} does not exist. No data to process.")
+        ddf.map_partitions(process_partition).compute()
 
     @staticmethod
     def most_frequent(row):
         """
-        Find the most frequent string value in a row, excluding NaNs and 
-        non-string types.
+        Finds the most frequent value in a row, excluding NaN values.
 
-        Parameters:
-        row (Series): The row of data.
+        Args:
+            row (pd.Series): A row from a DataFrame.
 
         Returns:
-        str or None: The most frequent string value, or None if no strings are found.
+            str: The most frequent value in the row.
         """
         values = row.dropna()
         string_values = values[values.apply(lambda x: isinstance(x, str))]
@@ -222,25 +250,29 @@ class RelationshipDataProcessor:
     @staticmethod
     def propagate_phenotype(group):
         """
-        Propagate non-null values within each group for the 'Phenotype' column.
+        Propagates the phenotype information within a group.
 
-        Parameters:
-        group (DataFrame): The group of data.
+        Args:
+            group (pd.DataFrame): A DataFrame group.
 
         Returns:
-        DataFrame: The group with propagated 'Phenotype' values.
+            pd.DataFrame: The updated group with propagated phenotype information.
         """
-        phenotype_value = group['Phenotype'].dropna().unique()
+        phenotype_value = group['phenotype'].dropna().unique()
         if len(phenotype_value) > 0:
-            group['Phenotype'] = phenotype_value[0]
+            group['phenotype'] = phenotype_value[0]
         return group
 
     def _determine_labels_and_activity(self, merged_df):
         """
-        Determine the labels and activity based on keywords in the assay names.
-        """
+        Determines the activity labels for the data based on predefined keywords.
 
-        # Define the mapping values
+        Args:
+            merged_df (pd.DataFrame): The DataFrame containing merged data.
+
+        Returns:
+            pd.DataFrame: The DataFrame with determined activity labels.
+        """
         inhibitor_keywords = [
             'inhibition', 'reversible inhibition', 'time dependent inhibition',
             'inhibitory activity', 'time-dependent inhibition', 'time dependent irreversible inhibition',
@@ -278,8 +310,8 @@ class RelationshipDataProcessor:
         ]
 
         inactivator_keywords = [
-            'inactivator', 'inactivation of', 'mechanism based inactivation of',
-            'inactivators', 'metabolism dependent inactivation'
+            'inactivator', 'inactivation of', 'mechanism based inactivation of', 'inactivators',
+            'metabolism dependent inactivation'
         ]
 
         activator_keywords = [
@@ -290,12 +322,10 @@ class RelationshipDataProcessor:
             'induction of', 'inducer', 'inducers', 'time-dependant induction'
         ]
 
-        # Combine all keywords into a single list for easy checking
         all_keywords = (inhibitor_keywords + ligand_keywords + inhibitor_substrate_keywords +
                         inhibitor_activator_modulator_keywords + substrate_keywords +
                         inactivator_keywords + activator_keywords + inducer_keywords)
 
-        # Define a dictionary to map each keyword to its corresponding label
         keyword_to_label = {
             **{keyword: 'Inhibitor' for keyword in inhibitor_keywords},
             **{keyword: 'Inhibitor/Substrate' for keyword in inhibitor_substrate_keywords},
@@ -307,15 +337,15 @@ class RelationshipDataProcessor:
             **{keyword: 'Ligand' for keyword in ligand_keywords},
         }
 
-        # Function to determine the appropriate label based on the first keyword appearance in the assay name
         def determine_active_label(assay_name):
+            # Determine the appropriate label based on the first keyword found in the assay name
             assay_name_lower = assay_name.lower()
             first_keyword = None
-            first_position = len(assay_name_lower)  # Start with the maximum length of the assay name
+            first_position = len(assay_name_lower)
 
             for keyword in all_keywords:
                 position = assay_name_lower.find(keyword)
-                if 0 <= position < first_position:  # Check if keyword is found and is the earliest one so far
+                if 0 <= position < first_position:
                     first_keyword = keyword
                     first_position = position
 
@@ -323,31 +353,29 @@ class RelationshipDataProcessor:
                 return keyword_to_label[first_keyword]
             return 'Inhibitor/Inducer/Modulator'
 
-        # Set default activity to None
-        merged_df['Activity'] = None
+        merged_df['activity'] = None
 
-        # Handle Inactive outcomes
-        inactive_mask = merged_df['Activity Outcome'] == 'Inactive'
-        merged_df.loc[inactive_mask, 'Activity'] = 'Inactive'
+        # Assign the 'Inactive' label where the activity outcome is inactive
+        inactive_mask = merged_df['activity_outcome'] == 'Inactive'
+        merged_df.loc[inactive_mask, 'activity'] = 'Inactive'
 
-        # Handle Active outcomes
-        active_mask = merged_df['Activity Outcome'] == 'Active'
+        # Assign labels based on assay name keywords for active outcomes
+        active_mask = merged_df['activity_outcome'] == 'Active'
         if active_mask.any():
-            merged_df.loc[active_mask, 'Activity'] = merged_df.loc[active_mask, 'Assay Name'].apply(determine_active_label)
-            merged_df.loc[active_mask & merged_df['Activity Name'].isin(['Km', 'Drug metabolism']), 'Activity'] = 'Substrate'
+            merged_df.loc[active_mask, 'activity'] = merged_df.loc[active_mask, 'assay_name'].apply(determine_active_label)
+            merged_df.loc[active_mask & merged_df['activity_name'].isin(['Km', 'Drug metabolism']), 'activity'] = 'Substrate'
 
-            # Apply the changes to the 'Activity' column based on the combined conditions
             substrate_pattern = r'(activity of.*oxidation)|(activity at cyp.*phenotyping)|(activity at human recombinant cyp.*formation)|(activity at recombinant cyp.*formation)'
-            merged_df.loc[active_mask & merged_df['Assay Name'].str.contains(substrate_pattern, case=False, regex=True), 'Activity'] = 'Substrate'
+            merged_df.loc[active_mask & merged_df['assay_name'].str.contains(substrate_pattern, case=False, regex=True), 'activity'] = 'Substrate'
 
             ActIndMod_pattern = r'(effect on cyp)|(effect on human recombinant cyp)|(effect on recombinant cyp)|(effect on human cyp)'
-            merged_df.loc[active_mask & merged_df['Assay Name'].str.contains(ActIndMod_pattern, case=False, regex=True), 'Activity'] = 'Inhibitor/Inducer/Modulator'
+            merged_df.loc[active_mask & merged_df['assay_name'].str.contains(ActIndMod_pattern, case=False, regex=True), 'activity'] = 'Inhibitor/Inducer/Modulator'
 
             inducer_pattern = r'(effect on cyp.*induction)|(induction of.*)'
-            merged_df.loc[active_mask & merged_df['Assay Name'].str.contains(inducer_pattern, case=False, regex=True), 'Activity'] = 'Inducer'
+            merged_df.loc[active_mask & merged_df['assay_name'].str.contains(inducer_pattern, case=False, regex=True), 'activity'] = 'Inducer'
 
-            merged_df.loc[active_mask & merged_df['activity direction'].str.contains('decreasing', case=False), 'Activity'] = 'Inhibitor'
-            merged_df.loc[active_mask & merged_df['activity direction'].str.contains('increasing', case=False), 'Activity'] = 'Activator'
-            merged_df.loc[active_mask & (merged_df['AID'] == 1215398), 'Activity'] = 'Inactivator'
+            merged_df.loc[active_mask & merged_df['activity_direction'].str.contains('decreasing', case=False), 'activity'] = 'Inhibitor'
+            merged_df.loc[active_mask & merged_df['activity_direction'].str.contains('increasing', case=False), 'activity'] = 'Activator'
+            merged_df.loc[active_mask & (merged_df['aid'] == 1215398), 'activity'] = 'Inactivator'
 
         return merged_df
