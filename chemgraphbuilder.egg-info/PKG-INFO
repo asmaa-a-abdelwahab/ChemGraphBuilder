@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: chemgraphbuilder
-Version: 1.4.0
+Version: 1.5.0
 Summary: A package to build chemical knowledge graphs using data from PubChem and Neo4j
 Home-page: https://github.com/asmaa-a-abdelwahab/ChemGraphBuilder
 Author: Asmaa Ali Abdelwahab

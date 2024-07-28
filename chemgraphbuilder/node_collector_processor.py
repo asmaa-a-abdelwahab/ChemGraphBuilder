@@ -27,12 +27,9 @@ class NodeCollectorProcessor:
 
     def __init__(self, node_type, enzyme_list):
         """
-        Initializes the NodesCollectorProcessor with Neo4j connection details, the node type to collect data for, and the list of enzymes.
+        Initializes the NodesCollectorProcessor with the node type to collect data for, and the list of enzymes.
 
         Args:
-            uri (str): The URI for the Neo4j database.
-            username (str): The username for the Neo4j database.
-            password (str): The password for the Neo4j database.
             node_type (str): The type of node to collect data for (e.g., 'Compound', 'BioAssay', 'Gene', 'Protein').
             enzyme_list (list of str): List of enzyme names for which assay data will be fetched from PubChem.
         """
@@ -44,21 +41,27 @@ class NodeCollectorProcessor:
         """
         Collects and processes data based on the node type and saves it to the appropriate file.
         """
-        if self.node_type == 'Compound':
+        data_file = 'Data/AllDataConnected.csv'
+
+        # Check if the data file exists before running the extractor
+        if not os.path.exists(data_file):
+            logging.info(f"{data_file} does not exist. Running data extraction...")
             df = self.extractor.run()
-            self.extractor.extract_compound_properties(main_data='Data/AllDataConnected.csv')
+        else:
+            logging.info(f"{data_file} already exists. Skipping data extraction.")
+
+        # Process data based on the node type
+        if self.node_type == 'Compound':
+            self.extractor.extract_compound_properties(main_data=data_file)
             self.processor.preprocess_compounds()
         elif self.node_type == 'BioAssay':
-            df = self.extractor.run()
-            self.extractor.extract_assay_properties(main_data='Data/AllDataConnected.csv')
+            self.extractor.extract_assay_properties(main_data=data_file)
             self.processor.preprocess_assays()
         elif self.node_type == 'Gene':
-            df = self.extractor.run()
-            self.extractor.extract_gene_properties(main_data='Data/AllDataConnected.csv')
+            self.extractor.extract_gene_properties(main_data=data_file)
             self.processor.preprocess_genes()
         elif self.node_type == 'Protein':
-            df = self.extractor.run()
-            self.extractor.extract_protein_properties(main_data='Data/AllDataConnected.csv')
+            self.extractor.extract_protein_properties(main_data=data_file)
             self.processor.preprocess_proteins()
         else:
             logging.error(f"Unsupported node type: {self.node_type}")
@@ -68,8 +71,8 @@ def main():
     Main function to parse command-line arguments and collect data for the specified node type and enzyme list.
     """
     parser = argparse.ArgumentParser(description="Collect data for different types of nodes.")
-    parser.add_argument('--node_type', type=str, required=True, choices=['Compound', 'BioAssay', 'Gene', 'Protein'], help='The type of node to collect data for')
-    parser.add_argument('--enzyme_list', type=str, required=True, help='Comma-separated list of enzyme names to fetch data for')
+    parser.add_argument('--node-type', type=str, required=True, choices=['Compound', 'BioAssay', 'Gene', 'Protein'], help='The type of node to collect data for')
+    parser.add_argument('--enzyme-list', type=str, required=True, help='Comma-separated list of enzyme names to fetch data for')
 
     args = parser.parse_args()
     enzyme_list = args.enzyme_list.split(',')
