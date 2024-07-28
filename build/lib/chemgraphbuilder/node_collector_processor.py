@@ -1,13 +1,13 @@
 """
 NodesCollectorProcessor Module
 
-This module provides the NodesCollectorProcessor class for collecting and processing data for different types of nodes 
-using the NodePropertiesExtractor and NodeDataProcessor classes. The collected data is intended for loading into 
+This module provides the NodesCollectorProcessor class for collecting and processing data for different types of nodes
+using the NodePropertiesExtractor and NodeDataProcessor classes. The collected data is intended for loading into
 a Neo4j graph database. The module supports command-line interface (CLI) usage for ease of use.
 
 Classes:
     NodesCollectorProcessor: A class to collect and process data for different types of nodes.
-    
+
 Functions:
     main: Main function to parse command-line arguments and collect data for the specified node type and enzyme list.
 
@@ -29,13 +29,12 @@ Usage Example:
 import os
 import logging
 import argparse
-from neo4j import GraphDatabase
 from chemgraphbuilder.node_properties_extractor import NodePropertiesExtractor
 from chemgraphbuilder.node_data_processor import NodeDataProcessor
 
 logging.basicConfig(level=logging.INFO)
 
-class NodeCollectorProcessor:
+class NodesCollectorProcessor:
     """
     A class to collect and process data for different types of nodes using NodePropertiesExtractor and NodeDataProcessor.
     """
@@ -92,16 +91,13 @@ def main():
     Main function to parse command-line arguments and collect data for the specified node type and enzyme list.
     """
     parser = argparse.ArgumentParser(description="Collect data for different types of nodes.")
-    parser.add_argument('--uri', type=str, required=True, help='The URI for the Neo4j database')
-    parser.add_argument('--username', type=str, required=True, help='The username for the Neo4j database')
-    parser.add_argument('--password', type=str, required=True, help='The password for the Neo4j database')
     parser.add_argument('--node_type', type=str, required=True, choices=['Compound', 'BioAssay', 'Gene', 'Protein'], help='The type of node to collect data for')
     parser.add_argument('--enzyme_list', type=str, required=True, help='Comma-separated list of enzyme names to fetch data for')
 
     args = parser.parse_args()
     enzyme_list = args.enzyme_list.split(',')
 
-    collector = NodesCollectorProcessor(uri=args.uri, username=args.username, password=args.password, node_type=args.node_type, enzyme_list=enzyme_list)
+    collector = NodesCollectorProcessor(node_type=args.node_type, enzyme_list=enzyme_list)
     collector.collect_and_process_data()
     collector.close()
 
