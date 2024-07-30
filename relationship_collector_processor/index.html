@@ -45,6 +45,8 @@
     
       <link rel="stylesheet" href="../assets/_mkdocstrings.css">
     
+      <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    
     <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
@@ -489,7 +491,7 @@
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code><a class="autorefs autorefs-internal" title="chemgraphbuilder.relationship_collector_processor.RelationshipCollectorProcessor" href="#chemgraphbuilder.relationship_collector_processor.RelationshipCollectorProcessor">RelationshipCollectorProcessor</a></code></td>
+            <td><code><a class="autorefs autorefs-internal" title="chemgraphbuilder.relationship_collector_processor.RelationshipsCollectorProcessor" href="#chemgraphbuilder.relationship_collector_processor.RelationshipsCollectorProcessor">RelationshipsCollectorProcessor</a></code></td>
             <td>
               <div class="doc-md-description">
                 <p>Class to collect and process relationship data for different types of relationships.</p>
@@ -535,8 +537,8 @@
 
 
 
-<h2 id="chemgraphbuilder.relationship_collector_processor.RelationshipCollectorProcessor" class="doc doc-heading">
-            <code>RelationshipCollectorProcessor</code>
+<h2 id="chemgraphbuilder.relationship_collector_processor.RelationshipsCollectorProcessor" class="doc doc-heading">
+            <code>RelationshipsCollectorProcessor</code>
 
 
 </h2>
@@ -559,7 +561,7 @@
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code><span title="chemgraphbuilder.relationship_collector_processor.RelationshipCollectorProcessor.relationship_type">relationship_type</span></code></td>
+            <td><code><span title="chemgraphbuilder.relationship_collector_processor.RelationshipsCollectorProcessor.relationship_type">relationship_type</span></code></td>
             <td>
                   <code>str</code>
             </td>
@@ -570,7 +572,7 @@
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code><span title="chemgraphbuilder.relationship_collector_processor.RelationshipCollectorProcessor.data_file">data_file</span></code></td>
+            <td><code><span title="chemgraphbuilder.relationship_collector_processor.RelationshipsCollectorProcessor.data_file">data_file</span></code></td>
             <td>
                   <code>str</code>
             </td>
@@ -581,9 +583,9 @@
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code><span title="chemgraphbuilder.relationship_collector_processor.RelationshipCollectorProcessor.extractor">extractor</span></code></td>
+            <td><code><span title="chemgraphbuilder.relationship_collector_processor.RelationshipsCollectorProcessor.extractor">extractor</span></code></td>
             <td>
-                  <code><span title="relationship_properties_extractor.RelationshipPropertiesExtractor">RelationshipPropertiesExtractor</span></code>
+                  <code><a class="autorefs autorefs-internal" title="chemgraphbuilder.relationship_properties_extractor.RelationshipPropertiesExtractor" href="../documentation/#chemgraphbuilder.relationship_properties_extractor.RelationshipPropertiesExtractor">RelationshipPropertiesExtractor</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -592,9 +594,9 @@
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code><span title="chemgraphbuilder.relationship_collector_processor.RelationshipCollectorProcessor.processor">processor</span></code></td>
+            <td><code><span title="chemgraphbuilder.relationship_collector_processor.RelationshipsCollectorProcessor.processor">processor</span></code></td>
             <td>
-                  <code><span title="relationship_data_processor.RelationshipDataProcessor">RelationshipDataProcessor</span></code>
+                  <code><a class="autorefs autorefs-internal" title="chemgraphbuilder.relationship_data_processor.RelationshipDataProcessor" href="../documentation/#chemgraphbuilder.relationship_data_processor.RelationshipDataProcessor">RelationshipDataProcessor</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -656,7 +658,7 @@
 <span class="normal">66</span>
 <span class="normal">67</span>
 <span class="normal">68</span>
-<span class="normal">69</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">RelationshipCollectorProcessor</span><span class="p">:</span>
+<span class="normal">69</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">RelationshipsCollectorProcessor</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A class to collect and process relationship data for different types of relationships using RelationshipPropertiesExtractor and RelationshipDataProcessor.</span>
 
@@ -669,7 +671,7 @@
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">relationship_type</span><span class="p">,</span> <span class="n">start_chunk</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Initializes the RelationshipCollectorProcessor with the relationship type, data file, and start chunk index.</span>
+<span class="sd">        Initializes the RelationshipsCollectorProcessor with the relationship type, data file, and start chunk index.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            relationship_type (str): The type of relationship to collect data for (e.g., &#39;Assay_Compound&#39;, &#39;Assay_Enzyme&#39;, &#39;Gene_Enzyme&#39;, &#39;Compound_Enzyme&#39;, &#39;Compound_Similarity&#39;, &#39;Compound_Cooccurrence&#39;, &#39;Compound_Transformation&#39;).</span>
@@ -724,7 +726,7 @@
 <div class="doc doc-object doc-function">
 
 
-<h3 id="chemgraphbuilder.relationship_collector_processor.RelationshipCollectorProcessor.__init__" class="doc doc-heading">
+<h3 id="chemgraphbuilder.relationship_collector_processor.RelationshipsCollectorProcessor.__init__" class="doc doc-heading">
             <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">relationship_type</span><span class="p">,</span> <span class="n">start_chunk</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span></code>
 
 </h3>
@@ -732,7 +734,7 @@
 
     <div class="doc doc-contents ">
 
-      <p>Initializes the RelationshipCollectorProcessor with the relationship type, data file, and start chunk index.</p>
+      <p>Initializes the RelationshipsCollectorProcessor with the relationship type, data file, and start chunk index.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -797,7 +799,7 @@
 <span class="normal">46</span>
 <span class="normal">47</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">relationship_type</span><span class="p">,</span> <span class="n">start_chunk</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Initializes the RelationshipCollectorProcessor with the relationship type, data file, and start chunk index.</span>
+<span class="sd">    Initializes the RelationshipsCollectorProcessor with the relationship type, data file, and start chunk index.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        relationship_type (str): The type of relationship to collect data for (e.g., &#39;Assay_Compound&#39;, &#39;Assay_Enzyme&#39;, &#39;Gene_Enzyme&#39;, &#39;Compound_Enzyme&#39;, &#39;Compound_Similarity&#39;, &#39;Compound_Cooccurrence&#39;, &#39;Compound_Transformation&#39;).</span>
@@ -821,7 +823,7 @@
 <div class="doc doc-object doc-function">
 
 
-<h3 id="chemgraphbuilder.relationship_collector_processor.RelationshipCollectorProcessor.collect_relationship_data" class="doc doc-heading">
+<h3 id="chemgraphbuilder.relationship_collector_processor.RelationshipsCollectorProcessor.collect_relationship_data" class="doc doc-heading">
             <code class="highlight language-python"><span class="n">collect_relationship_data</span><span class="p">()</span></code>
 
 </h3>
@@ -945,7 +947,7 @@
 
     <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
 
-    <span class="n">collector</span> <span class="o">=</span> <span class="n">RelationshipCollectorProcessor</span><span class="p">(</span><span class="n">relationship_type</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">relationship_type</span><span class="p">,</span> <span class="n">start_chunk</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">start_chunk</span><span class="p">)</span>
+    <span class="n">collector</span> <span class="o">=</span> <span class="n">RelationshipsCollectorProcessor</span><span class="p">(</span><span class="n">relationship_type</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">relationship_type</span><span class="p">,</span> <span class="n">start_chunk</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">start_chunk</span><span class="p">)</span>
     <span class="n">collector</span><span class="o">.</span><span class="n">collect_relationship_data</span><span class="p">()</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -1010,6 +1012,12 @@
     
     
       <script src="../assets/javascripts/bundle.fe8b6f2b.min.js"></script>
+      
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+      
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+      
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
       
     
   </body>
