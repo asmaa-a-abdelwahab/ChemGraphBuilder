@@ -285,17 +285,17 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#chemgraphbuilder.node_collector_processor.NodeCollectorProcessor" class="md-nav__link">
+  <a href="#chemgraphbuilder.node_collector_processor.NodesCollectorProcessor" class="md-nav__link">
     <span class="md-ellipsis">
-      NodeCollectorProcessor
+      NodesCollectorProcessor
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="NodeCollectorProcessor">
+    <nav class="md-nav" aria-label="NodesCollectorProcessor">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#chemgraphbuilder.node_collector_processor.NodeCollectorProcessor.__init__" class="md-nav__link">
+  <a href="#chemgraphbuilder.node_collector_processor.NodesCollectorProcessor.__init__" class="md-nav__link">
     <span class="md-ellipsis">
       __init__
     </span>
@@ -304,16 +304,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#chemgraphbuilder.node_collector_processor.NodeCollectorProcessor.close" class="md-nav__link">
-    <span class="md-ellipsis">
-      close
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#chemgraphbuilder.node_collector_processor.NodeCollectorProcessor.collect_and_process_data" class="md-nav__link">
+  <a href="#chemgraphbuilder.node_collector_processor.NodesCollectorProcessor.collect_and_process_data" class="md-nav__link">
     <span class="md-ellipsis">
       collect_and_process_data
     </span>
@@ -551,17 +542,17 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#chemgraphbuilder.node_collector_processor.NodeCollectorProcessor" class="md-nav__link">
+  <a href="#chemgraphbuilder.node_collector_processor.NodesCollectorProcessor" class="md-nav__link">
     <span class="md-ellipsis">
-      NodeCollectorProcessor
+      NodesCollectorProcessor
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="NodeCollectorProcessor">
+    <nav class="md-nav" aria-label="NodesCollectorProcessor">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#chemgraphbuilder.node_collector_processor.NodeCollectorProcessor.__init__" class="md-nav__link">
+  <a href="#chemgraphbuilder.node_collector_processor.NodesCollectorProcessor.__init__" class="md-nav__link">
     <span class="md-ellipsis">
       __init__
     </span>
@@ -570,16 +561,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#chemgraphbuilder.node_collector_processor.NodeCollectorProcessor.close" class="md-nav__link">
-    <span class="md-ellipsis">
-      close
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#chemgraphbuilder.node_collector_processor.NodeCollectorProcessor.collect_and_process_data" class="md-nav__link">
+  <a href="#chemgraphbuilder.node_collector_processor.NodesCollectorProcessor.collect_and_process_data" class="md-nav__link">
     <span class="md-ellipsis">
       collect_and_process_data
     </span>
@@ -628,8 +610,8 @@
 <a id="chemgraphbuilder.node_collector_processor"></a>
     <div class="doc doc-contents first">
 
-      <p>NodeCollectorProcessor Module</p>
-<p>This module provides the NodeCollectorProcessor class for collecting and processing data for different types of nodes
+      <p>NodesCollectorProcessor Module</p>
+<p>This module provides the NodesCollectorProcessor class for collecting and processing data for different types of nodes
 using the NodePropertiesExtractor and NodeDataProcessor classes. The collected data is intended for loading into
 a Neo4j graph database. The module supports command-line interface (CLI) usage for ease of use.</p>
 
@@ -644,7 +626,7 @@ a Neo4j graph database. The module supports command-line interface (CLI) usage f
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code><a class="autorefs autorefs-internal" title="chemgraphbuilder.node_collector_processor.NodeCollectorProcessor" href="#chemgraphbuilder.node_collector_processor.NodeCollectorProcessor">NodeCollectorProcessor</a></code></td>
+            <td><code><a class="autorefs autorefs-internal" title="chemgraphbuilder.node_collector_processor.NodesCollectorProcessor" href="#chemgraphbuilder.node_collector_processor.NodesCollectorProcessor">NodesCollectorProcessor</a></code></td>
             <td>
               <div class="doc-md-description">
                 <p>A class to collect and process data for different types of nodes.</p>
@@ -690,8 +672,8 @@ a Neo4j graph database. The module supports command-line interface (CLI) usage f
 
 
 
-<h2 id="chemgraphbuilder.node_collector_processor.NodeCollectorProcessor" class="doc doc-heading">
-            <code>NodeCollectorProcessor</code>
+<h2 id="chemgraphbuilder.node_collector_processor.NodesCollectorProcessor" class="doc doc-heading">
+            <code>NodesCollectorProcessor</code>
 
 
 </h2>
@@ -744,62 +726,42 @@ a Neo4j graph database. The module supports command-line interface (CLI) usage f
 <span class="normal">60</span>
 <span class="normal">61</span>
 <span class="normal">62</span>
-<span class="normal">63</span>
-<span class="normal">64</span>
-<span class="normal">65</span>
-<span class="normal">66</span>
-<span class="normal">67</span>
-<span class="normal">68</span>
-<span class="normal">69</span>
-<span class="normal">70</span>
-<span class="normal">71</span>
-<span class="normal">72</span>
-<span class="normal">73</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">NodeCollectorProcessor</span><span class="p">:</span>
+<span class="normal">63</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">NodesCollectorProcessor</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A class to collect and process data for different types of nodes using NodePropertiesExtractor and NodeDataProcessor.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uri</span><span class="p">,</span> <span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="p">,</span> <span class="n">node_type</span><span class="p">,</span> <span class="n">enzyme_list</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_type</span><span class="p">,</span> <span class="n">enzyme_list</span><span class="p">,</span> <span class="n">start_chunk</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Initializes the NodesCollectorProcessor with Neo4j connection details, the node type to collect data for, and the list of enzymes.</span>
+<span class="sd">        Initializes the NodesCollectorProcessor with the node type to collect data for, and the list of enzymes.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            uri (str): The URI for the Neo4j database.</span>
-<span class="sd">            username (str): The username for the Neo4j database.</span>
-<span class="sd">            password (str): The password for the Neo4j database.</span>
 <span class="sd">            node_type (str): The type of node to collect data for (e.g., &#39;Compound&#39;, &#39;BioAssay&#39;, &#39;Gene&#39;, &#39;Protein&#39;).</span>
 <span class="sd">            enzyme_list (list of str): List of enzyme names for which assay data will be fetched from PubChem.</span>
+<span class="sd">            start_chunk (int, optional): The starting chunk index for processing. Default is None.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">driver</span> <span class="o">=</span> <span class="n">GraphDatabase</span><span class="o">.</span><span class="n">driver</span><span class="p">(</span><span class="n">uri</span><span class="p">,</span> <span class="n">auth</span><span class="o">=</span><span class="p">(</span><span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">node_type</span> <span class="o">=</span> <span class="n">node_type</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">extractor</span> <span class="o">=</span> <span class="n">NodePropertiesExtractor</span><span class="p">(</span><span class="n">enzyme_list</span><span class="o">=</span><span class="n">enzyme_list</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">processor</span> <span class="o">=</span> <span class="n">NodeDataProcessor</span><span class="p">(</span><span class="n">data_dir</span><span class="o">=</span><span class="s2">&quot;Data&quot;</span><span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Closes the connection to the Neo4j database.&quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">start_chunk</span> <span class="o">=</span> <span class="n">start_chunk</span>
 
     <span class="k">def</span> <span class="nf">collect_and_process_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Collects and processes data based on the node type and saves it to the appropriate file.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">node_type</span> <span class="o">==</span> <span class="s1">&#39;Compound&#39;</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">extractor</span><span class="o">.</span><span class="n">create_data_directories</span><span class="p">()</span>
             <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">extractor</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">extractor</span><span class="o">.</span><span class="n">extract_compound_properties</span><span class="p">(</span><span class="n">main_data</span><span class="o">=</span><span class="s1">&#39;Data/AllDataConnected.csv&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">extractor</span><span class="o">.</span><span class="n">extract_compound_properties</span><span class="p">(</span><span class="n">main_data</span><span class="o">=</span><span class="s1">&#39;Data/AllDataConnected.csv&#39;</span><span class="p">,</span> <span class="n">start_chunk</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">start_chunk</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">processor</span><span class="o">.</span><span class="n">preprocess_compounds</span><span class="p">()</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">node_type</span> <span class="o">==</span> <span class="s1">&#39;BioAssay&#39;</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">extractor</span><span class="o">.</span><span class="n">create_data_directories</span><span class="p">()</span>
             <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">extractor</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">extractor</span><span class="o">.</span><span class="n">extract_assay_properties</span><span class="p">(</span><span class="n">main_data</span><span class="o">=</span><span class="s1">&#39;Data/AllDataConnected.csv&#39;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">processor</span><span class="o">.</span><span class="n">preprocess_assays</span><span class="p">()</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">node_type</span> <span class="o">==</span> <span class="s1">&#39;Gene&#39;</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">extractor</span><span class="o">.</span><span class="n">create_data_directories</span><span class="p">()</span>
             <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">extractor</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">extractor</span><span class="o">.</span><span class="n">extract_gene_properties</span><span class="p">(</span><span class="n">main_data</span><span class="o">=</span><span class="s1">&#39;Data/AllDataConnected.csv&#39;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">processor</span><span class="o">.</span><span class="n">preprocess_genes</span><span class="p">()</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">node_type</span> <span class="o">==</span> <span class="s1">&#39;Protein&#39;</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">extractor</span><span class="o">.</span><span class="n">create_data_directories</span><span class="p">()</span>
             <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">extractor</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">extractor</span><span class="o">.</span><span class="n">extract_protein_properties</span><span class="p">(</span><span class="n">main_data</span><span class="o">=</span><span class="s1">&#39;Data/AllDataConnected.csv&#39;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">processor</span><span class="o">.</span><span class="n">preprocess_proteins</span><span class="p">()</span>
@@ -823,15 +785,15 @@ a Neo4j graph database. The module supports command-line interface (CLI) usage f
 <div class="doc doc-object doc-function">
 
 
-<h3 id="chemgraphbuilder.node_collector_processor.NodeCollectorProcessor.__init__" class="doc doc-heading">
-            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">uri</span><span class="p">,</span> <span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="p">,</span> <span class="n">node_type</span><span class="p">,</span> <span class="n">enzyme_list</span><span class="p">)</span></code>
+<h3 id="chemgraphbuilder.node_collector_processor.NodesCollectorProcessor.__init__" class="doc doc-heading">
+            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">node_type</span><span class="p">,</span> <span class="n">enzyme_list</span><span class="p">,</span> <span class="n">start_chunk</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
 </h3>
 
 
     <div class="doc doc-contents ">
 
-      <p>Initializes the NodesCollectorProcessor with Neo4j connection details, the node type to collect data for, and the list of enzymes.</p>
+      <p>Initializes the NodesCollectorProcessor with the node type to collect data for, and the list of enzymes.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -845,48 +807,6 @@ a Neo4j graph database. The module supports command-line interface (CLI) usage f
         </tr>
       </thead>
       <tbody>
-          <tr class="doc-section-item">
-            <td><code>uri</code></td>
-            <td>
-                  <code>str</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The URI for the Neo4j database.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>username</code></td>
-            <td>
-                  <code>str</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The username for the Neo4j database.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>password</code></td>
-            <td>
-                  <code>str</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The password for the Neo4j database.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
           <tr class="doc-section-item">
             <td><code>node_type</code></td>
             <td>
@@ -915,6 +835,20 @@ a Neo4j graph database. The module supports command-line interface (CLI) usage f
                 <em>required</em>
             </td>
           </tr>
+          <tr class="doc-section-item">
+            <td><code>start_chunk</code></td>
+            <td>
+                  <code>int</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The starting chunk index for processing. Default is None.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
       </tbody>
     </table>
 
@@ -932,23 +866,19 @@ a Neo4j graph database. The module supports command-line interface (CLI) usage f
 <span class="normal">37</span>
 <span class="normal">38</span>
 <span class="normal">39</span>
-<span class="normal">40</span>
-<span class="normal">41</span>
-<span class="normal">42</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uri</span><span class="p">,</span> <span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="p">,</span> <span class="n">node_type</span><span class="p">,</span> <span class="n">enzyme_list</span><span class="p">):</span>
+<span class="normal">40</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_type</span><span class="p">,</span> <span class="n">enzyme_list</span><span class="p">,</span> <span class="n">start_chunk</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Initializes the NodesCollectorProcessor with Neo4j connection details, the node type to collect data for, and the list of enzymes.</span>
+<span class="sd">    Initializes the NodesCollectorProcessor with the node type to collect data for, and the list of enzymes.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        uri (str): The URI for the Neo4j database.</span>
-<span class="sd">        username (str): The username for the Neo4j database.</span>
-<span class="sd">        password (str): The password for the Neo4j database.</span>
 <span class="sd">        node_type (str): The type of node to collect data for (e.g., &#39;Compound&#39;, &#39;BioAssay&#39;, &#39;Gene&#39;, &#39;Protein&#39;).</span>
 <span class="sd">        enzyme_list (list of str): List of enzyme names for which assay data will be fetched from PubChem.</span>
+<span class="sd">        start_chunk (int, optional): The starting chunk index for processing. Default is None.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">driver</span> <span class="o">=</span> <span class="n">GraphDatabase</span><span class="o">.</span><span class="n">driver</span><span class="p">(</span><span class="n">uri</span><span class="p">,</span> <span class="n">auth</span><span class="o">=</span><span class="p">(</span><span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="p">))</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">node_type</span> <span class="o">=</span> <span class="n">node_type</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">extractor</span> <span class="o">=</span> <span class="n">NodePropertiesExtractor</span><span class="p">(</span><span class="n">enzyme_list</span><span class="o">=</span><span class="n">enzyme_list</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">processor</span> <span class="o">=</span> <span class="n">NodeDataProcessor</span><span class="p">(</span><span class="n">data_dir</span><span class="o">=</span><span class="s2">&quot;Data&quot;</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">start_chunk</span> <span class="o">=</span> <span class="n">start_chunk</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -958,33 +888,7 @@ a Neo4j graph database. The module supports command-line interface (CLI) usage f
 <div class="doc doc-object doc-function">
 
 
-<h3 id="chemgraphbuilder.node_collector_processor.NodeCollectorProcessor.close" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">close</span><span class="p">()</span></code>
-
-</h3>
-
-
-    <div class="doc doc-contents ">
-
-      <p>Closes the connection to the Neo4j database.</p>
-
-            <details class="quote">
-              <summary>Source code in <code>chemgraphbuilder/node_collector_processor.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">44</span>
-<span class="normal">45</span>
-<span class="normal">46</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Closes the connection to the Neo4j database.&quot;&quot;&quot;</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-</code></pre></div></td></tr></table></div>
-            </details>
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h3 id="chemgraphbuilder.node_collector_processor.NodeCollectorProcessor.collect_and_process_data" class="doc doc-heading">
+<h3 id="chemgraphbuilder.node_collector_processor.NodesCollectorProcessor.collect_and_process_data" class="doc doc-heading">
             <code class="highlight language-python"><span class="n">collect_and_process_data</span><span class="p">()</span></code>
 
 </h3>
@@ -996,7 +900,13 @@ a Neo4j graph database. The module supports command-line interface (CLI) usage f
 
             <details class="quote">
               <summary>Source code in <code>chemgraphbuilder/node_collector_processor.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">48</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">42</span>
+<span class="normal">43</span>
+<span class="normal">44</span>
+<span class="normal">45</span>
+<span class="normal">46</span>
+<span class="normal">47</span>
+<span class="normal">48</span>
 <span class="normal">49</span>
 <span class="normal">50</span>
 <span class="normal">51</span>
@@ -1011,37 +921,23 @@ a Neo4j graph database. The module supports command-line interface (CLI) usage f
 <span class="normal">60</span>
 <span class="normal">61</span>
 <span class="normal">62</span>
-<span class="normal">63</span>
-<span class="normal">64</span>
-<span class="normal">65</span>
-<span class="normal">66</span>
-<span class="normal">67</span>
-<span class="normal">68</span>
-<span class="normal">69</span>
-<span class="normal">70</span>
-<span class="normal">71</span>
-<span class="normal">72</span>
-<span class="normal">73</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">collect_and_process_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="normal">63</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">collect_and_process_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Collects and processes data based on the node type and saves it to the appropriate file.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">node_type</span> <span class="o">==</span> <span class="s1">&#39;Compound&#39;</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">extractor</span><span class="o">.</span><span class="n">create_data_directories</span><span class="p">()</span>
         <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">extractor</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">extractor</span><span class="o">.</span><span class="n">extract_compound_properties</span><span class="p">(</span><span class="n">main_data</span><span class="o">=</span><span class="s1">&#39;Data/AllDataConnected.csv&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">extractor</span><span class="o">.</span><span class="n">extract_compound_properties</span><span class="p">(</span><span class="n">main_data</span><span class="o">=</span><span class="s1">&#39;Data/AllDataConnected.csv&#39;</span><span class="p">,</span> <span class="n">start_chunk</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">start_chunk</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">processor</span><span class="o">.</span><span class="n">preprocess_compounds</span><span class="p">()</span>
     <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">node_type</span> <span class="o">==</span> <span class="s1">&#39;BioAssay&#39;</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">extractor</span><span class="o">.</span><span class="n">create_data_directories</span><span class="p">()</span>
         <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">extractor</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">extractor</span><span class="o">.</span><span class="n">extract_assay_properties</span><span class="p">(</span><span class="n">main_data</span><span class="o">=</span><span class="s1">&#39;Data/AllDataConnected.csv&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">processor</span><span class="o">.</span><span class="n">preprocess_assays</span><span class="p">()</span>
     <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">node_type</span> <span class="o">==</span> <span class="s1">&#39;Gene&#39;</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">extractor</span><span class="o">.</span><span class="n">create_data_directories</span><span class="p">()</span>
         <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">extractor</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">extractor</span><span class="o">.</span><span class="n">extract_gene_properties</span><span class="p">(</span><span class="n">main_data</span><span class="o">=</span><span class="s1">&#39;Data/AllDataConnected.csv&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">processor</span><span class="o">.</span><span class="n">preprocess_genes</span><span class="p">()</span>
     <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">node_type</span> <span class="o">==</span> <span class="s1">&#39;Protein&#39;</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">extractor</span><span class="o">.</span><span class="n">create_data_directories</span><span class="p">()</span>
         <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">extractor</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">extractor</span><span class="o">.</span><span class="n">extract_protein_properties</span><span class="p">(</span><span class="n">main_data</span><span class="o">=</span><span class="s1">&#39;Data/AllDataConnected.csv&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">processor</span><span class="o">.</span><span class="n">preprocess_proteins</span><span class="p">()</span>
@@ -1077,33 +973,33 @@ a Neo4j graph database. The module supports command-line interface (CLI) usage f
 
             <details class="quote">
               <summary>Source code in <code>chemgraphbuilder/node_collector_processor.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">75</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">65</span>
+<span class="normal">66</span>
+<span class="normal">67</span>
+<span class="normal">68</span>
+<span class="normal">69</span>
+<span class="normal">70</span>
+<span class="normal">71</span>
+<span class="normal">72</span>
+<span class="normal">73</span>
+<span class="normal">74</span>
+<span class="normal">75</span>
 <span class="normal">76</span>
 <span class="normal">77</span>
-<span class="normal">78</span>
-<span class="normal">79</span>
-<span class="normal">80</span>
-<span class="normal">81</span>
-<span class="normal">82</span>
-<span class="normal">83</span>
-<span class="normal">84</span>
-<span class="normal">85</span>
-<span class="normal">86</span>
-<span class="normal">87</span>
-<span class="normal">88</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+<span class="normal">78</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Main function to parse command-line arguments and collect data for the specified node type and enzyme list.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Collect data for different types of nodes.&quot;</span><span class="p">)</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--node_type&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">choices</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Compound&#39;</span><span class="p">,</span> <span class="s1">&#39;BioAssay&#39;</span><span class="p">,</span> <span class="s1">&#39;Gene&#39;</span><span class="p">,</span> <span class="s1">&#39;Protein&#39;</span><span class="p">],</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;The type of node to collect data for&#39;</span><span class="p">)</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--enzyme_list&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Comma-separated list of enzyme names to fetch data for&#39;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--node-type&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">choices</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Compound&#39;</span><span class="p">,</span> <span class="s1">&#39;BioAssay&#39;</span><span class="p">,</span> <span class="s1">&#39;Gene&#39;</span><span class="p">,</span> <span class="s1">&#39;Protein&#39;</span><span class="p">],</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;The type of node to collect data for&#39;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--enzyme-list&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Comma-separated list of enzyme names to fetch data for&#39;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--start-chunk&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;The starting chunk index for processing Compound Data&#39;</span><span class="p">)</span>
 
     <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
     <span class="n">enzyme_list</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">enzyme_list</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)</span>
 
-    <span class="n">collector</span> <span class="o">=</span> <span class="n">NodeCollectorProcessor</span><span class="p">(</span><span class="n">node_type</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">node_type</span><span class="p">,</span> <span class="n">enzyme_list</span><span class="o">=</span><span class="n">enzyme_list</span><span class="p">)</span>
+    <span class="n">collector</span> <span class="o">=</span> <span class="n">NodesCollectorProcessor</span><span class="p">(</span><span class="n">node_type</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">node_type</span><span class="p">,</span> <span class="n">enzyme_list</span><span class="o">=</span><span class="n">enzyme_list</span><span class="p">,</span> <span class="n">start_chunk</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">start_chunk</span><span class="p">)</span>
     <span class="n">collector</span><span class="o">.</span><span class="n">collect_and_process_data</span><span class="p">()</span>
-    <span class="n">collector</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
