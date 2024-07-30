@@ -25,13 +25,13 @@ class NodeDataProcessor:
     """
     NodeDataProcessor is responsible for preprocessing various types of node data
     (assays, proteins, genes, and compounds) by renaming columns, consolidating
-    multiple files, and saving the processed data. This preprocessing step is
+    multiple files, and saving the processed data. This preprocessing step is 
     crucial for ensuring uniformity and ease of access in subsequent analysis
     and integration processes.
 
     Attributes:
         data_dir (str): The directory where the node data files are stored.
-
+    
     Methods:
         preprocess_assays(): Processes and renames columns in assay data.
         preprocess_proteins(): Processes and renames columns in protein data.
@@ -94,7 +94,7 @@ class NodeDataProcessor:
         path = f'{self.data_dir}/Nodes/Compound_Properties'
         all_csv_files = glob.glob(path + "/*.csv")
         first_file = True
-        output_file = f'Data/Nodes/Compound_Properties.csv'
+        output_file = f'{path}/Compound_Properties.csv'
 
         with open(output_file, 'w', newline='', encoding='utf-8') as f_out:
             for file in all_csv_files:
@@ -108,4 +108,4 @@ class NodeDataProcessor:
 
         df = pd.read_csv(output_file)
         df.rename(columns={"CID": "CompoundID", "Title": "CompoundName"}, inplace=True)
-        df.to_csv(f"{output_file.replace('.csv', '_Processed')}", index=False)
+        df.to_csv(f'{path}/Compound_Properties_Processed.csv', index=False)

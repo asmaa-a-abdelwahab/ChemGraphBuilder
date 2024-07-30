@@ -11,9 +11,9 @@ Functions:
 import os
 import logging
 import argparse
-from chemgraphbuilder.relationship_properties_extractor import RelationshipPropertiesExtractor
-from chemgraphbuilder.relationship_data_processor import RelationshipDataProcessor
-from chemgraphbuilder.setup_data_folder import SetupDataFolder
+from relationship_properties_extractor import RelationshipPropertiesExtractor
+from relationship_data_processor import RelationshipDataProcessor
+from setup_data_folder import SetupDataFolder
 
 logging.basicConfig(level=logging.INFO)
 
