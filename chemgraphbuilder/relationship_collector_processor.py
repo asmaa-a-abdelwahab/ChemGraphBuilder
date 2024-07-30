@@ -2,7 +2,7 @@
 Module to collect and process relationship data for different types of relationships using RelationshipPropertiesExtractor and RelationshipDataProcessor.
 
 Classes:
-    RelationshipCollectorProcessor: Class to collect and process relationship data for different types of relationships.
+    RelationshipsCollectorProcessor: Class to collect and process relationship data for different types of relationships.
 
 Functions:
     main: Main function to parse command-line arguments and collect relationship data for the specified type.
@@ -11,13 +11,13 @@ Functions:
 import os
 import logging
 import argparse
-from relationship_properties_extractor import RelationshipPropertiesExtractor
-from relationship_data_processor import RelationshipDataProcessor
-from setup_data_folder import SetupDataFolder
+from chemgraphbuilder.relationship_properties_extractor import RelationshipPropertiesExtractor
+from chemgraphbuilder.relationship_data_processor import RelationshipDataProcessor
+from chemgraphbuilder.setup_data_folder import SetupDataFolder
 
 logging.basicConfig(level=logging.INFO)
 
-class RelationshipCollectorProcessor:
+class RelationshipsCollectorProcessor:
     """
     A class to collect and process relationship data for different types of relationships using RelationshipPropertiesExtractor and RelationshipDataProcessor.
 
@@ -30,7 +30,7 @@ class RelationshipCollectorProcessor:
 
     def __init__(self, relationship_type, start_chunk=0):
         """
-        Initializes the RelationshipCollectorProcessor with the relationship type, data file, and start chunk index.
+        Initializes the RelationshipsCollectorProcessor with the relationship type, data file, and start chunk index.
 
         Args:
             relationship_type (str): The type of relationship to collect data for (e.g., 'Assay_Compound', 'Assay_Enzyme', 'Gene_Enzyme', 'Compound_Enzyme', 'Compound_Similarity', 'Compound_Cooccurrence', 'Compound_Transformation').
@@ -88,7 +88,7 @@ def main():
 
     args = parser.parse_args()
 
-    collector = RelationshipCollectorProcessor(relationship_type=args.relationship_type, start_chunk=args.start_chunk)
+    collector = RelationshipsCollectorProcessor(relationship_type=args.relationship_type, start_chunk=args.start_chunk)
     collector.collect_relationship_data()
 
 if __name__ == '__main__':
