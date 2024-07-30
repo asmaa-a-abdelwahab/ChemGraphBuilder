@@ -1,12 +1,12 @@
 """
-NodeCollectorProcessor Module
+NodesCollectorProcessor Module
 
-This module provides the NodeCollectorProcessor class for collecting and processing data for different types of nodes
+This module provides the NodesCollectorProcessor class for collecting and processing data for different types of nodes
 using the NodePropertiesExtractor and NodeDataProcessor classes. The collected data is intended for loading into
 a Neo4j graph database. The module supports command-line interface (CLI) usage for ease of use.
 
 Classes:
-    NodeCollectorProcessor: A class to collect and process data for different types of nodes.
+    NodesCollectorProcessor: A class to collect and process data for different types of nodes.
 
 Functions:
     main: Main function to parse command-line arguments and collect data for the specified node type and enzyme list.
@@ -20,7 +20,7 @@ from chemgraphbuilder.node_data_processor import NodeDataProcessor
 
 logging.basicConfig(level=logging.INFO)
 
-class NodeCollectorProcessor:
+class NodesCollectorProcessor:
     """
     A class to collect and process data for different types of nodes using NodePropertiesExtractor and NodeDataProcessor.
     """
@@ -69,12 +69,12 @@ def main():
     parser = argparse.ArgumentParser(description="Collect data for different types of nodes.")
     parser.add_argument('--node-type', type=str, required=True, choices=['Compound', 'BioAssay', 'Gene', 'Protein'], help='The type of node to collect data for')
     parser.add_argument('--enzyme-list', type=str, required=True, help='Comma-separated list of enzyme names to fetch data for')
-    parser.add_argument('--start-chunk', type=int, default=None, help='The starting chunk index for processing Compound Data')
+    parser.add_argument('--start-chunk', type=int, default=None, help='The starting chunk index for processing')
 
     args = parser.parse_args()
     enzyme_list = args.enzyme_list.split(',')
 
-    collector = NodeCollectorProcessor(node_type=args.node_type, enzyme_list=enzyme_list, start_chunk=args.start_chunk)
+    collector = NodesCollectorProcessor(node_type=args.node_type, enzyme_list=enzyme_list, start_chunk=args.start_chunk)
     collector.collect_and_process_data()
 
 if __name__ == '__main__':
