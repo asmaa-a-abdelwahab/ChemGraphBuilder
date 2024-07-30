@@ -537,7 +537,7 @@
 <p>You can use the <code>NodesCollectorProcessor</code> class in both Python and the command line:</p>
 <h3 id="python-script-example">Python Script Example</h3>
 <p>You can use the <code>NodesCollectorProcessor</code> class within a Python script as follows:</p>
-<pre><code class="language-python">from chemgraphbuilder.nodes_collector_processor import NodesCollectorProcessor
+<pre><code class="language-python">from chemgraphbuilder.node_collector_processor import NodesCollectorProcessor
 from chemgraphbuilder.setup_data_folder import SetupDataFolder
 
 
@@ -549,7 +549,7 @@ setup_folder = SetupDataFolder()
 setup_folder.setup()
 
 # Initialize the collector
-collector = NodesCollectorProcessor(node_type=node_type, enzyme_list=enzyme_list)
+collector = NodesCollectorProcessor(node_type=node_type, enzyme_list=enzyme_list, start_chunk=0)
 
 # Collect and process the data
 collector.collect_and_process_data()
@@ -560,10 +560,12 @@ collector.close()
 <h3 id="command-line-interface-cli-example">Command Line Interface (CLI) Example</h3>
 <p>You can use the <code>NodesCollectorProcessor</code> class from the command line by executing the script with the necessary arguments:</p>
 <pre><code class="language-sh">setup-data-folder
-collect-process-nodes --node_type Compound --enzyme_list CYP2D6,CYP3A4
+collect-process-nodes --node_type Compound --enzyme_list CYP2D6,CYP3A4 --start_chunk 0 # the default start-chunk is 0
 </code></pre>
-<p>The <code>node_type</code> argument can be one of <code>"Compound"</code>, <code>"BioAssay"</code>, <code>"Gene"</code>, or <code>"Protein"</code>, depending on the type of data you want to collect. 
-The <code>enzyme_list</code> should be a comma-separated string of enzyme names.</p>
+<p>The <code>node_type</code> argument can be one of <code>"Compound"</code>, <code>"BioAssay"</code>, <code>"Gene"</code>, or <code>"Protein"</code>, depending on the type of data you want to collect.
+The <code>enzyme_list</code> should be a comma-separated string of enzyme names.
+The <code>start_chunk</code> argument is optional and is used when collecting data for the <code>Compound</code> type because the compound data is downloaded as chunks.
+If you weren't able to download all the data at once, you can continue the download starting from the desired chunk.</p>
 
 
 

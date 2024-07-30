@@ -64,7 +64,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#relationship-collector-and-processor" class="md-skip">
+        <a href="#relationships-collector-and-processor" class="md-skip">
           Skip to content
         </a>
       
@@ -586,7 +586,7 @@
                   
 
 
-<h1 id="relationship-collector-and-processor">Relationship Collector and Processor</h1>
+<h1 id="relationships-collector-and-processor">Relationships Collector and Processor</h1>
 <p>This module collects and processes relationship data for different types of relationships using the <code>RelationshipPropertiesExtractor</code> and <code>RelationshipDataProcessor</code> classes.</p>
 <h2 id="available-relationship-types">Available Relationship Types</h2>
 <ul>
@@ -600,14 +600,14 @@
 </ul>
 <h2 id="usage-examples">Usage Examples</h2>
 <h3 id="python">Python</h3>
-<p>To use the <code>RelationshipCollectorProcessor</code> class in Python, follow the example below:</p>
-<pre><code class="language-python">from relationship_collector_processor import RelationshipCollectorProcessor
+<p>To use the <code>RelationshipsCollectorProcessor</code> class in Python, follow the example below:</p>
+<pre><code class="language-python">from relationship_collector_processor import RelationshipsCollectorProcessor
 
 # Set the relationship type
 relationship_type = &quot;Assay_Compound&quot;  # Change to the desired relationship type
 
 # Initialize the collector
-collector = RelationshipCollectorProcessor(relationship_type=relationship_type)
+collector = RelationshipsCollectorProcessor(relationship_type=relationship_type, start_chunk=0)
 
 # Collect and process the relationship data
 collector.collect_relationship_data()
@@ -615,9 +615,12 @@ collector.collect_relationship_data()
 <h3 id="command-line">Command Line</h3>
 <p>To collect and process relationship data from the command line, use the following command:</p>
 <pre><code class="language-sh"># Collect and process the relationship data for the specified relationship type
-collect-process-relationships --relationship_type Assay_Compound
+collect-process-relationships --relationship_type Assay_Compound --start_chunk 0
 </code></pre>
-<p>Replace <code>Assay_Compound</code> with any of the available relationship types to collect different data.</p>
+<p>Replace <code>Assay_Compound</code> with any of the available relationship types to collect different data.
+If your data is downloaded as chunks and you were not able to complete the 
+download at once, you can use the <code>start_chunk</code> argument to specify the starting 
+chunk index and continue the download.</p>
 
 
 
