@@ -298,6 +298,8 @@
         <a href="../1.node_collector_processor/" class="md-tabs__link">
           
   
+    
+  
   Usage Examples
 
         </a>
@@ -368,9 +370,7 @@
   
 
 
-  
-
-<nav class="md-nav md-nav--primary md-nav--lifted md-nav--integrated" aria-label="Navigation" data-md-level="0">
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
     <a href=".." title="ChemGraphBuilder" class="md-nav__button md-logo" aria-label="ChemGraphBuilder" data-md-component="logo">
       
@@ -422,6 +422,24 @@
   
   
     
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
     
     
       
@@ -1595,6 +1613,908 @@
               </div>
             
             
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-setup-data-folder" class="md-nav__link">
+    <span class="md-ellipsis">
+      1. Setup Data Folder
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#chemgraphbuilder.setup_data_folder" class="md-nav__link">
+    <span class="md-ellipsis">
+      setup_data_folder
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#chemgraphbuilder.setup_data_folder.SetupDataFolder" class="md-nav__link">
+    <span class="md-ellipsis">
+      SetupDataFolder
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="SetupDataFolder">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#chemgraphbuilder.setup_data_folder.SetupDataFolder.__init__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __init__
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#chemgraphbuilder.setup_data_folder.SetupDataFolder.create_folder" class="md-nav__link">
+    <span class="md-ellipsis">
+      create_folder
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#chemgraphbuilder.setup_data_folder.SetupDataFolder.setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      setup
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#chemgraphbuilder.setup_data_folder.main" class="md-nav__link">
+    <span class="md-ellipsis">
+      main
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-neo4j-driver" class="md-nav__link">
+    <span class="md-ellipsis">
+      2. Neo4j Driver
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#chemgraphbuilder.neo4jdriver" class="md-nav__link">
+    <span class="md-ellipsis">
+      neo4jdriver
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#chemgraphbuilder.neo4jdriver.Neo4jBase" class="md-nav__link">
+    <span class="md-ellipsis">
+      Neo4jBase
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Neo4jBase">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#chemgraphbuilder.neo4jdriver.Neo4jBase.close" class="md-nav__link">
+    <span class="md-ellipsis">
+      close
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#chemgraphbuilder.neo4jdriver.Neo4jBase.connect_to_neo4j" class="md-nav__link">
+    <span class="md-ellipsis">
+      connect_to_neo4j
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#chemgraphbuilder.neo4jdriver.Neo4jConnectionError" class="md-nav__link">
+    <span class="md-ellipsis">
+      Neo4jConnectionError
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-node-properties-extractor" class="md-nav__link">
+    <span class="md-ellipsis">
+      3. Node Properties Extractor
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#chemgraphbuilder.node_properties_extractor" class="md-nav__link">
+    <span class="md-ellipsis">
+      node_properties_extractor
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#chemgraphbuilder.node_properties_extractor.NodePropertiesExtractor" class="md-nav__link">
+    <span class="md-ellipsis">
+      NodePropertiesExtractor
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="NodePropertiesExtractor">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#chemgraphbuilder.node_properties_extractor.NodePropertiesExtractor.__init__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __init__
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#chemgraphbuilder.node_properties_extractor.NodePropertiesExtractor.extract_assay_properties" class="md-nav__link">
+    <span class="md-ellipsis">
+      extract_assay_properties
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#chemgraphbuilder.node_properties_extractor.NodePropertiesExtractor.extract_compound_properties" class="md-nav__link">
+    <span class="md-ellipsis">
+      extract_compound_properties
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#chemgraphbuilder.node_properties_extractor.NodePropertiesExtractor.extract_gene_properties" class="md-nav__link">
+    <span class="md-ellipsis">
+      extract_gene_properties
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#chemgraphbuilder.node_properties_extractor.NodePropertiesExtractor.extract_protein_properties" class="md-nav__link">
+    <span class="md-ellipsis">
+      extract_protein_properties
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#chemgraphbuilder.node_properties_extractor.NodePropertiesExtractor.fetch_data" class="md-nav__link">
+    <span class="md-ellipsis">
+      fetch_data
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#chemgraphbuilder.node_properties_extractor.NodePropertiesExtractor.get_enzyme_assays" class="md-nav__link">
+    <span class="md-ellipsis">
+      get_enzyme_assays
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#chemgraphbuilder.node_properties_extractor.NodePropertiesExtractor.run" class="md-nav__link">
+    <span class="md-ellipsis">
+      run
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-node-data-processor" class="md-nav__link">
+    <span class="md-ellipsis">
+      4. Node Data Processor
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#chemgraphbuilder.node_data_processor" class="md-nav__link">
+    <span class="md-ellipsis">
+      node_data_processor
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#chemgraphbuilder.node_data_processor.NodeDataProcessor" class="md-nav__link">
+    <span class="md-ellipsis">
+      NodeDataProcessor
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="NodeDataProcessor">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#chemgraphbuilder.node_data_processor.NodeDataProcessor.__init__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __init__
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#chemgraphbuilder.node_data_processor.NodeDataProcessor.preprocess_assays" class="md-nav__link">
+    <span class="md-ellipsis">
+      preprocess_assays
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#chemgraphbuilder.node_data_processor.NodeDataProcessor.preprocess_compounds" class="md-nav__link">
+    <span class="md-ellipsis">
+      preprocess_compounds
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#chemgraphbuilder.node_data_processor.NodeDataProcessor.preprocess_genes" class="md-nav__link">
+    <span class="md-ellipsis">
+      preprocess_genes
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#chemgraphbuilder.node_data_processor.NodeDataProcessor.preprocess_proteins" class="md-nav__link">
+    <span class="md-ellipsis">
+      preprocess_proteins
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-add-graph-nodes" class="md-nav__link">
+    <span class="md-ellipsis">
+      5. Add Graph Nodes
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#chemgraphbuilder.add_graph_nodes" class="md-nav__link">
+    <span class="md-ellipsis">
+      add_graph_nodes
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#chemgraphbuilder.add_graph_nodes.AddGraphNodes" class="md-nav__link">
+    <span class="md-ellipsis">
+      AddGraphNodes
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="AddGraphNodes">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#chemgraphbuilder.add_graph_nodes.AddGraphNodes--methods" class="md-nav__link">
+    <span class="md-ellipsis">
+      Methods:
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#chemgraphbuilder.add_graph_nodes.AddGraphNodes.__init__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __init__
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="__init__">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#chemgraphbuilder.add_graph_nodes.AddGraphNodes.__init__--parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      Parameters:
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#chemgraphbuilder.add_graph_nodes.AddGraphNodes.combine_csv_files" class="md-nav__link">
+    <span class="md-ellipsis">
+      combine_csv_files
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="combine_csv_files">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#chemgraphbuilder.add_graph_nodes.AddGraphNodes.combine_csv_files--parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      Parameters:
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#chemgraphbuilder.add_graph_nodes.AddGraphNodes.combine_csv_files--returns" class="md-nav__link">
+    <span class="md-ellipsis">
+      Returns:
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#chemgraphbuilder.add_graph_nodes.AddGraphNodes.create_uniqueness_constraint" class="md-nav__link">
+    <span class="md-ellipsis">
+      create_uniqueness_constraint
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="create_uniqueness_constraint">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#chemgraphbuilder.add_graph_nodes.AddGraphNodes.create_uniqueness_constraint--parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      Parameters:
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#chemgraphbuilder.add_graph_nodes.AddGraphNodes.execute_queries" class="md-nav__link">
+    <span class="md-ellipsis">
+      execute_queries
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="execute_queries">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#chemgraphbuilder.add_graph_nodes.AddGraphNodes.execute_queries--parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      Parameters:
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#chemgraphbuilder.add_graph_nodes.AddGraphNodes.generate_cypher_queries" class="md-nav__link">
+    <span class="md-ellipsis">
+      generate_cypher_queries
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="generate_cypher_queries">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#chemgraphbuilder.add_graph_nodes.AddGraphNodes.generate_cypher_queries--parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      Parameters:
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#chemgraphbuilder.add_graph_nodes.AddGraphNodes.generate_cypher_queries--yields" class="md-nav__link">
+    <span class="md-ellipsis">
+      Yields:
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#chemgraphbuilder.add_graph_nodes.AddGraphNodes.process_and_add_nodes" class="md-nav__link">
+    <span class="md-ellipsis">
+      process_and_add_nodes
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="process_and_add_nodes">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#chemgraphbuilder.add_graph_nodes.AddGraphNodes.process_and_add_nodes--parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      Parameters:
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#chemgraphbuilder.add_graph_nodes.AddGraphNodes.process_and_add_nodes_from_directory" class="md-nav__link">
+    <span class="md-ellipsis">
+      process_and_add_nodes_from_directory
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="process_and_add_nodes_from_directory">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#chemgraphbuilder.add_graph_nodes.AddGraphNodes.process_and_add_nodes_from_directory--parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      Parameters:
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#chemgraphbuilder.add_graph_nodes.AddGraphNodes.public_generate_property_string" class="md-nav__link">
+    <span class="md-ellipsis">
+      public_generate_property_string
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="public_generate_property_string">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#chemgraphbuilder.add_graph_nodes.AddGraphNodes.public_generate_property_string--parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      Parameters:
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#chemgraphbuilder.add_graph_nodes.AddGraphNodes.public_generate_property_string--returns" class="md-nav__link">
+    <span class="md-ellipsis">
+      Returns:
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#chemgraphbuilder.add_graph_nodes.AddGraphNodes.read_csv_file" class="md-nav__link">
+    <span class="md-ellipsis">
+      read_csv_file
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="read_csv_file">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#chemgraphbuilder.add_graph_nodes.AddGraphNodes.read_csv_file--parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      Parameters:
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#chemgraphbuilder.add_graph_nodes.AddGraphNodes.read_csv_file--returns" class="md-nav__link">
+    <span class="md-ellipsis">
+      Returns:
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-relationship-properties-extractor" class="md-nav__link">
+    <span class="md-ellipsis">
+      6. Relationship Properties Extractor
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#chemgraphbuilder.relationship_properties_extractor" class="md-nav__link">
+    <span class="md-ellipsis">
+      relationship_properties_extractor
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#chemgraphbuilder.relationship_properties_extractor.RelationshipPropertiesExtractor" class="md-nav__link">
+    <span class="md-ellipsis">
+      RelationshipPropertiesExtractor
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="RelationshipPropertiesExtractor">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#chemgraphbuilder.relationship_properties_extractor.RelationshipPropertiesExtractor.__init__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __init__
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#chemgraphbuilder.relationship_properties_extractor.RelationshipPropertiesExtractor.assay_compound_relationship" class="md-nav__link">
+    <span class="md-ellipsis">
+      assay_compound_relationship
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#chemgraphbuilder.relationship_properties_extractor.RelationshipPropertiesExtractor.assay_enzyme_relationship" class="md-nav__link">
+    <span class="md-ellipsis">
+      assay_enzyme_relationship
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#chemgraphbuilder.relationship_properties_extractor.RelationshipPropertiesExtractor.compound_cooccurrence" class="md-nav__link">
+    <span class="md-ellipsis">
+      compound_cooccurrence
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#chemgraphbuilder.relationship_properties_extractor.RelationshipPropertiesExtractor.compound_gene_relationship" class="md-nav__link">
+    <span class="md-ellipsis">
+      compound_gene_relationship
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#chemgraphbuilder.relationship_properties_extractor.RelationshipPropertiesExtractor.compound_similarity_relationship" class="md-nav__link">
+    <span class="md-ellipsis">
+      compound_similarity_relationship
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#chemgraphbuilder.relationship_properties_extractor.RelationshipPropertiesExtractor.compound_transformation" class="md-nav__link">
+    <span class="md-ellipsis">
+      compound_transformation
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#chemgraphbuilder.relationship_properties_extractor.RelationshipPropertiesExtractor.fetch_data_for_aid" class="md-nav__link">
+    <span class="md-ellipsis">
+      fetch_data_for_aid
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#chemgraphbuilder.relationship_properties_extractor.RelationshipPropertiesExtractor.fetch_similar_cids" class="md-nav__link">
+    <span class="md-ellipsis">
+      fetch_similar_cids
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#chemgraphbuilder.relationship_properties_extractor.RelationshipPropertiesExtractor.gene_enzyme_relationship" class="md-nav__link">
+    <span class="md-ellipsis">
+      gene_enzyme_relationship
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#chemgraphbuilder.relationship_properties_extractor.RelationshipPropertiesExtractor.process_chunk" class="md-nav__link">
+    <span class="md-ellipsis">
+      process_chunk
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-relationship-data-processor" class="md-nav__link">
+    <span class="md-ellipsis">
+      7. Relationship Data Processor
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#chemgraphbuilder.relationship_data_processor" class="md-nav__link">
+    <span class="md-ellipsis">
+      relationship_data_processor
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#chemgraphbuilder.relationship_data_processor.RelationshipDataProcessor" class="md-nav__link">
+    <span class="md-ellipsis">
+      RelationshipDataProcessor
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="RelationshipDataProcessor">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#chemgraphbuilder.relationship_data_processor.RelationshipDataProcessor.__init__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __init__
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#chemgraphbuilder.relationship_data_processor.RelationshipDataProcessor.most_frequent" class="md-nav__link">
+    <span class="md-ellipsis">
+      most_frequent
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#chemgraphbuilder.relationship_data_processor.RelationshipDataProcessor.process_files" class="md-nav__link">
+    <span class="md-ellipsis">
+      process_files
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#chemgraphbuilder.relationship_data_processor.RelationshipDataProcessor.propagate_phenotype" class="md-nav__link">
+    <span class="md-ellipsis">
+      propagate_phenotype
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-add-graph-relationships" class="md-nav__link">
+    <span class="md-ellipsis">
+      8. Add Graph Relationships
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#chemgraphbuilder.setup_data_folder" class="md-nav__link">
+    <span class="md-ellipsis">
+      setup_data_folder
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#chemgraphbuilder.setup_data_folder.SetupDataFolder" class="md-nav__link">
+    <span class="md-ellipsis">
+      SetupDataFolder
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="SetupDataFolder">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#chemgraphbuilder.setup_data_folder.SetupDataFolder.__init__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __init__
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#chemgraphbuilder.setup_data_folder.SetupDataFolder.create_folder" class="md-nav__link">
+    <span class="md-ellipsis">
+      create_folder
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#chemgraphbuilder.setup_data_folder.SetupDataFolder.setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      setup
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#chemgraphbuilder.setup_data_folder.main" class="md-nav__link">
+    <span class="md-ellipsis">
+      main
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
           
           
             <div class="md-content" data-md-component="content">
@@ -1608,6 +2528,14 @@
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25Z"/></svg>
     </a>
   
+  
+    
+      
+    
+    <a href="https://github.com/asmaa-a-abdelwahab/ChemGraphBuilder/raw/main/docs/documentation.md" title="View source of this page" class="md-content__button md-icon">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0 8a5 5 0 0 1-5-5 5 5 0 0 1 5-5 5 5 0 0 1 5 5 5 5 0 0 1-5 5m0-12.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5Z"/></svg>
+    </a>
   
 
 
@@ -14013,6 +14941,46 @@ relationships folders with specified subfolders.</p>
       
         <footer class="md-footer">
   
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../graph_relationships_loader/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Class Documentation">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Class Documentation
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../about/" class="md-footer__link md-footer__link--next" aria-label="Next: About">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                About
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4Z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
   <div class="md-footer-meta md-typeset">
     <div class="md-footer-meta__inner md-grid">
       <div class="md-copyright">
@@ -14061,7 +15029,7 @@ relationships folders with specified subfolders.</p>
       <div class="md-progress" data-md-component="progress" role="progressbar"></div>
     
     
-    <script id="__config" type="application/json">{"base": "..", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.sections", "navigation.expand", "navigation.path", "navigation.tracking", "toc.integrate", "navigation.top", "navigation.instant", "navigation.instant.prefetch", "navigation.instant.progress", "header.social", "content.action.edit", "search.highlight", "search.share", "search.suggest"], "search": "../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    <script id="__config" type="application/json">{"base": "..", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.sections", "navigation.expand", "navigation.path", "navigation.tracking", "toc.follow", "navigation.indexes", "navigation.top", "navigation.instant", "navigation.instant.prefetch", "navigation.instant.progress", "header.social", "content.action.edit", "search.highlight", "search.share", "search.suggest", "content.action.edit", "content.action.view", "content.code.annotate", "content.code.copy", "content.tooltips", "navigation.footer"], "search": "../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
       <script src="../assets/javascripts/bundle.fe8b6f2b.min.js"></script>
