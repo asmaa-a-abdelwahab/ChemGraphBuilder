@@ -69,7 +69,7 @@ def main():
     parser = argparse.ArgumentParser(description="Collect data for different types of nodes.")
     parser.add_argument('--node-type', type=str, required=True, choices=['Compound', 'BioAssay', 'Gene', 'Protein'], help='The type of node to collect data for')
     parser.add_argument('--enzyme-list', type=str, required=True, help='Comma-separated list of enzyme names to fetch data for')
-    parser.add_argument('--start-chunk', type=int, default=None, help='The starting chunk index for processing')
+    parser.add_argument('--start-chunk', type=int, default=None, help='The starting chunk index for processing Compound Data')
 
     args = parser.parse_args()
     enzyme_list = args.enzyme_list.split(',')
