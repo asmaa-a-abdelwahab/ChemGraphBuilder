@@ -1,9 +1,9 @@
 """
-This module defines the `RelationshipPropertiesExtractor` class, which is responsible for extracting and analyzing 
-relationship properties among compounds, genes, and assays from the PubChem database. 
+This module defines the `RelationshipPropertiesExtractor` class, which is responsible for extracting and analyzing
+relationship properties among compounds, genes, and assays from the PubChem database.
 
-The class facilitates the retrieval of complex relational data between chemical entities, enabling detailed analysis 
-of biochemical interactions and properties. The extracted data is ideal for constructing knowledge graphs, supporting 
+The class facilitates the retrieval of complex relational data between chemical entities, enabling detailed analysis
+of biochemical interactions and properties. The extracted data is ideal for constructing knowledge graphs, supporting
 drug discovery, and understanding genetic influences on compound behavior.
 
 Classes:
@@ -33,29 +33,29 @@ logging.basicConfig(level=logging.INFO)
 
 class RelationshipPropertiesExtractor:
     """
-    Extracts and analyzes relationship properties among compounds, genes, and 
+    Extracts and analyzes relationship properties among compounds, genes, and
     assays from the PubChem database.
 
-    This class facilitates the retrieval of complex relational data between 
-    chemical entities, enabling detailed analysis of biochemical interactions 
+    This class facilitates the retrieval of complex relational data between
+    chemical entities, enabling detailed analysis of biochemical interactions
     and properties. The extracted data is ideal for constructing knowledge
-    graphs, supporting drug discovery, and understanding genetic influences 
+    graphs, supporting drug discovery, and understanding genetic influences
     on compound behavior.
 
-    Methods within the class are tailored to query specific relationship types 
-    from PubChem, including compound-assay relationships, compound co-occurrences, 
-    and compound transformations influenced by genes. Data fetched from PubChem 
-    is processed and saved in structured formats (CSV files), ready for further 
+    Methods within the class are tailored to query specific relationship types
+    from PubChem, including compound-assay relationships, compound co-occurrences,
+    and compound transformations influenced by genes. Data fetched from PubChem
+    is processed and saved in structured formats (CSV files), ready for further
     analysis or database integration.
 
     Attributes:
-        session (requests.Session): Session object to persist certain parameters 
+        session (requests.Session): Session object to persist certain parameters
         across requests.
 
     Usage:
         >>> extractor = RelationshipPropertiesExtractor()
         >>> extractor.assay_compound_relationship("Data/AllDataCollected.csv")
-        This example fetches assay-compound relationship data for specified 
+        This example fetches assay-compound relationship data for specified
         assays and saves the data to CSV files.
     """
 
@@ -89,64 +89,64 @@ class RelationshipPropertiesExtractor:
 
     def fetch_data_for_aid(self, aid, columns_to_remove):
         """
-        Fetches and processes assay data for a specified Assay ID (AID) from the 
+        Fetches and processes assay data for a specified Assay ID (AID) from the
         PubChem database, preparing it for analysis or further processing.
 
-        This method queries the PubChem database for assay data associated with 
-        a given AID. It constructs the query URL, sends the request using a 
-        previously established session, and processes the response. The response 
-        is expected to be in CSV format, which this method reads into a pandas 
-        DataFrame. Specific columns can be removed from this DataFrame based on 
-        the requirements for analysis. This allows for the customization of 
+        This method queries the PubChem database for assay data associated with
+        a given AID. It constructs the query URL, sends the request using a
+        previously established session, and processes the response. The response
+        is expected to be in CSV format, which this method reads into a pandas
+        DataFrame. Specific columns can be removed from this DataFrame based on
+        the requirements for analysis. This allows for the customization of
         the fetched data, making it easier to work with specific datasets.
 
-        If the request is successful and the data is fetched without issues, 
-        it undergoes initial processing to remove unwanted columns as specified 
-        by the 'columns_to_remove' parameter. In case of an error during the 
+        If the request is successful and the data is fetched without issues,
+        it undergoes initial processing to remove unwanted columns as specified
+        by the 'columns_to_remove' parameter. In case of an error during the
         data fetching or processing (e.g., issues with parsing the CSV data),
-        appropriate error messages are logged, and an empty DataFrame is 
+        appropriate error messages are logged, and an empty DataFrame is
         returned as a fallback.
 
         Parameters:
-            aid (int): The assay ID for which data is to be fetched. This ID is 
+            aid (int): The assay ID for which data is to be fetched. This ID is
             used to construct the query URL to the PubChem database.
-            columns_to_remove (list of str): A list of column names that should 
+            columns_to_remove (list of str): A list of column names that should
             be removed from the fetched DataFrame. This allows for the exclusion
-            of data that might not be relevant to the subsequent analysis or 
+            of data that might not be relevant to the subsequent analysis or
             processing steps.
 
         Returns:
-            pandas.DataFrame: A DataFrame containing the processed data 
-            associated with the given AID. The DataFrame will exclude columns 
-            listed in 'columns_to_remove'. If the data fetching fails or if 
+            pandas.DataFrame: A DataFrame containing the processed data
+            associated with the given AID. The DataFrame will exclude columns
+            listed in 'columns_to_remove'. If the data fetching fails or if
             an error occurs during processing, an empty DataFrame is returned.
 
         Raises:
-            requests.RequestException: If an error occurs during the HTTP request 
-            to the PubChem API. This includes scenarios such as timeout issues, 
-            non-200 status codes, or network-related errors. The exception is 
-            handled internally with logging, but it's important to be aware of 
+            requests.RequestException: If an error occurs during the HTTP request
+            to the PubChem API. This includes scenarios such as timeout issues,
+            non-200 status codes, or network-related errors. The exception is
+            handled internally with logging, but it's important to be aware of
             its possibility.
-            pd.errors.ParserError: If an error occurs while parsing the CSV 
-            response from PubChem into a DataFrame. This could happen due to 
-            malformed data or unexpected changes in the response format. 
-            Like with RequestException, this error is logged and results in 
+            pd.errors.ParserError: If an error occurs while parsing the CSV
+            response from PubChem into a DataFrame. This could happen due to
+            malformed data or unexpected changes in the response format.
+            Like with RequestException, this error is logged and results in
             the return of an empty DataFrame.
 
         Example:
             >>> extractor = RelationshipPropertiesExtractor()
             >>> processed_data_df = extractor.fetch_data_for_aid(12345, ['UnwantedColumn1', 'UnwantedColumn2'])
             >>> print(processed_data_df.head())
-            This example demonstrates how to fetch and process assay data for 
-            the assay with ID 12345, removing 'UnwantedColumn1' and 
-            'UnwantedColumn2' from the resulting DataFrame. The first few rows 
+            This example demonstrates how to fetch and process assay data for
+            the assay with ID 12345, removing 'UnwantedColumn1' and
+            'UnwantedColumn2' from the resulting DataFrame. The first few rows
             of the processed DataFrame are printed as an output.
 
         Note:
-            - This method is part of a class that requires a valid session with 
+            - This method is part of a class that requires a valid session with
             the PubChem API. Ensure that the class is properly initialized and that
             the session is active.
-            - The removal of columns is an optional step and can be customized 
+            - The removal of columns is an optional step and can be customized
             based on the analysis needs. If no columns need to be removed, pass an
             empty list as 'columns_to_remove'.
         """
@@ -198,34 +198,30 @@ class RelationshipPropertiesExtractor:
         df['AID'] = aid
 
 
-    def assay_compound_relationship(self, assays_data, chunk_size=100):
+    def assay_compound_relationship(self, assays_data, start_chunk=0):
         """
-        Processes and stores relationships between assays and compounds based 
+        Processes and stores relationships between assays and compounds based
         on assay data from PubChem.
 
-        The method utilizes chunk processing and limited concurrent requests 
-        to minimize memory usage.
-
-        Args:
+        Parameters:
             assays_data (str): Path to a CSV file containing assay IDs (AIDs).
-            chunk_size (int): Number of rows per chunk to process from the 
-            assays_data file.
-            max_workers (int): Maximum number of concurrent threads for data fetching.
+            start_chunk (int): The starting index for processing chunks.
         """
+        for chunk_idx, chunk in enumerate(pd.read_csv(assays_data, chunksize=100)):
+            if chunk_idx >= start_chunk:
+                columns_to_remove = ['PUBCHEM_RESULT_TAG', 'PUBCHEM_SID', 'PUBCHEM_EXT_DATASOURCE_SMILES']
+                output_dir = 'Data/Relationships/Assay_Compound_Relationship'
 
-        for chunk in pd.read_csv(assays_data, chunksize=chunk_size):
-            columns_to_remove = ['PUBCHEM_RESULT_TAG', 'PUBCHEM_SID',
-                                 'PUBCHEM_EXT_DATASOURCE_SMILES']
-            output_dir = 'Data/Relationships/Assay_Compound_Relationship'
-
-            # Process each assay ID in the chunk
-            for aid in chunk['AID']:
-                if not os.path.exists(f'{output_dir}/AID_{aid}.csv'):
-                    df = self.fetch_data_for_aid(aid, columns_to_remove)
-                    if not df.empty:
-                        if not os.path.exists(output_dir):
-                            os.makedirs(output_dir)
-                        df.to_csv(f'{output_dir}/AID_{aid}.csv', index=False)
+                for aid in chunk['AID']:
+                    if not os.path.exists(f'{output_dir}/AID_{aid}.csv'):
+                        df = self.fetch_data_for_aid(aid, columns_to_remove)
+                        if not df.empty:
+                            if not os.path.exists(output_dir):
+                                os.makedirs(output_dir)
+                            df.to_csv(f'{output_dir}/AID_{aid}.csv', index=False)
+                logging.info(f"Processed chunk {chunk_idx} for assay-compound relationships.")
+            else:
+                logging.info(f"No More Chunck to Process.")
 
 
 
@@ -238,27 +234,27 @@ class RelationshipPropertiesExtractor:
 
     def assay_enzyme_relationship(self, main_data):
         """
-        Extracts and saves relationships between assays and enzymes from the 
+        Extracts and saves relationships between assays and enzymes from the
         specified dataset.
 
-        This method processes assay data to identify relationships between 
-        assays and their target enzymes. It selects relevant columns from the 
-        input data, removes duplicates to ensure unique relationships, and saves 
-        the cleaned data to a CSV file for further analysis or integration into 
+        This method processes assay data to identify relationships between
+        assays and their target enzymes. It selects relevant columns from the
+        input data, removes duplicates to ensure unique relationships, and saves
+        the cleaned data to a CSV file for further analysis or integration into
         knowledge graphs.
 
         Parameters:
-            main_data (str): Path to the CSV file containing the main data. The 
-            file should include columns for 'AID' (Assay ID), 'Target GeneID', 
+            main_data (str): Path to the CSV file containing the main data. The
+            file should include columns for 'AID' (Assay ID), 'Target GeneID',
             and 'Activity Name'.
 
         Returns:
-            pandas.DataFrame: A DataFrame containing the unique relationships 
-            between assays and enzymes, including the assay ID, target gene ID, 
+            pandas.DataFrame: A DataFrame containing the unique relationships
+            between assays and enzymes, including the assay ID, target gene ID,
             and activity name.
 
         Side Effects:
-            - Writes a CSV file to 'Data/Assay_Enzyme_Relationship.csv', 
+            - Writes a CSV file to 'Data/Assay_Enzyme_Relationship.csv',
             containing the processed relationships data.
         """
         df = pd.read_csv(main_data)
@@ -271,26 +267,26 @@ class RelationshipPropertiesExtractor:
 
     def gene_enzyme_relationship(self, main_data):
         """
-        Extracts and saves relationships between genes and enzymes based on 
+        Extracts and saves relationships between genes and enzymes based on
         the provided dataset.
 
-        This method selects relevant columns to highlight the relationships 
+        This method selects relevant columns to highlight the relationships
         between genes and their corresponding enzymes.
-        It removes duplicate entries to ensure that each relationship is 
+        It removes duplicate entries to ensure that each relationship is
         represented uniquely and saves the resultant data to
-        a CSV file. This facilitates easy integration of genetic data into 
+        a CSV file. This facilitates easy integration of genetic data into
         knowledge bases or further analysis.
 
         Parameters:
-            main_data (str): Path to the CSV file containing gene and enzyme data. 
+            main_data (str): Path to the CSV file containing gene and enzyme data.
             Expected columns include 'Target GeneID' and 'Target Accession'.
 
         Returns:
-            pandas.DataFrame: A DataFrame of unique gene-enzyme relationships, 
+            pandas.DataFrame: A DataFrame of unique gene-enzyme relationships,
             including gene ID and enzyme accession numbers.
 
         Side Effects:
-            - Writes the processed data to 'Data/Gene_Enzyme_Relationship.csv' 
+            - Writes the processed data to 'Data/Gene_Enzyme_Relationship.csv'
             in a structured CSV format.
         """
         df = pd.read_csv(main_data)
@@ -303,31 +299,31 @@ class RelationshipPropertiesExtractor:
 
     def compound_gene_relationship(self, main_data):
         """
-        Identifies and records relationships between compounds and enzymes from 
+        Identifies and records relationships between compounds and enzymes from
         the input data.
 
-        This method focuses on extracting compound-enzyme interaction data, 
+        This method focuses on extracting compound-enzyme interaction data,
         including activity outcomes and values. It selects
-        pertinent columns, removes duplicate records, and sorts the data by 
-        Compound ID and Target Accession for clarity. The cleaned dataset is 
-        then saved to a CSV file, providing a structured view  of how compounds 
-        interact with various enzymes, which can be critical for drug discovery 
+        pertinent columns, removes duplicate records, and sorts the data by
+        Compound ID and Target Accession for clarity. The cleaned dataset is
+        then saved to a CSV file, providing a structured view  of how compounds
+        interact with various enzymes, which can be critical for drug discovery
         and pharmacological research.
 
         Parameters:
-            main_data (str): Path to the CSV file with compound and enzyme data. 
-            This file should contain columns for 'CID' (Compound ID), 
-            'Target Accession', 'Activity Outcome', 'Activity Name', and 
+            main_data (str): Path to the CSV file with compound and enzyme data.
+            This file should contain columns for 'CID' (Compound ID),
+            'Target Accession', 'Activity Outcome', 'Activity Name', and
             'Activity Value [uM]'.
 
         Returns:
-            pandas.DataFrame: A DataFrame with processed compound-enzyme 
-            relationships, sorted and cleaned for direct analysis or database 
+            pandas.DataFrame: A DataFrame with processed compound-enzyme
+            relationships, sorted and cleaned for direct analysis or database
             insertion.
 
         Side Effects:
-            - Saves the processed relationships data to 
-            'Data/Relationships/Compound_Gene_Relationship.csv', 
+            - Saves the processed relationships data to
+            'Data/Relationships/Compound_Gene_Relationship.csv',
             facilitating easy access and integration.
         """
         df = pd.read_csv(main_data)
@@ -344,32 +340,32 @@ class RelationshipPropertiesExtractor:
 
     def fetch_similar_cids(self, cid):
         """
-        Fetches similar compound IDs (CIDs) from the PubChem database for a 
+        Fetches similar compound IDs (CIDs) from the PubChem database for a
         given compound ID (CID) using 2D similarity.
 
-        This method queries the PubChem database to find compounds that are 
-        similar to the given CID based on 2D structural similarity. 
-        The similarity threshold is set to 95%, and a maximum of 100 similar 
-        CIDs are fetched. The response is parsed from XML format to extract 
+        This method queries the PubChem database to find compounds that are
+        similar to the given CID based on 2D structural similarity.
+        The similarity threshold is set to 95%, and a maximum of 100 similar
+        CIDs are fetched. The response is parsed from XML format to extract
         the similar CIDs.
 
         Parameters:
             cid (int): The compound ID for which similar CIDs are to be fetched.
 
         Returns:
-            tuple: A tuple containing the original CID and a list of similar 
+            tuple: A tuple containing the original CID and a list of similar
             CIDs. If an error occurs, the list of similar CIDs will be empty.
 
         Raises:
-            Exception: Logs an error message with the original CID and the 
-            exception if the request to PubChem fails or if parsing the XML 
+            Exception: Logs an error message with the original CID and the
+            exception if the request to PubChem fails or if parsing the XML
             response encounters an error.
 
         Note:
-            - The method utilizes the `requests` library for HTTP requests and 
+            - The method utilizes the `requests` library for HTTP requests and
             `xml.etree.ElementTree` for XML parsing.
-            - In case of a request failure or parsing error, the method logs 
-            the error and returns the original CID with an empty list, 
+            - In case of a request failure or parsing error, the method logs
+            the error and returns the original CID with an empty list,
             allowing the calling function to handle the exception as needed.
         """
         url = ("https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/"
@@ -393,25 +389,25 @@ class RelationshipPropertiesExtractor:
 
     def process_chunk(self, chunk):
         """
-        Processes a chunk of CIDs in parallel to fetch similar CIDs for each CID 
+        Processes a chunk of CIDs in parallel to fetch similar CIDs for each CID
         in the chunk.
 
-        This method uses a ThreadPoolExecutor to send out concurrent requests for 
+        This method uses a ThreadPoolExecutor to send out concurrent requests for
         fetching similar CIDs for a list of CIDs.
-        The number of worker threads is set to 5. Each CID's request is handled 
+        The number of worker threads is set to 5. Each CID's request is handled
         by `fetch_similar_cids` method.
 
         Parameters:
-            chunk (list of int): A list of compound IDs (CIDs) to process in 
+            chunk (list of int): A list of compound IDs (CIDs) to process in
             parallel.
 
         Returns:
-            list of tuples: A list of tuples, each containing a CID and its 
+            list of tuples: A list of tuples, each containing a CID and its
             corresponding list of similar CIDs.
 
         Side Effects:
             - Utilizes concurrent threads to speed up the fetching process.
-            - May log errors if any occur during the fetching of similar CIDs 
+            - May log errors if any occur during the fetching of similar CIDs
             for individual CIDs.
         """
         with ThreadPoolExecutor(max_workers=5) as executor:
@@ -420,66 +416,59 @@ class RelationshipPropertiesExtractor:
         return results
 
 
-    def compound_similarity_relationship(self, main_data):
+    def compound_similarity_relationship(self, main_data, start_chunk=0):
         """
-        Identifies and records the similarity relationships between compounds 
-        based on a list of CIDs.
+        Identifies and records the similarity relationships between compounds
+        based on a list of CIDs. The similarity is detrmined by the Tanimoto
+        similarity coefficient with threshold 95% to ensure highe structural 
+        similarity.
 
-        This method reads a CSV file containing compound data, filters compounds 
+        This method reads a CSV file containing compound data, filters compounds
         based on specific 'Target GeneID' values,
-        and fetches similar CIDs for each compound. The compounds are processed 
-        in chunks to manage memory usage and improve efficiency. The results are 
+        and fetches similar CIDs for each compound. The compounds are processed
+        in chunks to manage memory usage and improve efficiency. The results are
         saved into separate CSV files for each chunk.
 
         Parameters:
-            main_data (str): Path to the CSV file containing the main compound 
-            data. This file should include at least 'CID' and 'Target GeneID' 
-            columns.
-
-        Side Effects:
-            - Reads from a CSV file specified by `main_data`.
-            - Processes compounds in chunks to efficiently handle large datasets.
-            - Saves the results of similar CIDs for each chunk to separate CSV 
-            files within 'Data/Relationships/Compound_Similarities' directory.
-            - Logs information about processing and potential errors during the 
-            similarity fetching process.
-
+            main_data (str): Path to the CSV file containing the main compound data.
+            start_chunk (int): The starting index for processing chunks.
         Note:
-            - The method filters the main data for compounds associated with 
-            specific 'Target GeneID' values before fetching similar CIDs, 
+            - The method filters the main data for compounds associated with
+            specific 'Target GeneID' values before fetching similar CIDs,
             optimizing the process for relevant compounds only.
-            - The division of CIDs into chunks and concurrent processing helps 
-            in managing large datasets and utilizes parallelism for faster 
+            - The division of CIDs into chunks and concurrent processing helps
+            in managing large datasets and utilizes parallelism for faster
             execution.
         """
-        # Read main data and filter
         df = pd.read_csv(main_data)
         df = df[df['Target GeneID'].isin([1576, 1544, 1557, 1559, 1565])]
         df = df.dropna(subset=['CID'])
         IDs = df['CID'].unique().tolist()
 
-        # Divide the IDs into chunks of 10000
-        chunk_size = 10000
+        chunk_size=10000
         chunks = [IDs[i:i + chunk_size] for i in range(0, len(IDs), chunk_size)]
 
-        for i, chunk in enumerate(chunks, start=0): #chuncks rannge, numbering start for naming
-            chunk_results = self.process_chunk(chunk)
-            chunk_df = pd.DataFrame(chunk_results, columns=['CID',
-                                                            'Similar CIDs'])
-            chunk_df.to_csv(f'Data/Relationships/Compound_Similarities/Chunk_{i}.csv',
-                            index=False)
+        for i, chunk in enumerate(chunks, start=0):
+            if i >= start_chunk:
+                chunk_results = self.process_chunk(chunk)
+                chunk_df = pd.DataFrame(chunk_results, columns=['CID', 'Similar CIDs'])
+                if not os.path.exists('Data/Relationships/Compound_Similarities'):
+                    os.makedirs('Data/Relationships/Compound_Similarities')
+                chunk_df.to_csv(f'Data/Relationships/Compound_Similarities/Chunk_{i}.csv', index=False)
+                logging.info(f"Processed chunk {i} for compound similarity relationships.")
+
 
 
     def _fetch_data(self, cid):
         """
-        Fetches chemical-chemical and chemical-gene relationship data for a given 
+        Fetches chemical-chemical and chemical-gene relationship data for a given
         compound ID (CID). Checks if each data file exists before fetching.
 
         Args:
             cid (int): The compound ID for which data is to be fetched.
 
         Returns:
-            tuple: A tuple containing the CID, and two lists of data 
+            tuple: A tuple containing the CID, and two lists of data
             (chemical-chemical and chemical-gene relationships).
         """
         cpd_cpd_file = f'Data/Relationships/Cpd_Cpd_CoOcuurence/CID_{cid}.csv'
@@ -537,31 +526,31 @@ class RelationshipPropertiesExtractor:
         """
         Writes given data to a CSV file, with optional filtering before saving.
 
-        This method takes a list of dictionaries (data), converts it into a 
+        This method takes a list of dictionaries (data), converts it into a
         pandas DataFrame, and optionally filters the DataFrame based on
-        specified conditions before writing the result to a CSV file. The 
+        specified conditions before writing the result to a CSV file. The
         filtering is performed on specified columns with their expected
-        values provided in 'filter_condition'. This allows for selective 
+        values provided in 'filter_condition'. This allows for selective
         data saving, especially useful when dealing with large datasets
-        or when only a subset of data is needed for further processing 
+        or when only a subset of data is needed for further processing
         or analysis.
 
         Parameters:
-            data (list of dict): Data to be written to a CSV file. Each 
-            dictionary in the list represents a row in the DataFrame, with keys 
+            data (list of dict): Data to be written to a CSV file. Each
+            dictionary in the list represents a row in the DataFrame, with keys
             as column names and values as row values.
-            filename (str): Path to the CSV file where the data will be saved. 
+            filename (str): Path to the CSV file where the data will be saved.
             If the file exists, it will be overwritten.
-            filter_condition (dict, optional): A dictionary specifying the 
-            columns to filter by and the values to include. Keys in the 
-            dictionary are column names, and values are lists of acceptable 
-            values for that column. Rows not meeting the filter condition are 
+            filter_condition (dict, optional): A dictionary specifying the
+            columns to filter by and the values to include. Keys in the
+            dictionary are column names, and values are lists of acceptable
+            values for that column. Rows not meeting the filter condition are
             excluded from the final DataFrame to be saved.
 
         Side Effects:
-            - Writes a CSV file to the given filename path. The file is overwritten 
+            - Writes a CSV file to the given filename path. The file is overwritten
             if it already exists.
-            - Logs a warning if a specified column for filtering is not found in 
+            - Logs a warning if a specified column for filtering is not found in
             the DataFrame.
         """
 
@@ -576,151 +565,143 @@ class RelationshipPropertiesExtractor:
             df.to_csv(filename, index=False)
 
 
-    def compound_cooccurrence(self, main_data, rate_limit=5):
+    def compound_cooccurrence(self, main_data, rate_limit=5, start_chunk=0):
         """
-        Analyzes compound co-occurrence relationships from the specified main 
+        Analyzes compound co-occurrence relationships from the specified main
         data file and saves the results into structured CSV files.
 
-        This method takes a path to a CSV file containing compound data and 
-        performs batch processing to extract relationships between compounds 
-        and genes from the PubChem database. It filters compounds based on their 
-        association with specific genes of interest, then fetches co-occurrence 
-        data for each compound using parallel requests. The data fetched 
-        includes both compound-compound and compound-gene co-occurrence 
+        This method takes a path to a CSV file containing compound data and
+        performs batch processing to extract relationships between compounds
+        and genes from the PubChem database. It filters compounds based on their
+        association with specific genes of interest, then fetches co-occurrence
+        data for each compound using parallel requests. The data fetched
+        includes both compound-compound and compound-gene co-occurrence
         relationships. Results are saved in separate CSV files within specific
         directories for later analysis.
 
         Parameters:
-            main_data (str): Path to the CSV file containing the main data. This 
+            main_data (str): Path to the CSV file containing the main data. This
             file should include 'CID' (Compound ID) and 'Target GeneID' columns.
-            rate_limit (int): Controls the rate of API requests to avoid 
-            exceeding PubChem's request limits. Specifies the maximum number of 
+            rate_limit (int): Controls the rate of API requests to avoid
+            exceeding PubChem's request limits. Specifies the maximum number of
             requests that can be made per second.
-
-        Side Effects:
-            - Creates CSV files in 'Data/Relationships/Cpd_Cpd_CoOcuurence' 
-            and 'Data/Relationships/Cpd_gene_CoOcuurence' directories, 
-            storing compound-compound and compound-gene co-occurrence data, 
-            respectively.
-            - Logs the processing time for each chunk of data and any errors 
-            encountered during data fetching.
+            start_chunk (int): The starting index for processing chunks.
 
         Returns:
-            str: A message indicating the successful completion of data 
+            str: A message indicating the successful completion of data
             processing and saving.
 
         Raises:
-            FileNotFoundError: If the specified 'main_data' file does not exist 
+            FileNotFoundError: If the specified 'main_data' file does not exist
             or cannot be read.
-            ValueError: If 'main_data' does not contain the required columns 
+            ValueError: If 'main_data' does not contain the required columns
             ('CID' and 'Target GeneID').
 
         Example:
             >>> extractor = RelationshipPropertiesExtractor()
             >>> completion_message = extractor.compound_cooccurrence('Data/AllDataConnected.csv', rate_limit=5)
             >>> print(completion_message)
-            This would process the compound data, fetch co-occurrence data from 
+            This would process the compound data, fetch co-occurrence data from
             PubChem, and save the results into CSV files.
             The completion message would indicate successful processing.
 
         Note:
-            The 'main_data' file must be properly formatted, with at least 'CID' 
-            and 'Target GeneID' columns present. The method assumes the existence 
-            of 'Data/Relationships/Cpd_Cpd_CoOcuurence' and 
-            'Data/Relationships/Cpd_gene_CoOcuurence' directories for saving 
-            the output CSV files. It is recommended to check and adhere to 
-            PubChem's current rate limits when setting the 'rate_limit' 
-            parameter to avoid potential blocks or restrictions on your 
+            The 'main_data' file must be properly formatted, with at least 'CID'
+            and 'Target GeneID' columns present. The method assumes the existence
+            of 'Data/Relationships/Cpd_Cpd_CoOcuurence' and
+            'Data/Relationships/Cpd_gene_CoOcuurence' directories for saving
+            the output CSV files. It is recommended to check and adhere to
+            PubChem's current rate limits when setting the 'rate_limit'
+            parameter to avoid potential blocks or restrictions on your
             IP address due to excessive requests.
         """
         df = pd.read_csv(main_data, chunksize=3000)  # Reading in chunks for large files
-        for chunk in df:
-            chunk = chunk[chunk['Target GeneID'].isin([1576, 1544, 1557, 1559, 1565])]
-            chunk.dropna(subset=['CID'], inplace=True)
-            IDs = chunk['CID'].unique().tolist()
+        for chunk_idx, chunk in enumerate(df):
+            if chunk_idx >= start_chunk:
+                chunk = chunk[chunk['Target GeneID'].isin([1576, 1544, 1557, 1559, 1565])]
+                chunk.dropna(subset=['CID'], inplace=True)
+                IDs = chunk['CID'].unique().tolist()
 
-            start_time = timeit.default_timer()
-            with ThreadPoolExecutor(max_workers=rate_limit) as executor:
-                futures = {executor.submit(self._fetch_data, int(cid)): cid for cid in IDs}
-                for future in as_completed(futures):
-                    cid, cpd_cpd_data, cpd_gene_data = future.result()
-                    self._write_data_to_csv(cpd_cpd_data,
-                                            f'Data/Relationships/Cpd_Cpd_CoOcuurence/CID_{cid}.csv')
-                    self._write_data_to_csv(cpd_gene_data,
-                                            f'Data/Relationships/Cpd_gene_CoOcuurence/CID_{cid}.csv',
-                                            filter_condition={"ID_2": ["{'GeneSymbol': 'cyp3a4'}", "{'GeneSymbol': 'cyp1a2'}",
-                                                                    "{'GeneSymbol': 'cyp2c9'}", "{'GeneSymbol': 'cyp2c19'}",
-                                                                    "{'GeneSymbol': 'cyp2d6'}"]})
-                    time.sleep(1 / rate_limit)  # Ensuring we don't exceed rate limit
-            elapsed = timeit.default_timer() - start_time
-            logging.info(f"Processed chunk in {elapsed:.2f} seconds")
+                start_time = timeit.default_timer()
+                with ThreadPoolExecutor(max_workers=rate_limit) as executor:
+                    futures = {executor.submit(self._fetch_data, int(cid)): cid for cid in IDs}
+                    for future in as_completed(futures):
+                        cid, cpd_cpd_data, cpd_gene_data = future.result()
+                        self._write_data_to_csv(cpd_cpd_data, f'Data/Relationships/Cpd_Cpd_CoOcuurence/CID_{cid}.csv')
+                        self._write_data_to_csv(cpd_gene_data, f'Data/Relationships/Cpd_gene_CoOcuurence/CID_{cid}.csv',
+                                                filter_condition={"ID_2": ["{'GeneSymbol': 'cyp3a4'}", "{'GeneSymbol': 'cyp1a2'}",
+                                                                           "{'GeneSymbol': 'cyp2c9'}", "{'GeneSymbol': 'cyp2c19'}",
+                                                                           "{'GeneSymbol': 'cyp2d6'}"]})
+                        time.sleep(1 / rate_limit)  # Ensuring we don't exceed rate limit
+                elapsed = timeit.default_timer() - start_time
+                logging.info(f"Processed chunk {chunk_idx} in {elapsed:.2f} seconds")
 
         return "Data fetching and saving completed."
 
 
     def compound_transformation(self, gene_properties):
         """
-        Analyzes compound transformation data based on gene properties, focusing 
-        on metabolic transformations involving specified genes. This method 
+        Analyzes compound transformation data based on gene properties, focusing
+        on metabolic transformations involving specified genes. This method
         queries the PubChem database for transformation data related
         to compounds associated with the genes identified in the provided CSV file.
 
         Parameters:
-            gene_properties (str): Path to the CSV file containing gene properties 
-            generated by the NodePropertiesExtractor class, which should include 
-            'GeneID' as one of its columns. This file is used to identify genes 
+            gene_properties (str): Path to the CSV file containing gene properties
+            generated by the NodePropertiesExtractor class, which should include
+            'GeneID' as one of its columns. This file is used to identify genes
             of interest for which compound transformation data will be fetched.
 
         Processing Steps:
             1. Reads the provided CSV file to extract unique gene identifiers.
-            2. For each gene identifier, constructs a query to fetch relevant 
-            compound transformation data from PubChem, focusing on metabolic 
+            2. For each gene identifier, constructs a query to fetch relevant
+            compound transformation data from PubChem, focusing on metabolic
             transformations where the gene plays a role.
-            3. Processes and aggregates the fetched data into a structured 
+            3. Processes and aggregates the fetched data into a structured
             pandas DataFrame.
-            4. Filters the aggregated data to retain specific columns relevant 
-            to compound transformations, including substrate and metabolite 
+            4. Filters the aggregated data to retain specific columns relevant
+            to compound transformations, including substrate and metabolite
             Compound IDs (CIDs), the type of metabolic conversion, gene
             identifiers, PubMed IDs, and DOIs for related publications.
-            5. Saves the aggregated and filtered DataFrame to a CSV file for 
-            further analysis or integration into knowledge graphs or other 
+            5. Saves the aggregated and filtered DataFrame to a CSV file for
+            further analysis or integration into knowledge graphs or other
             data models.
 
         Returns:
-            pandas.DataFrame: A DataFrame containing processed compound 
-            transformation data, including substrate and metabolite CIDs, 
-            metabolic conversion types, gene identifiers, PubMed IDs, and DOIs. 
-            The DataFrame structure facilitates further analysis or use in 
-            constructing detailed views of metabolic pathways involving the 
+            pandas.DataFrame: A DataFrame containing processed compound
+            transformation data, including substrate and metabolite CIDs,
+            metabolic conversion types, gene identifiers, PubMed IDs, and DOIs.
+            The DataFrame structure facilitates further analysis or use in
+            constructing detailed views of metabolic pathways involving the
             specified genes.
 
         Side Effects:
-            - Saves the aggregated compound transformation data to 
+            - Saves the aggregated compound transformation data to
             'Data/Relationships/Compound_Transformation.csv'
-            in the current working directory. This file captures the relationship 
-            between substrates, metabolites, and genes based on the input gene 
+            in the current working directory. This file captures the relationship
+            between substrates, metabolites, and genes based on the input gene
             properties.
 
         Raises:
-            FileNotFoundError: If the specified 'gene_properties' file does not 
+            FileNotFoundError: If the specified 'gene_properties' file does not
             exist or cannot be read.
-            ValueError: If 'gene_properties' does not contain the required 
+            ValueError: If 'gene_properties' does not contain the required
             'GeneID' column.
 
         Example:
             >>> extractor = RelationshipPropertiesExtractor()
             >>> transformation_df = extractor.compound_transformation('Data/Nodes/gene_properties.csv')
             >>> print(transformation_df.head())
-            This example processes gene properties from 
+            This example processes gene properties from
             'path/to/gene_properties.csv', queries PubChem for
-            compound transformation data related to the genes, 
+            compound transformation data related to the genes,
             and compiles the results into a DataFrame.
 
         Note:
-            The method assumes that the input 'gene_properties' file is 
+            The method assumes that the input 'gene_properties' file is
             accessible and correctly formatted.
-            The availability and structure of the PubChem database may affect 
-            the completeness and accuracy of the fetched transformation data. 
+            The availability and structure of the PubChem database may affect
+            the completeness and accuracy of the fetched transformation data.
             Users should verify the existence of the 'Data/Relationships'
             directory and have appropriate permissions to write files to it.
         """
