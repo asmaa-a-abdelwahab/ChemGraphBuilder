@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='chemgraphbuilder',
-    version='1.8.0',
+    version='1.9.0',
     packages=find_packages(),
     install_requires=[
         "beautifulsoup4",
