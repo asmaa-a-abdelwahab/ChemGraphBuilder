@@ -12,6 +12,16 @@ nav:
     - Class_Documentation: graph_relationships_loader.md
   - Documentation: documentation.md
   - About: about.md
+
 theme: "material"
+
 plugins:
   - mkdocstrings
+  
+extra_css:
+  - https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css
+
+extra_javascript:
+  - https://code.jquery.com/jquery-3.3.1.slim.min.js
+  - https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js
+  - https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js
