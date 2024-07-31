@@ -5076,7 +5076,7 @@ steps outside the scope of this class.</p>
         <span class="n">chunk_size</span> <span class="o">=</span> <span class="mi">10000</span>
         <span class="n">num_chunks</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">IDs</span><span class="p">)</span> <span class="o">/</span> <span class="n">chunk_size</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">start_chunk</span> <span class="o">&lt;</span> <span class="n">num_chunks</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">num_chunks</span> <span class="o">&gt;=</span> <span class="n">start_chunk</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">start_chunk</span><span class="p">,</span> <span class="n">num_chunks</span><span class="p">):</span>
                 <span class="c1"># Calculate start and end indices for each chunk</span>
                 <span class="n">start_index</span> <span class="o">=</span> <span class="n">i</span> <span class="o">*</span> <span class="n">chunk_size</span>
@@ -5964,7 +5964,7 @@ API rate limits.</li>
     <span class="n">chunk_size</span> <span class="o">=</span> <span class="mi">10000</span>
     <span class="n">num_chunks</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">IDs</span><span class="p">)</span> <span class="o">/</span> <span class="n">chunk_size</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">start_chunk</span> <span class="o">&lt;</span> <span class="n">num_chunks</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">num_chunks</span> <span class="o">&gt;=</span> <span class="n">start_chunk</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">start_chunk</span><span class="p">,</span> <span class="n">num_chunks</span><span class="p">):</span>
             <span class="c1"># Calculate start and end indices for each chunk</span>
             <span class="n">start_index</span> <span class="o">=</span> <span class="n">i</span> <span class="o">*</span> <span class="n">chunk_size</span>
@@ -10424,14 +10424,14 @@ assays and saves the data to CSV files.</p>
 <span class="sd">            and activity name.</span>
 
 <span class="sd">        Side Effects:</span>
-<span class="sd">            - Writes a CSV file to &#39;Data/Assay_Enzyme_Relationship.csv&#39;,</span>
+<span class="sd">            - Writes a CSV file to &#39;Data/Relationships/Assay_Enzyme_Relationship.csv&#39;,</span>
 <span class="sd">            containing the processed relationships data.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">main_data</span><span class="p">)</span>
         <span class="n">columns_to_select</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;AID&#39;</span><span class="p">,</span> <span class="s1">&#39;Target GeneID&#39;</span><span class="p">,</span> <span class="s1">&#39;Activity Name&#39;</span><span class="p">]</span>
         <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">columns_to_select</span><span class="p">]</span>
         <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">(</span><span class="n">keep</span><span class="o">=</span><span class="s1">&#39;first&#39;</span><span class="p">,</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Data/Assay_Enzyme_Relationship.csv&#39;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Data/Relationships/Assay_Enzyme_Relationship.csv&#39;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">df</span>
 
 
@@ -10463,7 +10463,7 @@ assays and saves the data to CSV files.</p>
         <span class="n">columns_to_select</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Target GeneID&#39;</span><span class="p">,</span> <span class="s1">&#39;Target Accession&#39;</span><span class="p">]</span>
         <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">columns_to_select</span><span class="p">]</span>
         <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">(</span><span class="n">keep</span><span class="o">=</span><span class="s1">&#39;first&#39;</span><span class="p">,</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Data/Gene_Enzyme_Relationship.csv&#39;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Data/Relationships/Gene_Enzyme_Relationship.csv&#39;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">df</span>
 
 
@@ -10590,7 +10590,7 @@ assays and saves the data to CSV files.</p>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Identifies and records the similarity relationships between compounds</span>
 <span class="sd">        based on a list of CIDs. The similarity is detrmined by the Tanimoto</span>
-<span class="sd">        similarity coefficient with threshold 95% to ensure highe structural </span>
+<span class="sd">        similarity coefficient with threshold 95% to ensure highe structural</span>
 <span class="sd">        similarity.</span>
 
 <span class="sd">        This method reads a CSV file containing compound data, filters compounds</span>
@@ -11157,7 +11157,7 @@ knowledge graphs.</p>
 <details class="side-effects" open>
   <summary>Side Effects</summary>
   <ul>
-<li>Writes a CSV file to 'Data/Assay_Enzyme_Relationship.csv',
+<li>Writes a CSV file to 'Data/Relationships/Assay_Enzyme_Relationship.csv',
 containing the processed relationships data.</li>
 </ul>
 </details>
@@ -11215,14 +11215,14 @@ containing the processed relationships data.</li>
 <span class="sd">        and activity name.</span>
 
 <span class="sd">    Side Effects:</span>
-<span class="sd">        - Writes a CSV file to &#39;Data/Assay_Enzyme_Relationship.csv&#39;,</span>
+<span class="sd">        - Writes a CSV file to &#39;Data/Relationships/Assay_Enzyme_Relationship.csv&#39;,</span>
 <span class="sd">        containing the processed relationships data.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">main_data</span><span class="p">)</span>
     <span class="n">columns_to_select</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;AID&#39;</span><span class="p">,</span> <span class="s1">&#39;Target GeneID&#39;</span><span class="p">,</span> <span class="s1">&#39;Activity Name&#39;</span><span class="p">]</span>
     <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">columns_to_select</span><span class="p">]</span>
     <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">(</span><span class="n">keep</span><span class="o">=</span><span class="s1">&#39;first&#39;</span><span class="p">,</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Data/Assay_Enzyme_Relationship.csv&#39;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Data/Relationships/Assay_Enzyme_Relationship.csv&#39;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">df</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -11749,7 +11749,7 @@ facilitating easy access and integration.</li>
 
       <p>Identifies and records the similarity relationships between compounds
 based on a list of CIDs. The similarity is detrmined by the Tanimoto
-similarity coefficient with threshold 95% to ensure highe structural 
+similarity coefficient with threshold 95% to ensure highe structural
 similarity.</p>
 <p>This method reads a CSV file containing compound data, filters compounds
 based on specific 'Target GeneID' values,
@@ -11852,7 +11852,7 @@ saved into separate CSV files for each chunk.</p>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Identifies and records the similarity relationships between compounds</span>
 <span class="sd">    based on a list of CIDs. The similarity is detrmined by the Tanimoto</span>
-<span class="sd">    similarity coefficient with threshold 95% to ensure highe structural </span>
+<span class="sd">    similarity coefficient with threshold 95% to ensure highe structural</span>
 <span class="sd">    similarity.</span>
 
 <span class="sd">    This method reads a CSV file containing compound data, filters compounds</span>
@@ -13032,7 +13032,7 @@ in a structured CSV format.</li>
     <span class="n">columns_to_select</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Target GeneID&#39;</span><span class="p">,</span> <span class="s1">&#39;Target Accession&#39;</span><span class="p">]</span>
     <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">columns_to_select</span><span class="p">]</span>
     <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">(</span><span class="n">keep</span><span class="o">=</span><span class="s1">&#39;first&#39;</span><span class="p">,</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Data/Gene_Enzyme_Relationship.csv&#39;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Data/Relationships/Gene_Enzyme_Relationship.csv&#39;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">df</span>
 </code></pre></div></td></tr></table></div>
             </details>

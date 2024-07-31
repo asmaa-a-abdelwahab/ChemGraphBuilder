@@ -875,9 +875,7 @@
 
               <details class="quote">
                 <summary>Source code in <code>chemgraphbuilder/relationship_collector_processor.py</code></summary>
-                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">20</span>
-<span class="normal">21</span>
-<span class="normal">22</span>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">22</span>
 <span class="normal">23</span>
 <span class="normal">24</span>
 <span class="normal">25</span>
@@ -923,8 +921,7 @@
 <span class="normal">65</span>
 <span class="normal">66</span>
 <span class="normal">67</span>
-<span class="normal">68</span>
-<span class="normal">69</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">RelationshipsCollectorProcessor</span><span class="p">:</span>
+<span class="normal">68</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">RelationshipsCollectorProcessor</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A class to collect and process relationship data for different types of relationships using RelationshipPropertiesExtractor and RelationshipDataProcessor.</span>
 
@@ -949,9 +946,6 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">extractor</span> <span class="o">=</span> <span class="n">RelationshipPropertiesExtractor</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">processor</span> <span class="o">=</span> <span class="n">RelationshipDataProcessor</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="s2">&quot;Data/Relationships/Assay_Compound_Relationship&quot;</span><span class="p">)</span>
 
-        <span class="c1"># Setup data folder</span>
-        <span class="n">data_folder_setup</span> <span class="o">=</span> <span class="n">SetupDataFolder</span><span class="p">()</span>
-        <span class="n">data_folder_setup</span><span class="o">.</span><span class="n">setup</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">collect_relationship_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -1047,9 +1041,7 @@
 
             <details class="quote">
               <summary>Source code in <code>chemgraphbuilder/relationship_collector_processor.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">31</span>
-<span class="normal">32</span>
-<span class="normal">33</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">33</span>
 <span class="normal">34</span>
 <span class="normal">35</span>
 <span class="normal">36</span>
@@ -1061,9 +1053,7 @@
 <span class="normal">42</span>
 <span class="normal">43</span>
 <span class="normal">44</span>
-<span class="normal">45</span>
-<span class="normal">46</span>
-<span class="normal">47</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">relationship_type</span><span class="p">,</span> <span class="n">start_chunk</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+<span class="normal">45</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">relationship_type</span><span class="p">,</span> <span class="n">start_chunk</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Initializes the RelationshipsCollectorProcessor with the relationship type, data file, and start chunk index.</span>
 
@@ -1076,10 +1066,6 @@
     <span class="bp">self</span><span class="o">.</span><span class="n">start_chunk</span> <span class="o">=</span> <span class="n">start_chunk</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">extractor</span> <span class="o">=</span> <span class="n">RelationshipPropertiesExtractor</span><span class="p">()</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">processor</span> <span class="o">=</span> <span class="n">RelationshipDataProcessor</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="s2">&quot;Data/Relationships/Assay_Compound_Relationship&quot;</span><span class="p">)</span>
-
-    <span class="c1"># Setup data folder</span>
-    <span class="n">data_folder_setup</span> <span class="o">=</span> <span class="n">SetupDataFolder</span><span class="p">()</span>
-    <span class="n">data_folder_setup</span><span class="o">.</span><span class="n">setup</span><span class="p">()</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -1101,7 +1087,8 @@
 
             <details class="quote">
               <summary>Source code in <code>chemgraphbuilder/relationship_collector_processor.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">49</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">48</span>
+<span class="normal">49</span>
 <span class="normal">50</span>
 <span class="normal">51</span>
 <span class="normal">52</span>
@@ -1120,8 +1107,7 @@
 <span class="normal">65</span>
 <span class="normal">66</span>
 <span class="normal">67</span>
-<span class="normal">68</span>
-<span class="normal">69</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">collect_relationship_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="normal">68</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">collect_relationship_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Collects and processes relationship data based on the relationship type and saves it to the appropriate file.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -1172,7 +1158,8 @@
 
             <details class="quote">
               <summary>Source code in <code>chemgraphbuilder/relationship_collector_processor.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">71</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">70</span>
+<span class="normal">71</span>
 <span class="normal">72</span>
 <span class="normal">73</span>
 <span class="normal">74</span>
@@ -1192,8 +1179,7 @@
 <span class="normal">88</span>
 <span class="normal">89</span>
 <span class="normal">90</span>
-<span class="normal">91</span>
-<span class="normal">92</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+<span class="normal">91</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Main function to parse command-line arguments and collect relationship data for the specified type.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
