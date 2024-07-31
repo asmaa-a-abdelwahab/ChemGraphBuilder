@@ -254,14 +254,14 @@ class RelationshipPropertiesExtractor:
             and activity name.
 
         Side Effects:
-            - Writes a CSV file to 'Data/Assay_Enzyme_Relationship.csv',
+            - Writes a CSV file to 'Data/Relationships/Assay_Enzyme_Relationship.csv',
             containing the processed relationships data.
         """
         df = pd.read_csv(main_data)
         columns_to_select = ['AID', 'Target GeneID', 'Activity Name']
         df = df[columns_to_select]
         df = df.drop_duplicates(keep='first', ignore_index=True)
-        df.to_csv(f'Data/Assay_Enzyme_Relationship.csv', index=False)
+        df.to_csv(f'Data/Relationships/Assay_Enzyme_Relationship.csv', index=False)
         return df
 
 
@@ -293,7 +293,7 @@ class RelationshipPropertiesExtractor:
         columns_to_select = ['Target GeneID', 'Target Accession']
         df = df[columns_to_select]
         df = df.drop_duplicates(keep='first', ignore_index=True)
-        df.to_csv(f'Data/Gene_Enzyme_Relationship.csv', index=False)
+        df.to_csv(f'Data/Relationships/Gene_Enzyme_Relationship.csv', index=False)
         return df
 
 
@@ -420,7 +420,7 @@ class RelationshipPropertiesExtractor:
         """
         Identifies and records the similarity relationships between compounds
         based on a list of CIDs. The similarity is detrmined by the Tanimoto
-        similarity coefficient with threshold 95% to ensure highe structural 
+        similarity coefficient with threshold 95% to ensure highe structural
         similarity.
 
         This method reads a CSV file containing compound data, filters compounds
