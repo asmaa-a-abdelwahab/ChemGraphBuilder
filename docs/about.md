@@ -1,17 +1,23 @@
-# Welcome to MkDocs
+## **About the `chemgraphbuilder` Package**
 
-For full documentation visit [mkdocs.org](https://www.mkdocs.org).
+The `chemgraphbuilder` package is a powerful tool designed to facilitate the construction of knowledge graphs that represent complex chemical-gene interactions. This package is ideal for researchers and data scientists working in the fields of bioinformatics, cheminformatics, and computational biology. By providing a structured framework for integrating data on compounds, genes, proteins, and bioassays, `chemgraphbuilder` helps uncover the intricate relationships between these entities.
 
-## Commands
+**Key features include:**
 
-* `mkdocs new [dir-name]` - Create a new project.
-* `mkdocs serve` - Start the live-reloading docs server.
-* `mkdocs build` - Build the documentation site.
-* `mkdocs -h` - Print help message and exit.
 
-## Project layout
+- **Node Representation:** Incorporates diverse nodes such as compounds, genes, proteins, and bioassays.
+- **Comprehensive Relationships:** Maps out various interactions, including compound similarities, compound co-occurrences, and more nuanced interactions like inhibitor, activator, and ligand roles between compounds and genes.
+- **Data Integration:** Supports the inclusion of extensive literature data, enhancing the depth and accuracy of the knowledge graph.
+- **Command Line and Programmatic Access:** Provides flexibility in usage, allowing for integration into larger workflows or standalone analyses.
 
-    mkdocs.yml    # The configuration file.
-    docs/
-        index.md  # The documentation homepage.
-        ...       # Other markdown pages, images and other files.
+The package aims to support advanced data analysis and visualization efforts, aiding in the discovery of new insights into chemical and biological data.
+
+## **About the Author**
+
+Asmaa Ali Abdelwahab is a research data scientisy and bioinformatician with extensive experience in data science, particularly in the realm of computational drug design and toxicology. Her work is focused on leveraging artificial intelligence and bioinformatics to have valuable contributions in precision medicine and precision toxicology.
+
+With a commitment to open science, Asmaa is passionate about making her work accessible to the broader scientific community, as exemplified by the `chemgraphbuilder` package. This tool is part of her broader effort to democratize access to advanced data analysis tools in the life sciences, promoting greater collaboration and innovation in the field.
+
+**Author LinkedIn Profile:** [https://www.linkedin.com/in/asmaa-a-abdelwahab/](https://www.linkedin.com/in/asmaa-a-abdelwahab/).
+
+**ChemGraphBuilder GitHub:** [https://github.com/asmaa-a-abdelwahab/ChemGraphBuilder](https://github.com/asmaa-a-abdelwahab/ChemGraphBuilder).

@@ -1,0 +1,14 @@
+/* Set the tab text color to white */
+.md-nav__link {
+    color: white !important;
+}
+
+/* Set the active tab text color to white */
+.md-nav__link--active {
+    color: white !important;
+}
+
+/* Set the GitHub icon color to white */
+.md-header__button .md-icon {
+    color: white !important;
+}

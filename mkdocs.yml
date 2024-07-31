@@ -1,24 +1,110 @@
 site_name: ChemGraphBuilder
+site_url: https://asmaa-a-abdelwahab.github.io/ChemGraphBuilder/
+site_author: Asmaa Ali Abdelwahab
+site_description: >-
+  chemgraphbuilder is a Python package for transforming chemical data into knowledge graphs. 
+  Leveraging PubChem for data extraction and Neo4j for graph databases, it enables researchers 
+  to easily extract, process, and visualize complex chemical relationships with precision.
+repo_url: https://github.com/asmaa-a-abdelwahab/ChemGraphBuilder
+repo_name: ChemGraphBuilder
+edit_uri: edit/main/docs/
+copyright: Copyright &copy; 2024 Asmaa A. Abdelwahab
 nav:
   - Home: index.md
-  - Usage_Examples:
-    - Step1_NodesCollectorProcessor: 1.node_collector_processor.md
-    - Class_Documentation: node_collector_processor.md
-    - Step2_RelationshipCollectorProcessor: 2.relationship_collector_processor.md
-    - Class_Documentation: relationship_collector_processor.md
-    - Step3_GraphNodesLoader: 3.graph_nodes_loader.md
-    - Class_Documentation: graph_nodes_loader.md
-    - Step4_GraphRelationshipsLoader: 4.graph_relationships_loader.md
-    - Class_Documentation: graph_relationships_loader.md
+  - Usage Examples:
+      - "Step 1: Nodes Collector Processor": 1.node_collector_processor.md
+      - "Class Documentation": node_collector_processor.md
+      - "Step 2: Relationship Collector Processor": 2.relationship_collector_processor.md
+      - "Class Documentation": relationship_collector_processor.md
+      - "Step 3: Graph Nodes Loader": 3.graph_nodes_loader.md
+      - "Class Documentation": graph_nodes_loader.md
+      - "Step 4: Graph Relationships Loader": 4.graph_relationships_loader.md
+      - "Class Documentation": graph_relationships_loader.md
   - Documentation: documentation.md
   - About: about.md
 
-theme: "material"
+theme:
+  name: 'material'
+  features:
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.sections
+    - navigation.expand  # Ensures ToC does not collapse   
+    - navigation.path
+    - navigation.tracking
+    - toc.follow
+    - navigation.top
+    - navigation.instant
+    - navigation.instant.prefetch
+    - navigation.instant.progress
+    - header.social  # Enables social icons in the header
+    - content.action.edit
+    - content.action.view
+    - content.code.annotate
+    - content.code.copy
+    - search.highlight
+    - search.share
+    - search.suggest
+    - search.highlight    
+    - navigation.footer
+  icon:
+    repo: fontawesome/brands/github
+    edit: material/pencil 
+    view: material/eye
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      primary: "indigo"
+      accent: "indigo"
+    - media: "(prefers-color-scheme: dark)"
+      primary: "indigo"
+      accent: "indigo"
+
+    - media: "(prefers-color-scheme)"
+      toggle:
+        icon: material/link
+        name: Switch to light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/toggle-switch
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: black
+      accent: indigo
+      toggle:
+        icon: material/toggle-switch-off
+        name: Switch to system preference
+  font:
+    text: Roboto
+    code: Roboto Mono
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/asmaa-a-abdelwahab/
+      name: "GitHub"
+    - icon: fontawesome/brands/linkedin
+      link: https://www.linkedin.com/in/asmaa-a-abdelwahab/
+      name: "LinkedIn"
 
 plugins:
+#   - blog
+  - search:
+      separator: '[\s\u200b\-_,:!=\[\]()"`/]+|\.(?!\d)|&[lg]t;|(?!\b)(?=[A-Z][a-z])'
+#   - minify:
+#       minify_html: true
   - mkdocstrings
-  
+  - search
+  - social
+#   - git-authors
+  - git-committers:
+      repository: asmaa-a-abdelwahab/ChemGraphBuilder
+      branch: main
+
 extra_css:
+  - https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css
   - https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css
 
 extra_javascript:
