@@ -804,7 +804,7 @@ class NodePropertiesExtractor:
         chunk_size = 10000
         num_chunks = math.ceil(len(IDs) / chunk_size)
 
-        if start_chunk < num_chunks:
+        if num_chunks >= start_chunk:
             for i in range(start_chunk, num_chunks):
                 # Calculate start and end indices for each chunk
                 start_index = i * chunk_size
