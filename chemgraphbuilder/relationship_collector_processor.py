@@ -11,11 +11,13 @@ Functions:
 import os
 import logging
 import argparse
+import warnings
 from chemgraphbuilder.relationship_properties_extractor import RelationshipPropertiesExtractor
 from chemgraphbuilder.relationship_data_processor import RelationshipDataProcessor
-from chemgraphbuilder.setup_data_folder import SetupDataFolder
 
 logging.basicConfig(level=logging.INFO)
+warnings.filterwarnings("ignore", category=DeprecationWarning)
+
 
 class RelationshipsCollectorProcessor:
     """
@@ -42,9 +44,6 @@ class RelationshipsCollectorProcessor:
         self.extractor = RelationshipPropertiesExtractor()
         self.processor = RelationshipDataProcessor(path="Data/Relationships/Assay_Compound_Relationship")
 
-        # Setup data folder
-        data_folder_setup = SetupDataFolder()
-        data_folder_setup.setup()
 
     def collect_relationship_data(self):
         """
