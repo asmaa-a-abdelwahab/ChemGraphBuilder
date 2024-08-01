@@ -52,6 +52,9 @@ Welcome to the gallery. Here are some screenshots from the Knowledge Graph built
 <div id="carouselExample" class="carousel slide" data-ride="carousel">
   <div class="carousel-inner">
     <div class="carousel-item active">
+      <img src="./assets/images/schema.png" class="d-block w-100" alt="First slide">
+    </div>
+    <div class="carousel-item">
       <img src="./assets/images/1.png" class="d-block w-100" alt="First slide">
     </div>
     <div class="carousel-item">
