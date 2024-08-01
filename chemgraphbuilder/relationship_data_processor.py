@@ -142,34 +142,68 @@ class RelationshipDataProcessor:
         self._filter_and_clean_data()
         logging.info("Data filtered, cleaned, and combined successfully.")
 
+    # def _filter_and_clean_data(self):
+    #     """
+    #     Filters and cleans data from CSV files, then saves to output files.
+    #     """
+    #     output_file = os.path.join('Data/Relationships/Assay_Compound_Relationship.csv')
+    #     compound_gene_file = os.path.join('Data/Relationships/Compound_Gene_Relationship.csv')
+
+    #     if os.path.exists(output_file):
+    #         os.remove(output_file)
+    #     if os.path.exists(compound_gene_file):
+    #         os.remove(compound_gene_file)
+
+    #     unique_column_names = self._get_filtered_columns()+['activity']
+
+    #     # Initialize output files with headers
+    #     pd.DataFrame(columns=unique_column_names).to_csv(output_file, index=False)
+    #     pd.DataFrame(columns=['cid', 'target_geneid', 'activity', 'aid']).to_csv(compound_gene_file, index=False)
+
+    #     tasks = []
+    #     for i, file in enumerate(self.csv_files):
+    #         if i % 100 == 0:
+    #             logging.info(f"Processing file {i+1}/{len(self.csv_files)}: {file}")
+
+    #         tasks.append(dask.delayed(self._process_file)(file, unique_column_names, output_file, compound_gene_file))
+
+    #     dask.compute(*tasks)
+    #     logging.info(f"Processed {len(self.csv_files)} files")
+
     def _filter_and_clean_data(self):
         """
-        Filters and cleans data from CSV files, then saves to output files.
+        Filters and cleans data from CSV files, then saves to output files in chunks.
         """
-        output_file = os.path.join('Data/Relationships/Assay_Compound_Relationship.csv')
-        compound_gene_file = os.path.join('Data/Relationships/Compound_Gene_Relationship.csv')
+        base_output_file = 'Data/Relationships/Assay_Compound_Relationship'
+        base_compound_gene_file = 'Data/Relationships/Compound_Gene_Relationship'
+        
+        # Determine the unique column names
+        unique_column_names = self._get_filtered_columns() + ['activity']
 
-        if os.path.exists(output_file):
-            os.remove(output_file)
-        if os.path.exists(compound_gene_file):
-            os.remove(compound_gene_file)
+        # Process files in chunks of 500
+        chunk_size = 500
+        total_files = len(self.csv_files)
 
-        unique_column_names = self._get_filtered_columns()+['activity']
+        for chunk_index in range(0, total_files, chunk_size):
+            chunk_files = self.csv_files[chunk_index:chunk_index + chunk_size]
+            chunk_output_file = f"{base_output_file}_chunk_{chunk_index // chunk_size + 1}.csv"
+            chunk_compound_gene_file = f"{base_compound_gene_file}_chunk_{chunk_index // chunk_size + 1}.csv"
 
-        # Initialize output files with headers
-        pd.DataFrame(columns=unique_column_names).to_csv(output_file, index=False)
-        pd.DataFrame(columns=['cid', 'target_geneid', 'activity', 'aid']).to_csv(compound_gene_file, index=False)
+            # Initialize output files with headers for each chunk
+            pd.DataFrame(columns=unique_column_names).to_csv(chunk_output_file, index=False)
+            pd.DataFrame(columns=['cid', 'target_geneid', 'activity', 'aid']).to_csv(chunk_compound_gene_file, index=False)
 
-        tasks = []
-        for i, file in enumerate(self.csv_files):
-            if i % 100 == 0:
-                logging.info(f"Processing file {i+1}/{len(self.csv_files)}: {file}")
+            tasks = []
+            for i, file in enumerate(chunk_files, start=chunk_index + 1):
+                if (i - chunk_index) % 100 == 0:
+                    logging.info(f"Processing file {i}/{total_files}: {file}")
+                
+                tasks.append(dask.delayed(self._process_file)(file, unique_column_names, chunk_output_file, chunk_compound_gene_file))
 
-            tasks.append(dask.delayed(self._process_file)(file, unique_column_names, output_file, compound_gene_file))
+            dask.compute(*tasks)
+            logging.info(f"Processed chunk {chunk_index // chunk_size + 1} of {total_files // chunk_size + 1}")
 
-        dask.compute(*tasks)
-        logging.info(f"Processed {len(self.csv_files)} files")
-
+    
     def _process_file(self, file, unique_column_names, output_file, compound_gene_file):
         """
         Processes a single CSV file, applying filtering, cleaning, and adding data.
