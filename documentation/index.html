@@ -10797,8 +10797,8 @@ assays and saves the data to CSV files.</p>
                     <span class="n">futures</span> <span class="o">=</span> <span class="p">{</span><span class="n">executor</span><span class="o">.</span><span class="n">submit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_fetch_data</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">cid</span><span class="p">)):</span> <span class="n">cid</span> <span class="k">for</span> <span class="n">cid</span> <span class="ow">in</span> <span class="n">IDs</span><span class="p">}</span>
                     <span class="k">for</span> <span class="n">future</span> <span class="ow">in</span> <span class="n">as_completed</span><span class="p">(</span><span class="n">futures</span><span class="p">):</span>
                         <span class="n">cid</span><span class="p">,</span> <span class="n">cpd_cpd_data</span><span class="p">,</span> <span class="n">cpd_gene_data</span> <span class="o">=</span> <span class="n">future</span><span class="o">.</span><span class="n">result</span><span class="p">()</span>
-                        <span class="bp">self</span><span class="o">.</span><span class="n">_write_data_to_csv</span><span class="p">(</span><span class="n">cpd_cpd_data</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;Data/Relationships/Cpd_Cpd_CoOcuurence/CID_</span><span class="si">{</span><span class="n">cid</span><span class="si">}</span><span class="s1">.csv&#39;</span><span class="p">)</span>
-                        <span class="bp">self</span><span class="o">.</span><span class="n">_write_data_to_csv</span><span class="p">(</span><span class="n">cpd_gene_data</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;Data/Relationships/Cpd_gene_CoOcuurence/CID_</span><span class="si">{</span><span class="n">cid</span><span class="si">}</span><span class="s1">.csv&#39;</span><span class="p">,</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_write_data_to_csv</span><span class="p">(</span><span class="n">cpd_cpd_data</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;Data/Relationships/Cpd_Cpd_CoOccurrence/CID_</span><span class="si">{</span><span class="n">cid</span><span class="si">}</span><span class="s1">.csv&#39;</span><span class="p">)</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_write_data_to_csv</span><span class="p">(</span><span class="n">cpd_gene_data</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;Data/Relationships/Cpd_gene_CoOccurrence/CID_</span><span class="si">{</span><span class="n">cid</span><span class="si">}</span><span class="s1">.csv&#39;</span><span class="p">,</span>
                                                 <span class="n">filter_condition</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;ID_2&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;{&#39;GeneSymbol&#39;: &#39;cyp3a4&#39;}&quot;</span><span class="p">,</span> <span class="s2">&quot;{&#39;GeneSymbol&#39;: &#39;cyp1a2&#39;}&quot;</span><span class="p">,</span>
                                                                            <span class="s2">&quot;{&#39;GeneSymbol&#39;: &#39;cyp2c9&#39;}&quot;</span><span class="p">,</span> <span class="s2">&quot;{&#39;GeneSymbol&#39;: &#39;cyp2c19&#39;}&quot;</span><span class="p">,</span>
                                                                            <span class="s2">&quot;{&#39;GeneSymbol&#39;: &#39;cyp2d6&#39;}&quot;</span><span class="p">]})</span>
@@ -10876,7 +10876,7 @@ assays and saves the data to CSV files.</p>
 <span class="sd">            directory and have appropriate permissions to write files to it.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">gene_properties</span><span class="p">)</span>
-        <span class="n">IDs</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;GeneID&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+        <span class="n">IDs</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;Target GeneID&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
 
         <span class="n">transformation_dfs</span> <span class="o">=</span> <span class="p">[]</span>
 
@@ -11536,8 +11536,8 @@ IP address due to excessive requests.</p>
                 <span class="n">futures</span> <span class="o">=</span> <span class="p">{</span><span class="n">executor</span><span class="o">.</span><span class="n">submit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_fetch_data</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">cid</span><span class="p">)):</span> <span class="n">cid</span> <span class="k">for</span> <span class="n">cid</span> <span class="ow">in</span> <span class="n">IDs</span><span class="p">}</span>
                 <span class="k">for</span> <span class="n">future</span> <span class="ow">in</span> <span class="n">as_completed</span><span class="p">(</span><span class="n">futures</span><span class="p">):</span>
                     <span class="n">cid</span><span class="p">,</span> <span class="n">cpd_cpd_data</span><span class="p">,</span> <span class="n">cpd_gene_data</span> <span class="o">=</span> <span class="n">future</span><span class="o">.</span><span class="n">result</span><span class="p">()</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">_write_data_to_csv</span><span class="p">(</span><span class="n">cpd_cpd_data</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;Data/Relationships/Cpd_Cpd_CoOcuurence/CID_</span><span class="si">{</span><span class="n">cid</span><span class="si">}</span><span class="s1">.csv&#39;</span><span class="p">)</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">_write_data_to_csv</span><span class="p">(</span><span class="n">cpd_gene_data</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;Data/Relationships/Cpd_gene_CoOcuurence/CID_</span><span class="si">{</span><span class="n">cid</span><span class="si">}</span><span class="s1">.csv&#39;</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_write_data_to_csv</span><span class="p">(</span><span class="n">cpd_cpd_data</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;Data/Relationships/Cpd_Cpd_CoOccurrence/CID_</span><span class="si">{</span><span class="n">cid</span><span class="si">}</span><span class="s1">.csv&#39;</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_write_data_to_csv</span><span class="p">(</span><span class="n">cpd_gene_data</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;Data/Relationships/Cpd_gene_CoOccurrence/CID_</span><span class="si">{</span><span class="n">cid</span><span class="si">}</span><span class="s1">.csv&#39;</span><span class="p">,</span>
                                             <span class="n">filter_condition</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;ID_2&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;{&#39;GeneSymbol&#39;: &#39;cyp3a4&#39;}&quot;</span><span class="p">,</span> <span class="s2">&quot;{&#39;GeneSymbol&#39;: &#39;cyp1a2&#39;}&quot;</span><span class="p">,</span>
                                                                        <span class="s2">&quot;{&#39;GeneSymbol&#39;: &#39;cyp2c9&#39;}&quot;</span><span class="p">,</span> <span class="s2">&quot;{&#39;GeneSymbol&#39;: &#39;cyp2c19&#39;}&quot;</span><span class="p">,</span>
                                                                        <span class="s2">&quot;{&#39;GeneSymbol&#39;: &#39;cyp2d6&#39;}&quot;</span><span class="p">]})</span>
@@ -12264,7 +12264,7 @@ directory and have appropriate permissions to write files to it.</p>
 <span class="sd">        directory and have appropriate permissions to write files to it.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">gene_properties</span><span class="p">)</span>
-    <span class="n">IDs</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;GeneID&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+    <span class="n">IDs</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;Target GeneID&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
 
     <span class="n">transformation_dfs</span> <span class="o">=</span> <span class="p">[]</span>
 
@@ -13655,7 +13655,41 @@ load, filter, clean, and process data files related to assay-compound relationsh
 <span class="normal">378</span>
 <span class="normal">379</span>
 <span class="normal">380</span>
-<span class="normal">381</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">RelationshipDataProcessor</span><span class="p">:</span>
+<span class="normal">381</span>
+<span class="normal">382</span>
+<span class="normal">383</span>
+<span class="normal">384</span>
+<span class="normal">385</span>
+<span class="normal">386</span>
+<span class="normal">387</span>
+<span class="normal">388</span>
+<span class="normal">389</span>
+<span class="normal">390</span>
+<span class="normal">391</span>
+<span class="normal">392</span>
+<span class="normal">393</span>
+<span class="normal">394</span>
+<span class="normal">395</span>
+<span class="normal">396</span>
+<span class="normal">397</span>
+<span class="normal">398</span>
+<span class="normal">399</span>
+<span class="normal">400</span>
+<span class="normal">401</span>
+<span class="normal">402</span>
+<span class="normal">403</span>
+<span class="normal">404</span>
+<span class="normal">405</span>
+<span class="normal">406</span>
+<span class="normal">407</span>
+<span class="normal">408</span>
+<span class="normal">409</span>
+<span class="normal">410</span>
+<span class="normal">411</span>
+<span class="normal">412</span>
+<span class="normal">413</span>
+<span class="normal">414</span>
+<span class="normal">415</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">RelationshipDataProcessor</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A class to process relationship data files, filtering and augmenting the data.</span>
 
@@ -13781,33 +13815,67 @@ load, filter, clean, and process data files related to assay-compound relationsh
         <span class="bp">self</span><span class="o">.</span><span class="n">_filter_and_clean_data</span><span class="p">()</span>
         <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Data filtered, cleaned, and combined successfully.&quot;</span><span class="p">)</span>
 
+    <span class="c1"># def _filter_and_clean_data(self):</span>
+    <span class="c1">#     &quot;&quot;&quot;</span>
+    <span class="c1">#     Filters and cleans data from CSV files, then saves to output files.</span>
+    <span class="c1">#     &quot;&quot;&quot;</span>
+    <span class="c1">#     output_file = os.path.join(&#39;Data/Relationships/Assay_Compound_Relationship.csv&#39;)</span>
+    <span class="c1">#     compound_gene_file = os.path.join(&#39;Data/Relationships/Compound_Gene_Relationship.csv&#39;)</span>
+
+    <span class="c1">#     if os.path.exists(output_file):</span>
+    <span class="c1">#         os.remove(output_file)</span>
+    <span class="c1">#     if os.path.exists(compound_gene_file):</span>
+    <span class="c1">#         os.remove(compound_gene_file)</span>
+
+    <span class="c1">#     unique_column_names = self._get_filtered_columns()+[&#39;activity&#39;]</span>
+
+    <span class="c1">#     # Initialize output files with headers</span>
+    <span class="c1">#     pd.DataFrame(columns=unique_column_names).to_csv(output_file, index=False)</span>
+    <span class="c1">#     pd.DataFrame(columns=[&#39;cid&#39;, &#39;target_geneid&#39;, &#39;activity&#39;, &#39;aid&#39;]).to_csv(compound_gene_file, index=False)</span>
+
+    <span class="c1">#     tasks = []</span>
+    <span class="c1">#     for i, file in enumerate(self.csv_files):</span>
+    <span class="c1">#         if i % 100 == 0:</span>
+    <span class="c1">#             logging.info(f&quot;Processing file {i+1}/{len(self.csv_files)}: {file}&quot;)</span>
+
+    <span class="c1">#         tasks.append(dask.delayed(self._process_file)(file, unique_column_names, output_file, compound_gene_file))</span>
+
+    <span class="c1">#     dask.compute(*tasks)</span>
+    <span class="c1">#     logging.info(f&quot;Processed {len(self.csv_files)} files&quot;)</span>
+
     <span class="k">def</span> <span class="nf">_filter_and_clean_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Filters and cleans data from CSV files, then saves to output files.</span>
+<span class="sd">        Filters and cleans data from CSV files, then saves to output files in chunks.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">output_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;Data/Relationships/Assay_Compound_Relationship.csv&#39;</span><span class="p">)</span>
-        <span class="n">compound_gene_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;Data/Relationships/Compound_Gene_Relationship.csv&#39;</span><span class="p">)</span>
+        <span class="n">base_output_file</span> <span class="o">=</span> <span class="s1">&#39;Data/Relationships/Assay_Compound_Relationship&#39;</span>
+        <span class="n">base_compound_gene_file</span> <span class="o">=</span> <span class="s1">&#39;Data/Relationships/Compound_Gene_Relationship&#39;</span>
 
-        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">output_file</span><span class="p">):</span>
-            <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">output_file</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">compound_gene_file</span><span class="p">):</span>
-            <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">compound_gene_file</span><span class="p">)</span>
+        <span class="c1"># Determine the unique column names</span>
+        <span class="n">unique_column_names</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_filtered_columns</span><span class="p">()</span> <span class="o">+</span> <span class="p">[</span><span class="s1">&#39;activity&#39;</span><span class="p">]</span>
 
-        <span class="n">unique_column_names</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_filtered_columns</span><span class="p">()</span><span class="o">+</span><span class="p">[</span><span class="s1">&#39;activity&#39;</span><span class="p">]</span>
+        <span class="c1"># Process files in chunks of 500</span>
+        <span class="n">chunk_size</span> <span class="o">=</span> <span class="mi">500</span>
+        <span class="n">total_files</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">csv_files</span><span class="p">)</span>
 
-        <span class="c1"># Initialize output files with headers</span>
-        <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">unique_column_names</span><span class="p">)</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">output_file</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-        <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;cid&#39;</span><span class="p">,</span> <span class="s1">&#39;target_geneid&#39;</span><span class="p">,</span> <span class="s1">&#39;activity&#39;</span><span class="p">,</span> <span class="s1">&#39;aid&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">compound_gene_file</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">chunk_index</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">total_files</span><span class="p">,</span> <span class="n">chunk_size</span><span class="p">):</span>
+            <span class="n">chunk_files</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">csv_files</span><span class="p">[</span><span class="n">chunk_index</span><span class="p">:</span><span class="n">chunk_index</span> <span class="o">+</span> <span class="n">chunk_size</span><span class="p">]</span>
+            <span class="n">chunk_output_file</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">base_output_file</span><span class="si">}</span><span class="s2">_chunk_</span><span class="si">{</span><span class="n">chunk_index</span><span class="w"> </span><span class="o">//</span><span class="w"> </span><span class="n">chunk_size</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2">.csv&quot;</span>
+            <span class="n">chunk_compound_gene_file</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">base_compound_gene_file</span><span class="si">}</span><span class="s2">_chunk_</span><span class="si">{</span><span class="n">chunk_index</span><span class="w"> </span><span class="o">//</span><span class="w"> </span><span class="n">chunk_size</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2">.csv&quot;</span>
 
-        <span class="n">tasks</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">file</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">csv_files</span><span class="p">):</span>
-            <span class="k">if</span> <span class="n">i</span> <span class="o">%</span> <span class="mi">100</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Processing file </span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">csv_files</span><span class="p">)</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">file</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="c1"># Initialize output files with headers for each chunk</span>
+            <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">unique_column_names</span><span class="p">)</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">chunk_output_file</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;cid&#39;</span><span class="p">,</span> <span class="s1">&#39;target_geneid&#39;</span><span class="p">,</span> <span class="s1">&#39;activity&#39;</span><span class="p">,</span> <span class="s1">&#39;aid&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">chunk_compound_gene_file</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
-            <span class="n">tasks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dask</span><span class="o">.</span><span class="n">delayed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_process_file</span><span class="p">)(</span><span class="n">file</span><span class="p">,</span> <span class="n">unique_column_names</span><span class="p">,</span> <span class="n">output_file</span><span class="p">,</span> <span class="n">compound_gene_file</span><span class="p">))</span>
+            <span class="n">tasks</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">file</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">chunk_files</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="n">chunk_index</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">i</span> <span class="o">-</span> <span class="n">chunk_index</span><span class="p">)</span> <span class="o">%</span> <span class="mi">100</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Processing file </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">total_files</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">file</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
-        <span class="n">dask</span><span class="o">.</span><span class="n">compute</span><span class="p">(</span><span class="o">*</span><span class="n">tasks</span><span class="p">)</span>
-        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Processed </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">csv_files</span><span class="p">)</span><span class="si">}</span><span class="s2"> files&quot;</span><span class="p">)</span>
+                <span class="n">tasks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dask</span><span class="o">.</span><span class="n">delayed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_process_file</span><span class="p">)(</span><span class="n">file</span><span class="p">,</span> <span class="n">unique_column_names</span><span class="p">,</span> <span class="n">chunk_output_file</span><span class="p">,</span> <span class="n">chunk_compound_gene_file</span><span class="p">))</span>
+
+            <span class="n">dask</span><span class="o">.</span><span class="n">compute</span><span class="p">(</span><span class="o">*</span><span class="n">tasks</span><span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Processed chunk </span><span class="si">{</span><span class="n">chunk_index</span><span class="w"> </span><span class="o">//</span><span class="w"> </span><span class="n">chunk_size</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2"> of </span><span class="si">{</span><span class="n">total_files</span><span class="w"> </span><span class="o">//</span><span class="w"> </span><span class="n">chunk_size</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
 
     <span class="k">def</span> <span class="nf">_process_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file</span><span class="p">,</span> <span class="n">unique_column_names</span><span class="p">,</span> <span class="n">output_file</span><span class="p">,</span> <span class="n">compound_gene_file</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -14172,20 +14240,20 @@ load, filter, clean, and process data files related to assay-compound relationsh
 
             <details class="quote">
               <summary>Source code in <code>chemgraphbuilder/relationship_data_processor.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">235</span>
-<span class="normal">236</span>
-<span class="normal">237</span>
-<span class="normal">238</span>
-<span class="normal">239</span>
-<span class="normal">240</span>
-<span class="normal">241</span>
-<span class="normal">242</span>
-<span class="normal">243</span>
-<span class="normal">244</span>
-<span class="normal">245</span>
-<span class="normal">246</span>
-<span class="normal">247</span>
-<span class="normal">248</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@staticmethod</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">269</span>
+<span class="normal">270</span>
+<span class="normal">271</span>
+<span class="normal">272</span>
+<span class="normal">273</span>
+<span class="normal">274</span>
+<span class="normal">275</span>
+<span class="normal">276</span>
+<span class="normal">277</span>
+<span class="normal">278</span>
+<span class="normal">279</span>
+<span class="normal">280</span>
+<span class="normal">281</span>
+<span class="normal">282</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@staticmethod</span>
 <span class="k">def</span> <span class="nf">most_frequent</span><span class="p">(</span><span class="n">row</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Finds the most frequent value in a row, excluding NaN values.</span>
@@ -14312,21 +14380,21 @@ load, filter, clean, and process data files related to assay-compound relationsh
 
             <details class="quote">
               <summary>Source code in <code>chemgraphbuilder/relationship_data_processor.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">250</span>
-<span class="normal">251</span>
-<span class="normal">252</span>
-<span class="normal">253</span>
-<span class="normal">254</span>
-<span class="normal">255</span>
-<span class="normal">256</span>
-<span class="normal">257</span>
-<span class="normal">258</span>
-<span class="normal">259</span>
-<span class="normal">260</span>
-<span class="normal">261</span>
-<span class="normal">262</span>
-<span class="normal">263</span>
-<span class="normal">264</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@staticmethod</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">284</span>
+<span class="normal">285</span>
+<span class="normal">286</span>
+<span class="normal">287</span>
+<span class="normal">288</span>
+<span class="normal">289</span>
+<span class="normal">290</span>
+<span class="normal">291</span>
+<span class="normal">292</span>
+<span class="normal">293</span>
+<span class="normal">294</span>
+<span class="normal">295</span>
+<span class="normal">296</span>
+<span class="normal">297</span>
+<span class="normal">298</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@staticmethod</span>
 <span class="k">def</span> <span class="nf">propagate_phenotype</span><span class="p">(</span><span class="n">group</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Propagates the phenotype information within a group.</span>
