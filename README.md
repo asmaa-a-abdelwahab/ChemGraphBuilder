@@ -87,7 +87,7 @@ This version is more neutral and impersonal, typical of passive voice.
 
 ## License
 
-This project is licensed under the GPL-3.0 License - see the [LICENSE]([LICENSE](https://github.com/asmaa-a-abdelwahab/ChemGraphBuilder#GPL-3.0-1-ov-file)) file for details.
+This project is licensed under the GPL-3.0 License - see the [LICENSE](https://github.com/asmaa-a-abdelwahab/ChemGraphBuilder#GPL-3.0-1-ov-file) file for details.
 
 ## Contact
 
