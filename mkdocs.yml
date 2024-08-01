@@ -80,6 +80,7 @@ theme:
   font:
     text: Roboto
     code: Roboto Mono
+  favicon: docs/assets/images/favicon.png
 extra:
   social:
     - icon: fontawesome/brands/github
