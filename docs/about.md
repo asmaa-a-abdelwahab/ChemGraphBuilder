@@ -4,13 +4,10 @@ The `chemgraphbuilder` package is a powerful tool designed to facilitate the con
 
 **Key features include:**
 
-
 - **Node Representation:** Incorporates diverse nodes such as compounds, genes, proteins, and bioassays.
-- **Comprehensive Relationships:** Maps out various interactions, including compound similarities, compound co-occurrences, and more nuanced interactions like inhibitor, activator, and ligand roles between compounds and genes.
-- **Data Integration:** Supports the inclusion of extensive literature data, enhancing the depth and accuracy of the knowledge graph.
+- **Comprehensive Relationships:** Maps out various interactions, including gene-protein relationships, bioassay-gene relationships, bioassay-compound relationships, compound similarities, compound co-occurrences in literature, and more nuanced interactions like inhibitor, activator, ligand, and other roles between compounds and genes.
+- **Data Integration:** The knowledge graph schema is designed to support the integration of additional data sources, enhancing the depth and accuracy of the knowledge graph.
 - **Command Line and Programmatic Access:** Provides flexibility in usage, allowing for integration into larger workflows or standalone analyses.
-
-The package aims to support advanced data analysis and visualization efforts, aiding in the discovery of new insights into chemical and biological data.
 
 ## **About the Author**
 
