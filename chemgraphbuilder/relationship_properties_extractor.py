@@ -627,8 +627,8 @@ class RelationshipPropertiesExtractor:
                     futures = {executor.submit(self._fetch_data, int(cid)): cid for cid in IDs}
                     for future in as_completed(futures):
                         cid, cpd_cpd_data, cpd_gene_data = future.result()
-                        self._write_data_to_csv(cpd_cpd_data, f'Data/Relationships/Cpd_Cpd_CoOcuurence/CID_{cid}.csv')
-                        self._write_data_to_csv(cpd_gene_data, f'Data/Relationships/Cpd_gene_CoOcuurence/CID_{cid}.csv',
+                        self._write_data_to_csv(cpd_cpd_data, f'Data/Relationships/Cpd_Cpd_CoOccurrence/CID_{cid}.csv')
+                        self._write_data_to_csv(cpd_gene_data, f'Data/Relationships/Cpd_gene_CoOccurrence/CID_{cid}.csv',
                                                 filter_condition={"ID_2": ["{'GeneSymbol': 'cyp3a4'}", "{'GeneSymbol': 'cyp1a2'}",
                                                                            "{'GeneSymbol': 'cyp2c9'}", "{'GeneSymbol': 'cyp2c19'}",
                                                                            "{'GeneSymbol': 'cyp2d6'}"]})
@@ -706,7 +706,7 @@ class RelationshipPropertiesExtractor:
             directory and have appropriate permissions to write files to it.
         """
         df = pd.read_csv(gene_properties)
-        IDs = df['GeneID'].unique().tolist()
+        IDs = df['Target GeneID'].unique().tolist()
 
         transformation_dfs = []
 
