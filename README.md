@@ -81,10 +81,6 @@ Full documentation is available at [ChemGraphBuilder Documentation](https://asma
 
 Contributions are welcome! If any issues are found or suggestions for improvements arise, they can be reported via the [GitHub Issues](https://github.com/asmaa-a-abdelwahab/chemgraphbuilder/issues) page. Contributions to the codebase through pull requests are also encouraged.
 
---- 
-
-This version is more neutral and impersonal, typical of passive voice.
-
 ## License
 
 This project is licensed under the GPL-3.0 License - see the [LICENSE](https://github.com/asmaa-a-abdelwahab/ChemGraphBuilder#GPL-3.0-1-ov-file) file for details.
