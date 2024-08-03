@@ -11,6 +11,9 @@ import getpass
 import os
 from neo4j import GraphDatabase
 
+# Set up logging configuration
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
 class Neo4jConnectionError(Exception):
     """Custom exception for Neo4j connection errors."""
     # No need for pass statement, docstring is sufficient
