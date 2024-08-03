@@ -3,7 +3,7 @@ import glob
 import pandas as pd
 import logging
 import concurrent.futures
-import ast
+import json
 import numpy as np
 
 # Set up logging configuration
@@ -85,7 +85,11 @@ class RelationshipDataProcessor:
         """
         with open("Data/Relationships/all_data_connected_dict.txt", "w") as file:
             for key, value in all_data_connected.items():
-                file.write(f"{key}: {value}\n")
+                # Replace nan values with a placeholder string
+                for k, v in value.items():
+                    if pd.isna(v):
+                        value[k] = "__nan__"
+                file.write(f"{key}: {json.dumps(value)}\n")
 
     def _load_all_data_connected_from_file(self, file_path):
         """
@@ -101,15 +105,13 @@ class RelationshipDataProcessor:
         with open(file_path, "r") as file:
             for line in file:
                 key, value = line.strip().split(": ", 1)
-                key = ast.literal_eval(key)
-                # Replace 'nan' placeholder with np.nan
-                value = value.replace('nan', '"__nan__"')
-                value_dict = ast.literal_eval(value)
+                key = json.loads(key)
+                value_dict = json.loads(value)
                 # Convert '__nan__' back to np.nan
                 for k, v in value_dict.items():
                     if v == "__nan__":
                         value_dict[k] = np.nan
-                all_data_connected[key] = value_dict
+                all_data_connected[tuple(key)] = value_dict
         return all_data_connected
 
     def _get_filtered_columns(self):
