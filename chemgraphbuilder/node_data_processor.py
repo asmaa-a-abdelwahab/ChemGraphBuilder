@@ -20,6 +20,10 @@ Example Usage:
 """
 import glob
 import pandas as pd
+import logging
+
+# Set up logging configuration
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 class NodeDataProcessor:
     """
