@@ -1,10 +1,3 @@
-"""
-Module for processing relationship data files using Dask and pandas.
-
-This module includes the `RelationshipDataProcessor` class, which is used to
-load, filter, clean, and process data files related to assay-compound relationships.
-"""
-
 import os
 import glob
 import dask
@@ -171,10 +164,7 @@ class RelationshipDataProcessor:
                 pd.DataFrame(columns=['cid', 'target_geneid', 'activity', 'aid']).to_csv(batch_compound_gene_file, index=False)
 
                 tasks = []
-                for i, file in enumerate(batch_files, start=batch_index + 1):
-                    if (i - batch_index) % 100 == 0:
-                        logging.info(f"Processing file {i}/{total_files}: {file}")
-                    
+                for file in batch_files:
                     tasks.append(dask.delayed(self._process_file)(file, self.unique_column_names, batch_output_file, batch_compound_gene_file))
 
                 logging.info(f"Computing tasks for batch {batch_index // batch_size + 1}")
@@ -390,13 +380,8 @@ class RelationshipDataProcessor:
             ActIndMod_pattern = r'(?:effect on cyp)|(?:effect on human recombinant cyp)|(?:effect on recombinant cyp)|(?:effect on human cyp)'
             inducer_pattern = r'(?:effect on cyp.*induction)|(?:induction of.*)'
 
-            # substrate_pattern = r'(activity of.*oxidation)|(activity at cyp.*phenotyping)|(activity at human recombinant cyp.*formation)|(activity at recombinant cyp.*formation)'
             merged_df.loc[active_mask & merged_df['assay_name'].str.contains(substrate_pattern, case=False, regex=True), 'activity'] = 'Substrate'
-
-            # ActIndMod_pattern = r'(effect on cyp)|(effect on human recombinant cyp)|(effect on recombinant cyp)|(effect on human cyp)'
             merged_df.loc[active_mask & merged_df['assay_name'].str.contains(ActIndMod_pattern, case=False, regex=True), 'activity'] = 'Inhibitor/Inducer/Modulator'
-
-            # inducer_pattern = r'(effect on cyp.*induction)|(induction of.*)'
             merged_df.loc[active_mask & merged_df['assay_name'].str.contains(inducer_pattern, case=False, regex=True), 'activity'] = 'Inducer'
 
             merged_df.loc[active_mask & merged_df['activity_direction'].str.contains('decreasing', case=False), 'activity'] = 'Inhibitor'
