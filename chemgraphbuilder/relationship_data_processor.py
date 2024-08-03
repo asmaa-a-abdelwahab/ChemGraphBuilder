@@ -4,6 +4,7 @@ import pandas as pd
 import logging
 import concurrent.futures
 import ast
+import numpy as np
 
 # Set up logging configuration
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -101,8 +102,14 @@ class RelationshipDataProcessor:
             for line in file:
                 key, value = line.strip().split(": ", 1)
                 key = ast.literal_eval(key)
-                value = ast.literal_eval(value.replace('nan', 'float("nan")'))
-                all_data_connected[key] = value
+                # Replace 'nan' placeholder with np.nan
+                value = value.replace('nan', '"__nan__"')
+                value_dict = ast.literal_eval(value)
+                # Convert '__nan__' back to np.nan
+                for k, v in value_dict.items():
+                    if v == "__nan__":
+                        value_dict[k] = np.nan
+                all_data_connected[key] = value_dict
         return all_data_connected
 
     def _get_filtered_columns(self):
