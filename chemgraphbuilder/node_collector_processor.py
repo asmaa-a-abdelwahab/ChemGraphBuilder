@@ -18,7 +18,8 @@ import argparse
 from chemgraphbuilder.node_properties_extractor import NodePropertiesExtractor
 from chemgraphbuilder.node_data_processor import NodeDataProcessor
 
-logging.basicConfig(level=logging.INFO)
+# Set up logging configuration
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 class NodesCollectorProcessor:
     """
