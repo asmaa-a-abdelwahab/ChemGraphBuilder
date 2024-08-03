@@ -166,48 +166,51 @@ class RelationshipDataProcessor:
             output_file (str): The path to the output file for combined data.
             compound_gene_file (str): The path to the output file for compound-gene relationships.
         """
-        df = pd.read_csv(file, dtype={'ASSAYDATA_COMMENT': 'object'})
-        df.columns = [col.replace(' ', '_').lower() for col in df.columns]
-        df = df.dropna(subset=['cid'], how='any')
+        try:
+            df = pd.read_csv(file, dtype={'ASSAYDATA_COMMENT': 'object'})
+            df.columns = [col.replace(' ', '_').lower() for col in df.columns]
+            df = df.dropna(subset=['cid'], how='any')
 
-        phenotype_cols = [col for col in df.columns if col.startswith('phenotype')]
+            phenotype_cols = [col for col in df.columns if col.startswith('phenotype')]
 
-        if isinstance(df, pd.Series):
-            df = df.to_frame().T  # Convert to DataFrame if a Series is encountered
-        if df.columns.duplicated().any():
-            df = df.loc[:, ~df.columns.duplicated()]
-            logging.info("Duplicated columns removed from partition.")
-        df = df.reindex(columns=unique_column_names, fill_value=pd.NA)
-        df = df.dropna(subset=['aid', 'cid'], how='any')
+            if isinstance(df, pd.Series):
+                df = df.to_frame().T  # Convert to DataFrame if a Series is encountered
+            if df.columns.duplicated().any():
+                df = df.loc[:, ~df.columns.duplicated()]
+                logging.info("Duplicated columns removed from partition.")
+            df = df.reindex(columns=unique_column_names, fill_value=pd.NA)
+            df = df.dropna(subset=['aid', 'cid'], how='any')
 
-        if not df.empty:
-            df['measured_activity'] = df[phenotype_cols].apply(lambda row: row.mode()[0] if not row.mode().empty else None, axis=1)
-
-            df = df.apply(self._add_all_data_connected_info, axis=1)
-
-            if any(col in df.columns for col in phenotype_cols) and df['activity_outcome'].notna().all():
-                df = df.groupby(['activity_outcome', 'assay_name']).apply(self.propagate_phenotype).reset_index(drop=True)
-
-            if 'target_geneid' not in df.columns:
-                df['target_geneid'] = pd.NA
-
-            if 'sid' in df.columns:
-                df['activity_url'] = df.apply(lambda row: f"https://pubchem.ncbi.nlm.nih.gov/bioassay/{row['aid']}#sid={row['sid']}", axis=1)
-            else:
-                df['activity_url'] = pd.NA
-
-            # Drop rows where both aid and cid are 1
-            df = df[(df['aid'] != 1) | (df['cid'] != 1)]
-
-            df = self._determine_labels_and_activity(df)
-
-            logging.info(f"Processed file {file} with {len(df)} rows.")
             if not df.empty:
-                # Write the processed data to the output files
-                df.to_csv(output_file, mode='a', header=not os.path.exists(output_file), index=False)
-                df[['cid', 'target_geneid', 'activity', 'aid']].to_csv(compound_gene_file, mode='a', header=not os.path.exists(compound_gene_file), index=False)
-        else:
-            logging.info(f"No data to process in file {file} after filtering.")
+                df['measured_activity'] = df[phenotype_cols].apply(lambda row: row.mode()[0] if not row.mode().empty else None, axis=1)
+
+                df = df.apply(self._add_all_data_connected_info, axis=1)
+
+                if any(col in df.columns for col in phenotype_cols) and df['activity_outcome'].notna().all():
+                    df = df.groupby(['activity_outcome', 'assay_name']).apply(self.propagate_phenotype).reset_index(drop=True)
+
+                if 'target_geneid' not in df.columns:
+                    df['target_geneid'] = pd.NA
+
+                if 'sid' in df.columns:
+                    df['activity_url'] = df.apply(lambda row: f"https://pubchem.ncbi.nlm.nih.gov/bioassay/{row['aid']}#sid={row['sid']}", axis=1)
+                else:
+                    df['activity_url'] = pd.NA
+
+                # Drop rows where both aid and cid are 1
+                df = df[(df['aid'] != 1) | (df['cid'] != 1)]
+
+                df = self._determine_labels_and_activity(df)
+
+                logging.info(f"Processed file {file} with {len(df)} rows.")
+                if not df.empty:
+                    # Write the processed data to the output files
+                    df.to_csv(output_file, mode='a', header=not os.path.exists(output_file), index=False)
+                    df[['cid', 'target_geneid', 'activity', 'aid']].to_csv(compound_gene_file, mode='a', header=not os.path.exists(compound_gene_file), index=False)
+            else:
+                logging.info(f"No data to process in file {file} after filtering.")
+        except Exception as e:
+            logging.error(f"Error processing file {file}: {e}")
 
     @staticmethod
     def most_frequent(row):
@@ -354,3 +357,5 @@ class RelationshipDataProcessor:
             merged_df.loc[active_mask & merged_df['activity_direction'].str.contains('decreasing', case=False), 'activity'] = 'Inhibitor'
             merged_df.loc[active_mask & merged_df['activity_direction'].str.contains('increasing', case=False), 'activity'] = 'Activator'
             merged_df.loc[active_mask & (merged_df['aid'] == 1215398), 'activity'] = 'Inactivator'
+
+        return merged_df
