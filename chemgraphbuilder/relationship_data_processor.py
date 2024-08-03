@@ -36,6 +36,7 @@ class RelationshipDataProcessor:
         self.path = path
         self.csv_files = glob.glob(os.path.join(path, "AID_*.csv"))
         self.all_data_connected = self._load_all_data_connected('Data/AllDataConnected.csv')
+        self.unique_column_names = self._get_filtered_columns() + ['activity']
 
     def _load_all_data_connected(self, file_path):
         """
@@ -53,7 +54,6 @@ class RelationshipDataProcessor:
         ddf.columns = [col.replace(' ', '_').lower() for col in ddf.columns]
         ddf = ddf.dropna(subset=['aid', 'cid'], how='any')
         partitions = ddf.to_delayed()
-        ddf = ddf.repartition(partition_size=10e5)
 
         @dask.delayed
         def process_partition(partition):
@@ -142,34 +142,6 @@ class RelationshipDataProcessor:
         self._filter_and_clean_data()
         logging.info("Data filtered, cleaned, and combined successfully.")
 
-    # def _filter_and_clean_data(self):
-    #     """
-    #     Filters and cleans data from CSV files, then saves to output files.
-    #     """
-    #     output_file = os.path.join('Data/Relationships/Assay_Compound_Relationship.csv')
-    #     compound_gene_file = os.path.join('Data/Relationships/Compound_Gene_Relationship.csv')
-
-    #     if os.path.exists(output_file):
-    #         os.remove(output_file)
-    #     if os.path.exists(compound_gene_file):
-    #         os.remove(compound_gene_file)
-
-    #     unique_column_names = self._get_filtered_columns()+['activity']
-
-    #     # Initialize output files with headers
-    #     pd.DataFrame(columns=unique_column_names).to_csv(output_file, index=False)
-    #     pd.DataFrame(columns=['cid', 'target_geneid', 'activity', 'aid']).to_csv(compound_gene_file, index=False)
-
-    #     tasks = []
-    #     for i, file in enumerate(self.csv_files):
-    #         if i % 100 == 0:
-    #             logging.info(f"Processing file {i+1}/{len(self.csv_files)}: {file}")
-
-    #         tasks.append(dask.delayed(self._process_file)(file, unique_column_names, output_file, compound_gene_file))
-
-    #     dask.compute(*tasks)
-    #     logging.info(f"Processed {len(self.csv_files)} files")
-
     def _filter_and_clean_data(self):
         """
         Filters and cleans data from CSV files, then saves to output files in chunks.
@@ -177,33 +149,29 @@ class RelationshipDataProcessor:
         base_output_file = 'Data/Relationships/Assay_Compound_Relationship'
         base_compound_gene_file = 'Data/Relationships/Compound_Gene_Relationship'
         
-        # Determine the unique column names
-        unique_column_names = self._get_filtered_columns() + ['activity']
-
-        # Process files in chunks of 500
-        chunk_size = 500
+        # Process files in batches of 100
+        batch_size = 100
         total_files = len(self.csv_files)
 
-        for chunk_index in range(0, total_files, chunk_size):
-            chunk_files = self.csv_files[chunk_index:chunk_index + chunk_size]
-            chunk_output_file = f"{base_output_file}_chunk_{chunk_index // chunk_size + 1}.csv"
-            chunk_compound_gene_file = f"{base_compound_gene_file}_chunk_{chunk_index // chunk_size + 1}.csv"
+        for batch_index in range(0, total_files, batch_size):
+            batch_files = self.csv_files[batch_index:batch_index + batch_size]
+            batch_output_file = f"{base_output_file}_batch_{batch_index // batch_size + 1}.csv"
+            batch_compound_gene_file = f"{base_compound_gene_file}_batch_{batch_index // batch_size + 1}.csv"
 
-            # Initialize output files with headers for each chunk
-            pd.DataFrame(columns=unique_column_names).to_csv(chunk_output_file, index=False)
-            pd.DataFrame(columns=['cid', 'target_geneid', 'activity', 'aid']).to_csv(chunk_compound_gene_file, index=False)
+            # Initialize output files with headers for each batch
+            pd.DataFrame(columns=self.unique_column_names).to_csv(batch_output_file, index=False)
+            pd.DataFrame(columns=['cid', 'target_geneid', 'activity', 'aid']).to_csv(batch_compound_gene_file, index=False)
 
             tasks = []
-            for i, file in enumerate(chunk_files, start=chunk_index + 1):
-                if (i - chunk_index) % 100 == 0:
+            for i, file in enumerate(batch_files, start=batch_index + 1):
+                if (i - batch_index) % 100 == 0:
                     logging.info(f"Processing file {i}/{total_files}: {file}")
                 
-                tasks.append(dask.delayed(self._process_file)(file, unique_column_names, chunk_output_file, chunk_compound_gene_file))
+                tasks.append(dask.delayed(self._process_file)(file, self.unique_column_names, batch_output_file, batch_compound_gene_file))
 
             dask.compute(*tasks)
-            logging.info(f"Processed chunk {chunk_index // chunk_size + 1} of {total_files // chunk_size + 1}")
+            logging.info(f"Processed batch {batch_index // batch_size + 1} of {total_files // batch_size + 1}")
 
-    
     def _process_file(self, file, unique_column_names, output_file, compound_gene_file):
         """
         Processes a single CSV file, applying filtering, cleaning, and adding data.
@@ -214,12 +182,12 @@ class RelationshipDataProcessor:
             output_file (str): The path to the output file for combined data.
             compound_gene_file (str): The path to the output file for compound-gene relationships.
         """
-        ddf = dd.read_csv(file, blocksize=10000, dtype={'ASSAYDATA_COMMENT': 'object'})
+        ddf = dd.read_csv(file, blocksize=1000, dtype={'ASSAYDATA_COMMENT': 'object'})
         ddf.columns = [col.replace(' ', '_').lower() for col in ddf.columns]
         ddf = ddf.dropna(subset=['cid'], how='any')
 
         # Repartition to balance memory usage and performance
-        ddf = ddf.repartition(partition_size=1000)
+        ddf = ddf.repartition(partition_size=100)
 
         phenotype_cols = [col for col in ddf.columns if col.startswith('phenotype')]
 
