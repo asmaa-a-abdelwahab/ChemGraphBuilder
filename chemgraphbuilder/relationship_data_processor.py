@@ -385,13 +385,18 @@ class RelationshipDataProcessor:
             merged_df.loc[active_mask, 'activity'] = merged_df.loc[active_mask, 'assay_name'].apply(determine_active_label)
             merged_df.loc[active_mask & merged_df['activity_name'].isin(['Km', 'Drug metabolism']), 'activity'] = 'Substrate'
 
-            substrate_pattern = r'(activity of.*oxidation)|(activity at cyp.*phenotyping)|(activity at human recombinant cyp.*formation)|(activity at recombinant cyp.*formation)'
+            # Define the patterns with non-capturing groups
+            substrate_pattern = r'(?:activity of.*oxidation)|(?:activity at cyp.*phenotyping)|(?:activity at human recombinant cyp.*formation)|(?:activity at recombinant cyp.*formation)'
+            ActIndMod_pattern = r'(?:effect on cyp)|(?:effect on human recombinant cyp)|(?:effect on recombinant cyp)|(?:effect on human cyp)'
+            inducer_pattern = r'(?:effect on cyp.*induction)|(?:induction of.*)'
+
+            # substrate_pattern = r'(activity of.*oxidation)|(activity at cyp.*phenotyping)|(activity at human recombinant cyp.*formation)|(activity at recombinant cyp.*formation)'
             merged_df.loc[active_mask & merged_df['assay_name'].str.contains(substrate_pattern, case=False, regex=True), 'activity'] = 'Substrate'
 
-            ActIndMod_pattern = r'(effect on cyp)|(effect on human recombinant cyp)|(effect on recombinant cyp)|(effect on human cyp)'
+            # ActIndMod_pattern = r'(effect on cyp)|(effect on human recombinant cyp)|(effect on recombinant cyp)|(effect on human cyp)'
             merged_df.loc[active_mask & merged_df['assay_name'].str.contains(ActIndMod_pattern, case=False, regex=True), 'activity'] = 'Inhibitor/Inducer/Modulator'
 
-            inducer_pattern = r'(effect on cyp.*induction)|(induction of.*)'
+            # inducer_pattern = r'(effect on cyp.*induction)|(induction of.*)'
             merged_df.loc[active_mask & merged_df['assay_name'].str.contains(inducer_pattern, case=False, regex=True), 'activity'] = 'Inducer'
 
             merged_df.loc[active_mask & merged_df['activity_direction'].str.contains('decreasing', case=False), 'activity'] = 'Inhibitor'
