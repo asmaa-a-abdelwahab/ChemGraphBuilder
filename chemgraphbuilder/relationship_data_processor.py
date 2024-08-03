@@ -1,10 +1,8 @@
 import os
 import glob
-import dask
-import dask.dataframe as dd
 import pandas as pd
-import concurrent.futures
 import logging
+import concurrent.futures
 
 # Set up logging configuration
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -50,23 +48,12 @@ class RelationshipDataProcessor:
                   and values as dictionaries of additional information.
         """
         all_data_connected = {}
-        ddf = dd.read_csv(file_path, blocksize=20e6)
-        ddf.columns = [col.replace(' ', '_').lower() for col in ddf.columns]
-        ddf = ddf.dropna(subset=['aid', 'cid'], how='any')
-        partitions = ddf.to_delayed()
-
-        @dask.delayed
-        def process_partition(partition):
-            result = {}
-            partition = partition.dropna(subset=['aid', 'cid'], how='any')
-            for _, row in partition.iterrows():
-                key = (int(row['aid']), int(row['cid']), row['activity_outcome'])
-                result[key] = row.to_dict()
-            return result
-
-        results = dask.compute(*[process_partition(part) for part in partitions])
-        for result in results:
-            all_data_connected.update(result)
+        df = pd.read_csv(file_path)
+        df.columns = [col.replace(' ', '_').lower() for col in df.columns]
+        df = df.dropna(subset=['aid', 'cid'], how='any')
+        for _, row in df.iterrows():
+            key = (int(row['aid']), int(row['cid']), row['activity_outcome'])
+            all_data_connected[key] = row.to_dict()
 
         # Optionally save the dictionary to a file
         with open("Data/Relationships/all_data_connected_dict.txt", "w") as file:
@@ -163,12 +150,10 @@ class RelationshipDataProcessor:
                 pd.DataFrame(columns=self.unique_column_names).to_csv(batch_output_file, index=False)
                 pd.DataFrame(columns=['cid', 'target_geneid', 'activity', 'aid']).to_csv(batch_compound_gene_file, index=False)
 
-                tasks = []
                 for file in batch_files:
-                    tasks.append(dask.delayed(self._process_file)(file, self.unique_column_names, batch_output_file, batch_compound_gene_file))
+                    logging.info(f"Processing file {file}")
+                    self._process_file(file, self.unique_column_names, batch_output_file, batch_compound_gene_file)
 
-                logging.info(f"Computing tasks for batch {batch_index // batch_size + 1}")
-                dask.compute(*tasks)
                 logging.info(f"Processed batch {batch_index // batch_size + 1} of {total_files // batch_size + 1}")
 
     def _process_file(self, file, unique_column_names, output_file, compound_gene_file):
@@ -181,66 +166,48 @@ class RelationshipDataProcessor:
             output_file (str): The path to the output file for combined data.
             compound_gene_file (str): The path to the output file for compound-gene relationships.
         """
-        ddf = dd.read_csv(file, blocksize=1000, dtype={'ASSAYDATA_COMMENT': 'object'})
-        ddf.columns = [col.replace(' ', '_').lower() for col in ddf.columns]
-        ddf = ddf.dropna(subset=['cid'], how='any')
+        df = pd.read_csv(file, dtype={'ASSAYDATA_COMMENT': 'object'})
+        df.columns = [col.replace(' ', '_').lower() for col in df.columns]
+        df = df.dropna(subset=['cid'], how='any')
 
-        # Repartition to balance memory usage and performance
-        ddf = ddf.repartition(partition_size="100MB")
+        phenotype_cols = [col for col in df.columns if col.startswith('phenotype')]
 
-        phenotype_cols = [col for col in ddf.columns if col.startswith('phenotype')]
+        if isinstance(df, pd.Series):
+            df = df.to_frame().T  # Convert to DataFrame if a Series is encountered
+        if df.columns.duplicated().any():
+            df = df.loc[:, ~df.columns.duplicated()]
+            logging.info("Duplicated columns removed from partition.")
+        df = df.reindex(columns=unique_column_names, fill_value=pd.NA)
+        df = df.dropna(subset=['aid', 'cid'], how='any')
 
-        def process_partition(df):
-            """
-            Process a single partition of the dataframe.
+        if not df.empty:
+            df['measured_activity'] = df[phenotype_cols].apply(lambda row: row.mode()[0] if not row.mode().empty else None, axis=1)
 
-            Args:
-                df (pd.DataFrame): The dataframe partition.
+            df = df.apply(self._add_all_data_connected_info, axis=1)
 
-            Returns:
-                None
-            """
-            try:
-                if isinstance(df, pd.Series):
-                    df = df.to_frame().T  # Convert to DataFrame if a Series is encountered
-                if df.columns.duplicated().any():
-                    df = df.loc[:, ~df.columns.duplicated()]
-                    logging.info("Duplicated columns removed from partition.")
-                df = df.reindex(columns=unique_column_names, fill_value=pd.NA)
-                df = df.dropna(subset=['aid', 'cid'], how='any')
+            if any(col in df.columns for col in phenotype_cols) and df['activity_outcome'].notna().all():
+                df = df.groupby(['activity_outcome', 'assay_name']).apply(self.propagate_phenotype).reset_index(drop=True)
 
-                if not df.empty:
-                    df['measured_activity'] = df[phenotype_cols].apply(lambda row: row.mode()[0] if not row.mode().empty else None, axis=1)
+            if 'target_geneid' not in df.columns:
+                df['target_geneid'] = pd.NA
 
-                    df = df.apply(self._add_all_data_connected_info, axis=1)
+            if 'sid' in df.columns:
+                df['activity_url'] = df.apply(lambda row: f"https://pubchem.ncbi.nlm.nih.gov/bioassay/{row['aid']}#sid={row['sid']}", axis=1)
+            else:
+                df['activity_url'] = pd.NA
 
-                    if any(col in df.columns for col in phenotype_cols) and df['activity_outcome'].notna().all():
-                        df = df.groupby(['activity_outcome', 'assay_name']).apply(self.propagate_phenotype).reset_index(drop=True)
+            # Drop rows where both aid and cid are 1
+            df = df[(df['aid'] != 1) | (df['cid'] != 1)]
 
-                    if 'target_geneid' not in df.columns:
-                        df['target_geneid'] = pd.NA
+            df = self._determine_labels_and_activity(df)
 
-                    if 'sid' in df.columns:
-                        df['activity_url'] = df.apply(lambda row: f"https://pubchem.ncbi.nlm.nih.gov/bioassay/{row['aid']}#sid={row['sid']}", axis=1)
-                    else:
-                        df['activity_url'] = pd.NA
-
-                    # Drop rows where both aid and cid are 1
-                    df = df[(df['aid'] != 1) | (df['cid'] != 1)]
-
-                    df = self._determine_labels_and_activity(df)
-
-                    logging.info(f"Processed partition with {len(df)} rows.")
-                    if not df.empty:
-                        # Write the processed data to the output files
-                        df.to_csv(output_file, mode='a', header=not os.path.exists(output_file), index=False)
-                        df[['cid', 'target_geneid', 'activity', 'aid']].to_csv(compound_gene_file, mode='a', header=not os.path.exists(compound_gene_file), index=False)
-                else:
-                    logging.info("No data to process after filtering.")
-            except Exception as e:
-                logging.error(f"Error processing partition: {e}")
-
-        ddf.map_partitions(process_partition).compute()
+            logging.info(f"Processed file {file} with {len(df)} rows.")
+            if not df.empty:
+                # Write the processed data to the output files
+                df.to_csv(output_file, mode='a', header=not os.path.exists(output_file), index=False)
+                df[['cid', 'target_geneid', 'activity', 'aid']].to_csv(compound_gene_file, mode='a', header=not os.path.exists(compound_gene_file), index=False)
+        else:
+            logging.info(f"No data to process in file {file} after filtering.")
 
     @staticmethod
     def most_frequent(row):
@@ -387,5 +354,3 @@ class RelationshipDataProcessor:
             merged_df.loc[active_mask & merged_df['activity_direction'].str.contains('decreasing', case=False), 'activity'] = 'Inhibitor'
             merged_df.loc[active_mask & merged_df['activity_direction'].str.contains('increasing', case=False), 'activity'] = 'Activator'
             merged_df.loc[active_mask & (merged_df['aid'] == 1215398), 'activity'] = 'Inactivator'
-
-        return merged_df
