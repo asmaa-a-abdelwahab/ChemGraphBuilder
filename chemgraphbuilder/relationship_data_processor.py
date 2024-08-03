@@ -89,7 +89,7 @@ class RelationshipDataProcessor:
                 for k, v in value.items():
                     if pd.isna(v):
                         value[k] = "__nan__"
-                file.write(f"{key}: {json.dumps(value)}\n")
+                file.write(f"{json.dumps(key)}: {json.dumps(value)}\n")
 
     def _load_all_data_connected_from_file(self, file_path):
         """
@@ -105,13 +105,13 @@ class RelationshipDataProcessor:
         with open(file_path, "r") as file:
             for line in file:
                 key, value = line.strip().split(": ", 1)
-                key = json.loads(key)
+                key = tuple(json.loads(key))
                 value_dict = json.loads(value)
                 # Convert '__nan__' back to np.nan
                 for k, v in value_dict.items():
                     if v == "__nan__":
                         value_dict[k] = np.nan
-                all_data_connected[tuple(key)] = value_dict
+                all_data_connected[key] = value_dict
         return all_data_connected
 
     def _get_filtered_columns(self):
