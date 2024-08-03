@@ -177,6 +177,7 @@ class RelationshipDataProcessor:
                     
                     tasks.append(dask.delayed(self._process_file)(file, self.unique_column_names, batch_output_file, batch_compound_gene_file))
 
+                logging.info(f"Computing tasks for batch {batch_index // batch_size + 1}")
                 dask.compute(*tasks)
                 logging.info(f"Processed batch {batch_index // batch_size + 1} of {total_files // batch_size + 1}")
 
@@ -195,11 +196,20 @@ class RelationshipDataProcessor:
         ddf = ddf.dropna(subset=['cid'], how='any')
 
         # Repartition to balance memory usage and performance
-        ddf = ddf.repartition(partition_size=100)
+        ddf = ddf.repartition(partition_size="100MB")
 
         phenotype_cols = [col for col in ddf.columns if col.startswith('phenotype')]
 
         def process_partition(df):
+            """
+            Process a single partition of the dataframe.
+
+            Args:
+                df (pd.DataFrame): The dataframe partition.
+
+            Returns:
+                None
+            """
             try:
                 if isinstance(df, pd.Series):
                     df = df.to_frame().T  # Convert to DataFrame if a Series is encountered
