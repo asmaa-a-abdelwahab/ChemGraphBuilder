@@ -26,16 +26,23 @@ class RelationshipDataProcessor:
         all_data_connected (dict): A dictionary containing additional data connected to assays.
     """
 
-    def __init__(self, path):
+    def __init__(self, path, start_chunk=0):
         """
-        Initializes the RelationshipDataProcessor with the specified path.
+        Initializes the RelationshipDataProcessor with the specified path and start chunk index.
 
         Args:
             path (str): The directory path containing the CSV files.
+            start_chunk (int): The starting index for processing chunks.
         """
         self.path = path
         self.csv_files = glob.glob(os.path.join(path, "AID_*.csv"))
-        self.all_data_connected = self._load_all_data_connected('Data/AllDataConnected.csv')
+        self.start_chunk = start_chunk
+        self.all_data_connected = {}
+
+        # Load all data connected if start_chunk is zero or file does not exist
+        if self.start_chunk == 0 or not os.path.exists('Data/Relationships/all_data_connected_dict.txt'):
+            self.all_data_connected = self._load_all_data_connected('Data/AllDataConnected.csv')
+
         self.unique_column_names = self._get_filtered_columns() + ['activity']
 
     def _load_all_data_connected(self, file_path):
@@ -154,23 +161,24 @@ class RelationshipDataProcessor:
         total_files = len(self.csv_files)
 
         for batch_index in range(0, total_files, batch_size):
-            batch_files = self.csv_files[batch_index:batch_index + batch_size]
-            batch_output_file = f"{base_output_file}_batch_{batch_index // batch_size + 1}.csv"
-            batch_compound_gene_file = f"{base_compound_gene_file}_batch_{batch_index // batch_size + 1}.csv"
+            if batch_index >= self.start_chunk * batch_size:
+                batch_files = self.csv_files[batch_index:batch_index + batch_size]
+                batch_output_file = f"{base_output_file}_batch_{batch_index // batch_size + 1}.csv"
+                batch_compound_gene_file = f"{base_compound_gene_file}_batch_{batch_index // batch_size + 1}.csv"
 
-            # Initialize output files with headers for each batch
-            pd.DataFrame(columns=self.unique_column_names).to_csv(batch_output_file, index=False)
-            pd.DataFrame(columns=['cid', 'target_geneid', 'activity', 'aid']).to_csv(batch_compound_gene_file, index=False)
+                # Initialize output files with headers for each batch
+                pd.DataFrame(columns=self.unique_column_names).to_csv(batch_output_file, index=False)
+                pd.DataFrame(columns=['cid', 'target_geneid', 'activity', 'aid']).to_csv(batch_compound_gene_file, index=False)
 
-            tasks = []
-            for i, file in enumerate(batch_files, start=batch_index + 1):
-                if (i - batch_index) % 100 == 0:
-                    logging.info(f"Processing file {i}/{total_files}: {file}")
-                
-                tasks.append(dask.delayed(self._process_file)(file, self.unique_column_names, batch_output_file, batch_compound_gene_file))
+                tasks = []
+                for i, file in enumerate(batch_files, start=batch_index + 1):
+                    if (i - batch_index) % 100 == 0:
+                        logging.info(f"Processing file {i}/{total_files}: {file}")
+                    
+                    tasks.append(dask.delayed(self._process_file)(file, self.unique_column_names, batch_output_file, batch_compound_gene_file))
 
-            dask.compute(*tasks)
-            logging.info(f"Processed batch {batch_index // batch_size + 1} of {total_files // batch_size + 1}")
+                dask.compute(*tasks)
+                logging.info(f"Processed batch {batch_index // batch_size + 1} of {total_files // batch_size + 1}")
 
     def _process_file(self, file, unique_column_names, output_file, compound_gene_file):
         """
