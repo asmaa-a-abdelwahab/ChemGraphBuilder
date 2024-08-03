@@ -22,6 +22,7 @@ import io
 import os
 import time
 import timeit
+import json
 import logging
 from io import StringIO
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -30,7 +31,7 @@ import requests
 import pandas as pd
 import numpy as np
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 class RelationshipPropertiesExtractor:
     """
@@ -714,10 +715,28 @@ class RelationshipPropertiesExtractor:
         for gid in IDs:
             if not np.isnan(gid):
                 gid = int(gid)
-                url = ('https://pubchem.ncbi.nlm.nih.gov/sdq/sdqagent.cgi?infmt=json&outfmt=csv&query='
-                       '{"download":"*","collection":"chemblmetabolism","order":["relevancescore,desc"]'
-                       f',"start":1,"limit":10000000,"downloadfilename":"pubchem_geneid_{gid}_'
-                       f'chemblmetabolism","where":{"ands":[{"geneid":"{gid}"}]}}')
+                base_url = 'https://pubchem.ncbi.nlm.nih.gov/sdq/sdqagent.cgi?infmt=json&outfmt=csv&query='
+                query = {
+                    "download": "*",
+                    "collection": "chemblmetabolism",
+                    "order": ["relevancescore,desc"],
+                    "start": 1,
+                    "limit": 10000000,
+                    "downloadfilename": f"pubchem_geneid_{gid}_chemblmetabolism",
+                    "where": {
+                        "ands": [{"geneid": gid}]
+                    }
+                }
+                
+                # Convert the dictionary to a JSON string
+                query_string = json.dumps(query)
+                
+                # URL encode the JSON string
+                from urllib.parse import quote
+                encoded_query = quote(query_string)
+                
+                # Construct the final URL
+                url = f"{base_url}{encoded_query}"
     
                 response = self._send_request(url)
                 if response:
