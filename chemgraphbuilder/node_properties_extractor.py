@@ -42,7 +42,8 @@ import requests
 import pandas as pd
 import xmltodict
 
-logging.basicConfig(level=logging.INFO)
+# Set up logging configuration
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 class NodePropertiesExtractor:
     """
