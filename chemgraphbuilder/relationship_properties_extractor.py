@@ -726,15 +726,16 @@ class RelationshipPropertiesExtractor:
                         transformation_df = pd.read_csv(StringIO(response.text), sep=',', header=0, low_memory=False)
     
                         # Ensure columns exist
-                        required_columns = ['substratecid', 'metabolitecid', 'metconversion', 'geneids', 'pmids', 'dois']
-                        for col in required_columns:
-                            if col not in transformation_df.columns:
-                                transformation_df[col] = np.nan
+                        transformation_df = transformation_df[['substratecid',
+                                                                'metabolitecid',
+                                                                'metconversion',
+                                                                'geneids', 'pmids',
+                                                                  'dois']]
     
                         # Append the DataFrame to the list
                         transformation_dfs.append(transformation_df[required_columns])
                     except pd.errors.ParserError as e:
-                        logging.error(f"Error parsing CSV for gene ID {gid}: {e}")
+                        logging.error(f"Error parsing CSV for gene ID {gid}: {e}\nurl:url")
                         continue  # Skip this gene ID and continue with others
     
         # Concatenate all DataFrames
