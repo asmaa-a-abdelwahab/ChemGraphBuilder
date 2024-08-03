@@ -714,11 +714,10 @@ class RelationshipPropertiesExtractor:
         for gid in IDs:
             if not np.isnan(gid):
                 gid = int(gid)
-                url = ("https://pubchem.ncbi.nlm.nih.gov/sdq/sdqagent.cgi?infmt=json&outfmt=csv"
-                       "&query={%22download%22:%22*%22,%22collection%22:%22chemblmetabolism%22,"
-                       "%22order%22:[%22relevancescore,desc%22],%22start%22:1,%22limit%22:10000000,"
-                       f"%22downloadfilename%22:%22pubchem_geneid_{gid}_chemblmetabolism%22,%22where"
-                       f"%22:{%22ands%22:[{%22geneid%22:%22{gid}%22}]}}")
+                url = ('https://pubchem.ncbi.nlm.nih.gov/sdq/sdqagent.cgi?infmt=json&outfmt=csv&query='
+                       '{"download":"*","collection":"chemblmetabolism","order":["relevancescore,desc"]'
+                       f',"start":1,"limit":10000000,"downloadfilename":"pubchem_geneid_{gid}_'
+                       f'chemblmetabolism","where":{"ands":[{"geneid":"{gid}"}]}}')
     
                 response = self._send_request(url)
                 if response:
