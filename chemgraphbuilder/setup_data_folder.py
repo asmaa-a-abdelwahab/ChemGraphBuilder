@@ -36,7 +36,9 @@ class SetupDataFolder:
                 "Assay_Compound_Relationship",
                 "Compound_Similarities",
                 "Cpd_Cpd_CoOccurrence",
-                "Cpd_Gene_CoOccurrence"
+                "Cpd_Gene_CoOccurrence",
+                "Compound_Gene_Relationship",
+                "Assay_Compound_Relationship_Processed"
             ]
         }
 
