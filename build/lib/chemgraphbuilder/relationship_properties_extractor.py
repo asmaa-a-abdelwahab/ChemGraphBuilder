@@ -711,32 +711,31 @@ class RelationshipPropertiesExtractor:
         transformation_dfs = []
 
         for gid in IDs:
-            if not np.isnan(gid):
-                gid = int(gid)
-                url = ("https://pubchem.ncbi.nlm.nih.gov/sdq/sdqagent.cgi?infmt=json&outfmt=csv"
-                       "&query={{\"download\":\"*\",\"collection\":\"chemblmetabolism\",\"where\":"
-                       f"{{\"ands\":[{{\"geneid\":\"{gid}\"}}]}},\"order\":[\"relevancescore,desc\"]"
-                       f",\"start\":1,\"limit\":10000000,\"downloadfilename\":\"pubchem_geneid_{gid}_chemblmetabolism\"}}")
-    
-                response = self._send_request(url)
-                if response:
-                    try:
-                        transformation_df = pd.read_csv(StringIO(response.text),
-                                                        sep=',', header=0,
-                                                        low_memory=False)
-                        transformation_df = transformation_df[['substratecid',
-                                                               'metabolitecid',
-                                                               'metconversion',
-                                                               'geneids',
-                                                               'pmids',
-                                                               'dois']]
-                        transformation_dfs.append(transformation_df)
-                    except pd.errors.ParserError as e:
-                        print(f"Error parsing CSV for gene ID {gid}: {e}")
-                        continue  # Skip this gene ID and continue with others
-    
-            transformation_df = pd.concat(transformation_dfs, ignore_index=True) if transformation_dfs else pd.DataFrame()
-            self._write_to_csv(transformation_df,
-                               'Data/Relationships/Compound_Transformation.csv')
-    
-            return transformation_df
+            gid = int(gid)
+            url = ("https://pubchem.ncbi.nlm.nih.gov/sdq/sdqagent.cgi?infmt=json&outfmt=csv"
+                   "&query={{\"download\":\"*\",\"collection\":\"chemblmetabolism\",\"where\":"
+                   f"{{\"ands\":[{{\"geneid\":\"{gid}\"}}]}},\"order\":[\"relevancescore,desc\"]"
+                   f",\"start\":1,\"limit\":10000000,\"downloadfilename\":\"pubchem_geneid_{gid}_chemblmetabolism\"}}")
+
+            response = self._send_request(url)
+            if response:
+                try:
+                    transformation_df = pd.read_csv(StringIO(response.text),
+                                                    sep=',', header=0,
+                                                    low_memory=False)
+                    transformation_df = transformation_df[['substratecid',
+                                                           'metabolitecid',
+                                                           'metconversion',
+                                                           'geneids',
+                                                           'pmids',
+                                                           'dois']]
+                    transformation_dfs.append(transformation_df)
+                except pd.errors.ParserError as e:
+                    print(f"Error parsing CSV for gene ID {gid}: {e}")
+                    continue  # Skip this gene ID and continue with others
+
+        transformation_df = pd.concat(transformation_dfs, ignore_index=True) if transformation_dfs else pd.DataFrame()
+        self._write_to_csv(transformation_df,
+                           'Data/Relationships/Compound_Transformation.csv')
+
+        return transformation_df
