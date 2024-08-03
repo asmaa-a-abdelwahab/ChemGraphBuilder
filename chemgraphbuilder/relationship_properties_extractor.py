@@ -28,6 +28,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 import xml.etree.ElementTree as ET
 import requests
 import pandas as pd
+import numpy as np
 
 logging.basicConfig(level=logging.INFO)
 
