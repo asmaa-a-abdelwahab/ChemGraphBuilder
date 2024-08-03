@@ -146,10 +146,10 @@ class RelationshipDataProcessor:
         """
         Filters and cleans data from CSV files, then saves to output files in chunks.
         """
-        base_output_file = 'Data/Relationships/Assay_Compound_Relationship'
-        base_compound_gene_file = 'Data/Relationships/Compound_Gene_Relationship'
+        base_output_file = 'Data/Relationships/Assay_Compound_Relationship_Processed/Assay_Compound_Relationship'
+        base_compound_gene_file = 'Data/Relationships/Compound_Gene_Relationship/Compound_Gene_Relationship'
         
-        # Process files in batches of 100
+        # Process files in batches of 100 
         batch_size = 100
         total_files = len(self.csv_files)
 
