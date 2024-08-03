@@ -724,6 +724,7 @@ class RelationshipPropertiesExtractor:
                     try:
                         # Read the CSV data
                         transformation_df = pd.read_csv(StringIO(response.text), sep=',', header=0, low_memory=False)
+                        print(response.text)
     
                         # Ensure columns exist
                         transformation_df = transformation_df[['substratecid',
@@ -735,7 +736,7 @@ class RelationshipPropertiesExtractor:
                         # Append the DataFrame to the list
                         transformation_dfs.append(transformation_df[required_columns])
                     except pd.errors.ParserError as e:
-                        logging.error(f"Error parsing CSV for gene ID {gid}: {e}\nurl:url")
+                        logging.error(f"Error parsing CSV for gene ID {gid}: {e}\nurl:{url}")
                         continue  # Skip this gene ID and continue with others
     
         # Concatenate all DataFrames
