@@ -10,7 +10,10 @@ import ast
 import json
 import pandas as pd
 from chemgraphbuilder.neo4jdriver import Neo4jBase
+import logging
 
+# Set up logging configuration
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 class AddGraphRelationships(Neo4jBase):
     """
