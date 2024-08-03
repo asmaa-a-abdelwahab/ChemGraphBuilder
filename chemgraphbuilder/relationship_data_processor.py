@@ -29,12 +29,26 @@ class RelationshipDataProcessor:
         self.csv_files = glob.glob(os.path.join(path, "AID_*.csv"))
         self.start_chunk = start_chunk
         self.all_data_connected = {}
+        self.unique_column_names = []
 
-        # Load all data connected if start_chunk is zero or file does not exist
-        if self.start_chunk == 0 or not os.path.exists('Data/Relationships/all_data_connected_dict.txt'):
+        # Check if the all_data_connected_dict and all_columns files exist
+        all_data_connected_file = 'Data/Relationships/all_data_connected_dict.txt'
+        all_columns_file = 'Data/Relationships/all_columns.txt'
+
+        if os.path.exists(all_data_connected_file):
+            self.all_data_connected = self._load_all_data_connected_from_file(all_data_connected_file)
+        else:
             self.all_data_connected = self._load_all_data_connected('Data/AllDataConnected.csv')
 
-        self.unique_column_names = self._get_filtered_columns() + ['activity']
+        if os.path.exists(all_columns_file):
+            self.unique_column_names = self._load_columns_from_file(all_columns_file)
+        else:
+            self.unique_column_names = self._get_filtered_columns()
+            self._save_columns_to_file(all_columns_file, self.unique_column_names)
+
+        # Ensure the 'activity' column is included
+        if 'activity' not in self.unique_column_names:
+            self.unique_column_names.append('activity')
 
     def _load_all_data_connected(self, file_path):
         """
@@ -56,30 +70,37 @@ class RelationshipDataProcessor:
             all_data_connected[key] = row.to_dict()
 
         # Optionally save the dictionary to a file
+        self._save_all_data_connected_to_file(all_data_connected)
+
+        return all_data_connected
+
+    def _save_all_data_connected_to_file(self, all_data_connected):
+        """
+        Saves the all_data_connected dictionary to a file.
+
+        Args:
+            all_data_connected (dict): The dictionary to save.
+        """
         with open("Data/Relationships/all_data_connected_dict.txt", "w") as file:
             for key, value in all_data_connected.items():
                 file.write(f"{key}: {value}\n")
 
-        return all_data_connected
-
-    def _add_all_data_connected_info(self, row):
+    def _load_all_data_connected_from_file(self, file_path):
         """
-        Adds additional information from all_data_connected to a row.
+        Loads the all_data_connected dictionary from a file.
 
         Args:
-            row (pd.Series): A row from a DataFrame.
+            file_path (str): The path to the file containing the dictionary.
 
         Returns:
-            pd.Series: The updated row with additional data if available.
+            dict: The loaded dictionary.
         """
-        key = (int(row['aid']), int(row['cid']), row['activity_outcome'])
-        if key in self.all_data_connected:
-            additional_info = self.all_data_connected[key]
-            for col, val in additional_info.items():
-                row[col] = val
-        else:
-            logging.warning(f"Key {key} not found in all_data_connected.")
-        return row
+        all_data_connected = {}
+        with open(file_path, "r") as file:
+            for line in file:
+                key, value = line.strip().split(": ", 1)
+                all_data_connected[eval(key)] = eval(value)
+        return all_data_connected
 
     def _get_filtered_columns(self):
         """
@@ -113,12 +134,52 @@ class RelationshipDataProcessor:
 
         all_columns.update(additional_columns)
 
-        # Save the combined columns to a file for reference
-        with open("Data/Relationships/all_columns.txt", "w") as file:
-            for item in all_columns:
+        return list(all_columns)
+
+    def _save_columns_to_file(self, file_path, columns):
+        """
+        Saves the list of columns to a file.
+
+        Args:
+            file_path (str): The path to the file.
+            columns (list): The list of columns to save.
+        """
+        with open(file_path, "w") as file:
+            for item in columns:
                 file.write(f"{item}\n")
 
-        return list(all_columns)
+    def _load_columns_from_file(self, file_path):
+        """
+        Loads the list of columns from a file.
+
+        Args:
+            file_path (str): The path to the file.
+
+        Returns:
+            list: The loaded list of columns.
+        """
+        with open(file_path, "r") as file:
+            columns = [line.strip() for line in file]
+        return columns
+
+    def _add_all_data_connected_info(self, row):
+        """
+        Adds additional information from all_data_connected to a row.
+
+        Args:
+            row (pd.Series): A row from a DataFrame.
+
+        Returns:
+            pd.Series: The updated row with additional data if available.
+        """
+        key = (int(row['aid']), int(row['cid']), row['activity_outcome'])
+        if key in self.all_data_connected:
+            additional_info = self.all_data_connected[key]
+            for col, val in additional_info.items():
+                row[col] = val
+        else:
+            logging.warning(f"Key {key} not found in all_data_connected.")
+        return row
 
     def process_files(self):
         """
