@@ -6,6 +6,9 @@ import argparse
 from neo4j import GraphDatabase
 from chemgraphbuilder.add_graph_relationships import AddGraphRelationships
 
+# Set up logging configuration
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
 class GraphRelationshipsLoader:
     """
     Class for loading graph relationships into a Neo4j database using the AddGraphRelationships class.
