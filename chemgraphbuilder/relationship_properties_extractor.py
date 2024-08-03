@@ -717,12 +717,8 @@ class RelationshipPropertiesExtractor:
                 url = ("https://pubchem.ncbi.nlm.nih.gov/sdq/sdqagent.cgi?infmt=json&outfmt=csv"
                        "&query={%22download%22:%22*%22,%22collection%22:%22chemblmetabolism%22,"
                        "%22order%22:[%22relevancescore,desc%22],%22start%22:1,%22limit%22:10000000,"
-                       f"%22downloadfilename%22:%22pubchem_geneid_{gid}_chemblmetabolism%22,%22where%22"
-                       ":{%22ands%22:[{%22geneid%22:%221576%22}]}}")
-                # ("https://pubchem.ncbi.nlm.nih.gov/sdq/sdqagent.cgi?infmt=json&outfmt=csv"
-                #        "&query={{\"download\":\"*\",\"collection\":\"chemblmetabolism\",\"where\":"
-                #        f"{{\"ands\":[{{\"geneid\":\"{gid}\"}}]}},\"order\":[\"relevancescore,desc\"]"
-                #        f",\"start\":1,\"limit\":10000000,\"downloadfilename\":\"pubchem_geneid_{gid}_chemblmetabolism\"}}")
+                       f"%22downloadfilename%22:%22pubchem_geneid_{gid}_chemblmetabolism%22,%22where"
+                       f"%22:{%22ands%22:[{%22geneid%22:%22{gid}%22}]}}")
     
                 response = self._send_request(url)
                 if response:
@@ -733,13 +729,14 @@ class RelationshipPropertiesExtractor:
     
                         # Ensure columns exist
                         transformation_df = transformation_df[['substratecid',
-                                                                'metabolitecid',
-                                                                'metconversion',
-                                                                'geneids', 'pmids',
-                                                                  'dois']]
+                                                               'metabolitecid',
+                                                               'metconversion',
+                                                               'geneids',
+                                                               'pmids',
+                                                               'dois']]
     
                         # Append the DataFrame to the list
-                        transformation_dfs.append(transformation_df[required_columns])
+                        transformation_dfs.append(transformation_df)
                     except pd.errors.ParserError as e:
                         logging.error(f"Error parsing CSV for gene ID {gid}: {e}\nurl:{url}")
                         continue  # Skip this gene ID and continue with others
