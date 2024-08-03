@@ -15,7 +15,8 @@ import warnings
 from chemgraphbuilder.relationship_properties_extractor import RelationshipPropertiesExtractor
 from chemgraphbuilder.relationship_data_processor import RelationshipDataProcessor
 
-logging.basicConfig(level=logging.INFO)
+# Set up logging configuration
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 
