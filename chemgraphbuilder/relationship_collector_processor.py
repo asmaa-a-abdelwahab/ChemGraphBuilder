@@ -41,6 +41,7 @@ class RelationshipsCollectorProcessor:
         """
         self.relationship_type = relationship_type
         self.data_file = "Data/AllDataConnected.csv"
+        self.gene_data = "Data/Nodes/Gene_Properties_Processed.csv"
         self.start_chunk = start_chunk
         self.extractor = RelationshipPropertiesExtractor()
         self.processor = RelationshipDataProcessor(path="Data/Relationships/Assay_Compound_Relationship")
@@ -61,8 +62,10 @@ class RelationshipsCollectorProcessor:
             self.extractor.compound_gene_relationship(self.data_file)
         elif self.relationship_type == 'Compound_Similarity':
             self.extractor.compound_similarity_relationship(self.data_file, start_chunk=self.start_chunk)
-        elif self.relationship_type == 'Compound_Cooccurrence':
-            self.extractor.compound_cooccurrence(self.data_file, start_chunk=self.start_chunk)
+        elif self.relationship_type == 'Compound_Compound_Cooccurrence':
+            self.extractor.compound_compound_cooccurrence(self.data_file, start_chunk=self.start_chunk)
+        elif self.relationship_type == 'Compound_Gene_Cooccurrence':
+            self.extractor.compound_gene_cooccurrence(self.gene_data, start_chunk=self.start_chunk)
         elif self.relationship_type == 'Compound_Transformation':
             self.extractor.compound_transformation(self.data_file)
         else:
@@ -78,7 +81,8 @@ def main():
                         required=True,
                         choices=['Assay_Compound', 'Assay_Enzyme', 'Gene_Enzyme',
                                  'Compound_Gene', 'Compound_Similarity',
-                                 'Compound_Cooccurrence',
+                                 'Compound_Compound_Cooccurrence',
+                                 'Compound_Gene_Cooccurrence',
                                  'Compound_Transformation'],
                         help='The type of relationship to collect data for')
     parser.add_argument('--start_chunk',
