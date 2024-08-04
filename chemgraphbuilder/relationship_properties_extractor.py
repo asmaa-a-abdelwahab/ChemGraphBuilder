@@ -462,25 +462,25 @@ class RelationshipPropertiesExtractor:
 
 
 
-    def _fetch_data(self, cid):
-        """
-        Fetches chemical-chemical and chemical-gene relationship data for a given
-        compound ID (CID). Checks if each data file exists before fetching.
+    # def _fetch_data(self, cid):
+    #     """
+    #     Fetches chemical-chemical and chemical-gene relationship data for a given
+    #     compound ID (CID). Checks if each data file exists before fetching.
 
-        Args:
-            cid (int): The compound ID for which data is to be fetched.
+    #     Args:
+    #         cid (int): The compound ID for which data is to be fetched.
 
-        Returns:
-            tuple: A tuple containing the CID, and two lists of data
-            (chemical-chemical and chemical-gene relationships).
-        """
-        cpd_cpd_file = f'Data/Relationships/Cpd_Cpd_CoOcuurence/CID_{cid}.csv'
-        cpd_gene_file = f'Data/Relationships/Cpd_gene_CoOcuurence/CID_{cid}.csv'
+    #     Returns:
+    #         tuple: A tuple containing the CID, and two lists of data
+    #         (chemical-chemical and chemical-gene relationships).
+    #     """
+    #     cpd_cpd_file = f'Data/Relationships/Cpd_Cpd_CoOcuurence/CID_{cid}.csv'
+    #     cpd_gene_file = f'Data/Relationships/Cpd_gene_CoOcuurence/CID_{cid}.csv'
 
-        cpd_cpd_data = self._fetch_chemical_neighbor_data(cid) if not os.path.exists(cpd_cpd_file) else []
-        cpd_gene_data = self._fetch_chemical_gene_data(cid) if not os.path.exists(cpd_gene_file) else []
+    #     cpd_cpd_data = self._fetch_chemical_neighbor_data(cid) if not os.path.exists(cpd_cpd_file) else []
+    #     cpd_gene_data = self._fetch_chemical_gene_data(cid) if not os.path.exists(cpd_gene_file) else []
 
-        return cid, cpd_cpd_data, cpd_gene_data
+    #     return cid, cpd_cpd_data, cpd_gene_data
 
 
     def _fetch_chemical_neighbor_data(self, cid):
@@ -563,7 +563,7 @@ class RelationshipPropertiesExtractor:
         try:
             response = self._send_request(url)
             data = response.json()
-            return data.get('LinkDataSet', {}).get('LinkData', [])
+            return data
         except Exception as e:
             logging.error(f"Failed to fetch chemical-gene data for CID {gid}: {e}")
             return []
@@ -733,7 +733,6 @@ class RelationshipPropertiesExtractor:
 
         elapsed = timeit.default_timer() - start_time
         logging.info(f"Compound-gene data fetching and saving completed in {elapsed:.2f} seconds.")
-        return "Compound-gene data fetching and saving completed."
 
     
     # def compound_cooccurrence(self, main_data, rate_limit=5, start_chunk=0):
