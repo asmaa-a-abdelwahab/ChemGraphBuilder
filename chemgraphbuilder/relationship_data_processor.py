@@ -166,7 +166,7 @@ class RelationshipDataProcessor:
             file_path (str): The path to the file.
             columns (list): The list of columns to save.
         """
-        with open(file_path, "w") as file):
+        with open(file_path, "w") as file:
             for item in columns:
                 file.write(f"{item}\n")
 
