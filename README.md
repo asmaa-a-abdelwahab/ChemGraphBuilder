@@ -91,4 +91,4 @@ For questions or support, please contact [Asmaa A. Abdelwahab](mailto:asmaa.a.ab
 
 ## Acknowledgments
 
-- This project utilizes the PubChem Database and its API for accessing chemical and bioassay data. We acknowledge the efforts of the PubChem team for maintaining such a valuable resource.
+This project utilizes the PubChem Database and its API for accessing chemical and bioassay data. We acknowledge the efforts of the PubChem team for maintaining such a valuable resource.
