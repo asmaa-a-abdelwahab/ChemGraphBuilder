@@ -495,9 +495,11 @@ class RelationshipPropertiesExtractor:
         """
         cpd_cpd_url = ("https://pubchem.ncbi.nlm.nih.gov/link_db/link_db_server.cgi?format=JSON&type="
                        f"ChemicalNeighbor&operation=GetAllLinks&id_1={cid}&response_type=display")
+        print('url', cpd_cpd_url)
         try:
             response = self._send_request(cpd_cpd_url)
             data = response.json()
+            print(data)
             return data.get('LinkDataSet', {}).get('LinkData', [])
         except Exception as e:
             logging.error(f"Failed to fetch chemical-chemical data for CID {cid}: {e}")
@@ -642,14 +644,14 @@ class RelationshipPropertiesExtractor:
         logging.info(f"Unique Compound IDs to process: {len(compound_ids)}")
     
         for compound_id in compound_ids:
-            logging.info(f"Processing Compound ID {compound_id}")
+            logging.info(f"Processing Compound ID {int(compound_id)}")
             try:
                 data = self._fetch_chemical_neighbor_data(compound_id)
-                filename = f"Data/Relationships/Cpd_Cpd_CoOccurrence/Cpd_Cpd_CoOccurrence_{int(compound_id)}.csv"
+                filename = f"Data/Relationships/Cpd_Cpd_CoOccurrence/CID_{int(compound_id)}.csv"
                 self._write_data_to_csv(data, filename)
                 logging.info(f"Successfully wrote data for Compound ID {int(compound_id)} to {filename}")
             except Exception as e:
-                logging.error(f"Error processing Compound ID {compound_id}: {e}")
+                logging.error(f"Error processing Compound ID {int(compound_id)}: {e}")
             time.sleep(1 / rate_limit)  # Ensuring we don't exceed rate limit
     
         elapsed = timeit.default_timer() - start_time
