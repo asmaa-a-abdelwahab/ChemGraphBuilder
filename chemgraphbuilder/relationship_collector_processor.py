@@ -66,6 +66,8 @@ class RelationshipsCollectorProcessor:
             self.extractor.compound_compound_cooccurrence(self.data_file)
         elif self.relationship_type == 'Compound_Gene_Cooccurrence':
             self.extractor.compound_gene_cooccurrence(self.gene_data)
+        elif self.relationship_type == 'Compound_Gene_Interaction':
+            self.extractor.compound_gene_interaction(self.gene_data)
         elif self.relationship_type == 'Compound_Transformation':
             self.extractor.compound_transformation(self.data_file)
         else:
@@ -83,6 +85,7 @@ def main():
                                  'Compound_Gene', 'Compound_Similarity',
                                  'Compound_Compound_Cooccurrence',
                                  'Compound_Gene_Cooccurrence',
+                                 'Compound_Gene_Interaction',
                                  'Compound_Transformation'],
                         help='The type of relationship to collect data for')
     parser.add_argument('--start_chunk',
