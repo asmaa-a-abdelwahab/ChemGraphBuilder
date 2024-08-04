@@ -85,7 +85,7 @@ class RelationshipDataProcessor:
         """
         with open("Data/Relationships/all_data_connected_dict.txt", "w") as file:
             for key, value in all_data_connected.items():
-                key_str = f"{key[0]},{key[1]},{key[2]}"
+                key_str = f"({key[0]},{key[1]},'{key[2]}')"
                 # Replace nan values with a placeholder string
                 for k, v in value.items():
                     if pd.isna(v):
@@ -111,8 +111,9 @@ class RelationshipDataProcessor:
                     continue
                 try:
                     key_str, value_str = line.split(": ", 1)
-                    key_parts = key_str.split(',')
-                    key = (int(key_parts[0]), int(key_parts[1]), key_parts[2])
+                    # Ensure correct parsing of key_str
+                    key_str = key_str.strip("()").split(",")
+                    key = (int(key_str[0]), int(key_str[1]), key_str[2].strip("'"))
                     value_dict = json.loads(value_str)
                     # Convert '__nan__' back to np.nan
                     for k, v in value_dict.items():
