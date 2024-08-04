@@ -514,7 +514,7 @@ class RelationshipPropertiesExtractor:
             list: List of chemical-gene relationship data.
         """
         cpd_gene_url = ("https://pubchem.ncbi.nlm.nih.gov/link_db/link_db_server.cgi?format=JSON&"
-                        "type=GeneSymbolChemicalNeighbor&operation=GetAllLinks&id_1={gid}&response_type=display")
+                        f"type=GeneSymbolChemicalNeighbor&operation=GetAllLinks&id_1={gid}&response_type=display")
         try:
             response = self._send_request(cpd_gene_url)
             data = response.json()
@@ -588,19 +588,6 @@ class RelationshipPropertiesExtractor:
 
         return "Compound-compound data fetching and saving completed."
 
-    
-    def compound_gene_cooccurrence(self, gene_data, rate_limit=5, start_chunk=0):
-        """
-        Analyzes compound-gene co-occurrence relationships from the specified main data file and saves the results into structured CSV files.
-        """
-        df = pd.read_csv(gene_data)  # Reading in chunks for large files
-
-        IDs = df['GeneSymbol'].unique().tolist()
-
-        for gid in IDs:
-            data = self._fetch_chemical_gene_data(gid)
-            self._write_data_to_csv(data, f"Data/Relationships/Cpd_Gene_CoOccurrence/Cpd_Gene_CoOccurrence_{gid}.csv")
-        logging.info("Compound-gene data fetching and saving completed.")
 
     def compound_gene_cooccurrence(self, gene_data, rate_limit=5):
         """
