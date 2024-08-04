@@ -595,13 +595,51 @@ class RelationshipPropertiesExtractor:
         """
         df = pd.read_csv(gene_data)  # Reading in chunks for large files
 
-        IDs = chunk['GeneSymbol'].unique().tolist()
+        IDs = df['GeneSymbol'].unique().tolist()
 
-        start_time = timeit.default_timer()
         for gid in IDs:
             data = self._fetch_chemical_gene_data(gid)
             self._write_data_to_csv(data, f"Data/Relationships/Cpd_Gene_CoOccurrence/Cpd_Gene_CoOccurrence_{gid}.csv")
         logging.info("Compound-gene data fetching and saving completed.")
+
+    def compound_gene_cooccurrence(self, gene_data, rate_limit=5):
+        """
+        Analyzes compound-gene co-occurrence relationships from the specified main data file and saves the results into structured CSV files.
+        """
+        logging.info("Starting compound-gene co-occurrence analysis...")
+        start_time = timeit.default_timer()
+        
+        try:
+            df = pd.read_csv(gene_data)
+            logging.info(f"Loaded data from {gene_data}. Total rows: {len(df)}")
+        except FileNotFoundError:
+            logging.error(f"File not found: {gene_data}")
+            return "File not found."
+        except pd.errors.EmptyDataError:
+            logging.error(f"Empty data file: {gene_data}")
+            return "Empty data file."
+        except Exception as e:
+            logging.error(f"Error reading {gene_data}: {e}")
+            return "Error reading data file."
+
+        gene_symbols = df['GeneSymbol'].unique().tolist()
+        logging.info(f"Unique Gene Symbols to process: {len(gene_symbols)}")
+
+        for gene_symbol in gene_symbols:
+            logging.info(f"Processing Gene Symbol {gene_symbol}")
+            try:
+                data = self._fetch_chemical_gene_data(gene_symbol)
+                filename = f"Data/Relationships/Cpd_Gene_CoOccurrence/Cpd_Gene_CoOccurrence_{gene_symbol}.csv"
+                self._write_data_to_csv(data, filename)
+                logging.info(f"Successfully wrote data for Gene Symbol {gene_symbol} to {filename}")
+            except Exception as e:
+                logging.error(f"Error processing Gene Symbol {gene_symbol}: {e}")
+            time.sleep(1 / rate_limit)  # Ensuring we don't exceed rate limit
+
+        elapsed = timeit.default_timer() - start_time
+        logging.info(f"Compound-gene data fetching and saving completed in {elapsed:.2f} seconds.")
+        return "Compound-gene data fetching and saving completed."
+
 
 
     # def compound_cooccurrence(self, main_data, rate_limit=5, start_chunk=0):
