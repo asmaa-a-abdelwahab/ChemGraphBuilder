@@ -109,9 +109,9 @@ class RelationshipDataProcessor:
                     logging.warning(f"Skipping improperly formatted or empty line: {line}")
                     continue
                 try:
-                    key, value = line.split(": ", 1)
-                    key = tuple(json.loads(key))
-                    value_dict = json.loads(value)
+                    key_str, value_str = line.split(": ", 1)
+                    key = tuple(json.loads(key_str))
+                    value_dict = json.loads(value_str)
                     # Convert '__nan__' back to np.nan
                     for k, v in value_dict.items():
                         if v == "__nan__":
