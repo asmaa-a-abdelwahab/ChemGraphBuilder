@@ -63,7 +63,7 @@ class RelationshipsCollectorProcessor:
         elif self.relationship_type == 'Compound_Similarity':
             self.extractor.compound_similarity_relationship(self.data_file, start_chunk=self.start_chunk)
         elif self.relationship_type == 'Compound_Compound_Cooccurrence':
-            self.extractor.compound_compound_cooccurrence(self.data_file, start_chunk=self.start_chunk)
+            self.extractor.compound_compound_cooccurrence(self.data_file)
         elif self.relationship_type == 'Compound_Gene_Cooccurrence':
             self.extractor.compound_gene_cooccurrence(self.gene_data)
         elif self.relationship_type == 'Compound_Transformation':
