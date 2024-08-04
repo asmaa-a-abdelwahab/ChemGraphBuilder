@@ -523,6 +523,27 @@ class RelationshipPropertiesExtractor:
             logging.error(f"Failed to fetch chemical-gene data for CID {cid}: {e}")
             return []
 
+    
+    def _fetch_chemical_gene_interaction_data(self, gid):
+        """
+        Fetches chemical-gene relationship data for a given CID.
+
+        Args:
+            cid (int): The compound ID for which data is to be fetched.
+
+        Returns:
+            list: List of chemical-gene relationship data.
+        """
+        cpd_gene_url = ("https://pubchem.ncbi.nlm.nih.gov/link_db/link_db_server.cgi?format=JSON&"
+                        f"type=GeneSymbolChemicalNeighbor&operation=GetAllLinks&id_1={gid}&response_type=display")
+        try:
+            response = self._send_request(cpd_gene_url)
+            data = response.json()
+            return data.get('LinkDataSet', {}).get('LinkData', [])
+        except Exception as e:
+            logging.error(f"Failed to fetch chemical-gene data for CID {cid}: {e}")
+            return []
+            
 
     def _write_data_to_csv(self, data, filename, filter_condition=None):
         """
@@ -601,9 +622,9 @@ class RelationshipPropertiesExtractor:
             logging.info(f"Processing Compound ID {compound_id}")
             try:
                 data = self._fetch_chemical_neighbor_data(compound_id)
-                filename = f"Data/Relationships/Cpd_Cpd_CoOccurrence/Cpd_Cpd_CoOccurrence_{compound_id}.csv"
+                filename = f"Data/Relationships/Cpd_Cpd_CoOccurrence/Cpd_Cpd_CoOccurrence_{int(compound_id)}.csv"
                 self._write_data_to_csv(data, filename)
-                logging.info(f"Successfully wrote data for Compound ID {compound_id} to {filename}")
+                logging.info(f"Successfully wrote data for Compound ID {int(compound_id)} to {filename}")
             except Exception as e:
                 logging.error(f"Error processing Compound ID {compound_id}: {e}")
             time.sleep(1 / rate_limit)  # Ensuring we don't exceed rate limit
@@ -651,8 +672,46 @@ class RelationshipPropertiesExtractor:
         logging.info(f"Compound-gene data fetching and saving completed in {elapsed:.2f} seconds.")
         return "Compound-gene data fetching and saving completed."
 
+    
+    def compound_gene_interaction(self, gene_data, rate_limit=5):
+        """
+        Analyzes compound-gene co-occurrence relationships from the specified main data file and saves the results into structured CSV files.
+        """
+        logging.info("Starting compound-gene co-occurrence analysis...")
+        start_time = timeit.default_timer()
+        
+        try:
+            df = pd.read_csv(gene_data)
+            logging.info(f"Loaded data from {gene_data}. Total rows: {len(df)}")
+        except FileNotFoundError:
+            logging.error(f"File not found: {gene_data}")
+            return "File not found."
+        except pd.errors.EmptyDataError:
+            logging.error(f"Empty data file: {gene_data}")
+            return "Empty data file."
+        except Exception as e:
+            logging.error(f"Error reading {gene_data}: {e}")
+            return "Error reading data file."
 
+        gene_symbols = df['GeneSymbol'].unique().tolist()
+        logging.info(f"Unique Gene Symbols to process: {len(gene_symbols)}")
 
+        for gene_symbol in gene_symbols:
+            logging.info(f"Processing Gene Symbol {gene_symbol}")
+            try:
+                data = self._fetch_chemical_gene_interaction_data(gene_symbol)
+                filename = f"Data/Relationships/Compound_Gene_Relationship/Compound_Gene_Interaction_Outside_PubChem_{gene_symbol}.csv"
+                self._write_data_to_csv(data, filename)
+                logging.info(f"Successfully wrote data for Gene Symbol {gene_symbol} to {filename}")
+            except Exception as e:
+                logging.error(f"Error processing Gene Symbol {gene_symbol}: {e}")
+            time.sleep(1 / rate_limit)  # Ensuring we don't exceed rate limit
+
+        elapsed = timeit.default_timer() - start_time
+        logging.info(f"Compound-gene data fetching and saving completed in {elapsed:.2f} seconds.")
+        return "Compound-gene data fetching and saving completed."
+
+    
     # def compound_cooccurrence(self, main_data, rate_limit=5, start_chunk=0):
     #     """
     #     Analyzes compound co-occurrence relationships from the specified main
