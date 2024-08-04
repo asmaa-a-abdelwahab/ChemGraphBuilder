@@ -84,7 +84,7 @@ class AddGraphNodes(Neo4jBase):
         try:
             return float(value)
         except (TypeError, ValueError):
-            escaped_value = "'" + str(value).replace("'", "\\'").replace('"', '\\"').replace("\n", "\\n") + "'"
+            escaped_value = str(value).replace("\\", "\\\\").replace("'", "\\'").replace('"', '\\"').replace("\n", "\\n")
             return f"'{escaped_value}'"
 
 
