@@ -28,6 +28,7 @@ from io import StringIO
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import xml.etree.ElementTree as ET
 import requests
+from urllib.parse import quote, urlencode
 import pandas as pd
 import numpy as np
 
@@ -520,7 +521,7 @@ class RelationshipPropertiesExtractor:
             data = response.json()
             return data.get('LinkDataSet', {}).get('LinkData', [])
         except Exception as e:
-            logging.error(f"Failed to fetch chemical-gene data for CID {cid}: {e}")
+            logging.error(f"Failed to fetch chemical-gene data for CID {gid}: {e}")
             return []
 
     
@@ -534,14 +535,37 @@ class RelationshipPropertiesExtractor:
         Returns:
             list: List of chemical-gene relationship data.
         """
-        cpd_gene_url = ("https://pubchem.ncbi.nlm.nih.gov/link_db/link_db_server.cgi?format=JSON&"
-                        f"type=GeneSymbolChemicalNeighbor&operation=GetAllLinks&id_1={gid}&response_type=display")
+        base_url = "https://pubchem.ncbi.nlm.nih.gov/sdq/sdqagent.cgi"
+        params = {
+            "infmt": "json",
+            "outfmt": "json",
+            "query": {
+                "download": "*",
+                "collection": "consolidatedcompoundtarget",
+                "order": ["cid,asc"],
+                "start": 1,
+                "limit": 10000000,
+                "downloadfilename": f"pubchem_geneid_{gid}_consolidatedcompoundtarget",
+                "where": {
+                    "ands": [
+                        {"geneid": f"{gid}"}
+                    ]
+                }
+            }
+        }
+        
+        # Convert the 'query' parameter to a JSON string and then URL encode it
+        params["query"] = quote(json.dumps(params["query"]))
+        
+        # Construct the full URL
+        url = f"{base_url}?{urlencode(params)}"
+        
         try:
-            response = self._send_request(cpd_gene_url)
+            response = self._send_request(url)
             data = response.json()
             return data.get('LinkDataSet', {}).get('LinkData', [])
         except Exception as e:
-            logging.error(f"Failed to fetch chemical-gene data for CID {cid}: {e}")
+            logging.error(f"Failed to fetch chemical-gene data for CID {gid}: {e}")
             return []
             
 
@@ -875,11 +899,8 @@ class RelationshipPropertiesExtractor:
                 
                 # Convert the dictionary to a JSON string
                 query_string = json.dumps(query)
-                
                 # URL encode the JSON string
-                from urllib.parse import quote
                 encoded_query = quote(query_string)
-                
                 # Construct the final URL
                 url = f"{base_url}{encoded_query}"
     
