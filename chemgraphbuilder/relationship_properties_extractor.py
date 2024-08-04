@@ -514,7 +514,7 @@ class RelationshipPropertiesExtractor:
             list: List of chemical-gene relationship data.
         """
         cpd_gene_url = ("https://pubchem.ncbi.nlm.nih.gov/link_db/link_db_server.cgi?format=JSON&"
-                        "type=GeneSymbolChemicalNeighbor&operation=GetAllLinks&id_1={gid}&response_type=display)
+                        "type=GeneSymbolChemicalNeighbor&operation=GetAllLinks&id_1={gid}&response_type=display")
         try:
             response = self._send_request(cpd_gene_url)
             data = response.json()
