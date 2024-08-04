@@ -104,8 +104,12 @@ class RelationshipDataProcessor:
         all_data_connected = {}
         with open(file_path, "r") as file:
             for line in file:
-                if ": " in line:
-                    key, value = line.strip().split(": ", 1)
+                line = line.strip()
+                if not line or ": " not in line:
+                    logging.warning(f"Skipping improperly formatted or empty line: {line}")
+                    continue
+                try:
+                    key, value = line.split(": ", 1)
                     key = tuple(json.loads(key))
                     value_dict = json.loads(value)
                     # Convert '__nan__' back to np.nan
@@ -113,8 +117,8 @@ class RelationshipDataProcessor:
                         if v == "__nan__":
                             value_dict[k] = np.nan
                     all_data_connected[key] = value_dict
-                else:
-                    logging.warning(f"Line is not properly formatted: {line.strip()}")
+                except json.JSONDecodeError as e:
+                    logging.error(f"Error decoding JSON from line: {line}\n{e}")
         return all_data_connected
 
     def _get_filtered_columns(self):
