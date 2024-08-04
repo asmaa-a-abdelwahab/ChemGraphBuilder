@@ -72,7 +72,7 @@ class NodeDataProcessor:
         This method simplifies access to protein data for downstream analysis.
         """
         df = pd.read_csv(f'{self.data_dir}/Nodes/Protein_Properties.csv')
-        df.rename(columns={"ID": "ProteinID", "Name": "ProteinName",
+        df.rename(columns={"RefSeq Accession": "ProteinRefSeqAccession",
                            "Description": "ProteinDescription"}, inplace=True)
         df.to_csv(f'{self.data_dir}/Nodes/Protein_Properties_Processed.csv', index=False)
 
@@ -86,6 +86,7 @@ class NodeDataProcessor:
         df.rename(columns={"Symbol": "GeneSymbol", "Taxonomy ID": "TaxonomyID",
                            "Synonyms": "GeneSynonyms"}, inplace=True)
         df['GeneID'] = df['GeneID'].astype('Int64')
+        df['TaxonomyID'] = df['TaxonomyID'].astype('Int64')
         df.to_csv(f'{self.data_dir}/Nodes/Gene_Properties_Processed.csv', index=False)
 
 
