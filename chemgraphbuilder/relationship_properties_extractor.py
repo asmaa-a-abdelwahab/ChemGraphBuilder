@@ -494,12 +494,12 @@ class RelationshipPropertiesExtractor:
             list: List of chemical-chemical relationship data.
         """
         cpd_cpd_url = ("https://pubchem.ncbi.nlm.nih.gov/link_db/link_db_server.cgi?format=JSON&type="
-                       f"ChemicalNeighbor&operation=GetAllLinks&id_1={cid}&response_type=display")
-        print('url', cpd_cpd_url)
+                       f"ChemicalNeighbor&operation=GetAllLinks&id_1={int(cid)}&response_type=display")
+        # print('url', cpd_cpd_url)
         try:
             response = self._send_request(cpd_cpd_url)
             data = response.json()
-            print(data)
+            # print(data)
             return data.get('LinkDataSet', {}).get('LinkData', [])
         except Exception as e:
             logging.error(f"Failed to fetch chemical-chemical data for CID {cid}: {e}")
@@ -646,7 +646,7 @@ class RelationshipPropertiesExtractor:
         for compound_id in compound_ids:
             logging.info(f"Processing Compound ID {int(compound_id)}")
             try:
-                data = self._fetch_chemical_neighbor_data(compound_id)
+                data = self._fetch_chemical_neighbor_data(int(compound_id))
                 filename = f"Data/Relationships/Cpd_Cpd_CoOccurrence/CID_{int(compound_id)}.csv"
                 self._write_data_to_csv(data, filename)
                 logging.info(f"Successfully wrote data for Compound ID {int(compound_id)} to {filename}")
