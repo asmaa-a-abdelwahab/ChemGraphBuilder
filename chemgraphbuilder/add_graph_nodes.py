@@ -84,8 +84,9 @@ class AddGraphNodes(Neo4jBase):
         try:
             return float(value)
         except (TypeError, ValueError):
-            escaped_value = "'" + str(value).replace("'", "\\'").replace("\n", "\\n") + "'"
-            return escaped_value
+            escaped_value = "'" + str(value).replace("\\", "\\\\").replace("'", "\\'").replace('"', '\\"').replace("\n", "\\n") + "'"
+            return f"'{escaped_value}'"
+
 
     def generate_cypher_queries(self, node_dict, label, unique_property):
         """
