@@ -598,9 +598,9 @@ class RelationshipPropertiesExtractor:
         IDs = chunk['GeneSymbol'].unique().tolist()
 
         start_time = timeit.default_timer()
-       for gid in IDs:
-           data = self._fetch_chemical_gene_data(gid)
-           self._write_data_to_csv(data, f"Data/Relationships/Cpd_Gene_CoOccurrence/Cpd_Gene_CoOccurrence_{gid}.csv")
+        for gid in IDs:
+            data = self._fetch_chemical_gene_data(gid)
+            self._write_data_to_csv(data, f"Data/Relationships/Cpd_Gene_CoOccurrence/Cpd_Gene_CoOccurrence_{gid}.csv")
         logging.info("Compound-gene data fetching and saving completed.")
 
 
