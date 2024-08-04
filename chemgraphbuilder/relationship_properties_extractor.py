@@ -566,47 +566,50 @@ class RelationshipPropertiesExtractor:
         if not df.empty:
             df.to_csv(filename, index=False)
 
-    
-    def compound_compound_cooccurrence(self, main_data, rate_limit=5, start_chunk=0):
+        
+    def compound_compound_cooccurrence(self, main_data, rate_limit=5):
         """
         Analyzes compound-compound co-occurrence relationships from the specified main data file and saves the results into structured CSV files.
         
         Args:
             main_data (str): Path to the main data file.
-            rate_limit (int): The maximum number of concurrent requests.
-            start_chunk (int): The starting chunk index for processing.
+            rate_limit (int): The maximum number of requests per second.
         
         Returns:
             str: A message indicating the completion of data fetching and saving.
         """
-        logging.info(f"Starting compound_compound_cooccurrence with main_data={main_data}, rate_limit={rate_limit}, start_chunk={start_chunk}")
-
-        df = pd.read_csv(main_data, chunksize=3000)  # Reading in chunks for large files
-        total_chunks = sum(1 for _ in pd.read_csv(main_data, chunksize=3000))  # Calculate total number of chunks
-
-        for chunk_idx, chunk in enumerate(df):
-            if chunk_idx >= start_chunk:
-                logging.info(f"Processing chunk {chunk_idx + 1}/{total_chunks}")
-                chunk.dropna(subset=['CID'], inplace=True)
-                IDs = chunk['CID'].unique().tolist()
-
-                logging.info(f"Found {len(IDs)} unique CIDs in chunk {chunk_idx}")
-
-                start_time = timeit.default_timer()
-                with ThreadPoolExecutor(max_workers=rate_limit) as executor:
-                    futures = {executor.submit(self._fetch_chemical_neighbor_data, int(cid)): cid for cid in IDs}
-                    for future in as_completed(futures):
-                        cid = futures[future]
-                        try:
-                            result = future.result()
-                            logging.info(f"Fetched data for CID {cid}")
-                        except Exception as e:
-                            logging.error(f"Error fetching data for CID {cid}: {e}")
-                        time.sleep(1 / rate_limit)  # Ensuring we don't exceed rate limit
-                elapsed = timeit.default_timer() - start_time
-                logging.info(f"Processed chunk {chunk_idx + 1} in {elapsed:.2f} seconds")
-
-        logging.info("Compound-compound data fetching and saving completed.")
+        logging.info("Starting compound-compound co-occurrence analysis...")
+        start_time = timeit.default_timer()
+        
+        try:
+            df = pd.read_csv(main_data)
+            logging.info(f"Loaded data from {main_data}. Total rows: {len(df)}")
+        except FileNotFoundError:
+            logging.error(f"File not found: {main_data}")
+            return "File not found."
+        except pd.errors.EmptyDataError:
+            logging.error(f"Empty data file: {main_data}")
+            return "Empty data file."
+        except Exception as e:
+            logging.error(f"Error reading {main_data}: {e}")
+            return "Error reading data file."
+    
+        compound_ids = df['CID'].dropna().unique().tolist()
+        logging.info(f"Unique Compound IDs to process: {len(compound_ids)}")
+    
+        for compound_id in compound_ids:
+            logging.info(f"Processing Compound ID {compound_id}")
+            try:
+                data = self._fetch_chemical_neighbor_data(compound_id)
+                filename = f"Data/Relationships/Cpd_Cpd_CoOccurrence/Cpd_Cpd_CoOccurrence_{compound_id}.csv"
+                self._write_data_to_csv(data, filename)
+                logging.info(f"Successfully wrote data for Compound ID {compound_id} to {filename}")
+            except Exception as e:
+                logging.error(f"Error processing Compound ID {compound_id}: {e}")
+            time.sleep(1 / rate_limit)  # Ensuring we don't exceed rate limit
+    
+        elapsed = timeit.default_timer() - start_time
+        logging.info(f"Compound-compound data fetching and saving completed in {elapsed:.2f} seconds.")
         return "Compound-compound data fetching and saving completed."
 
 
