@@ -578,7 +578,7 @@ class RelationshipPropertiesExtractor:
         Returns:
             str: A message indicating the completion of data fetching and saving.
         """
-        logging.info("Starting compound-compound co-occurrence analysis...")
+        logging.info("Starting compound-compound co-occurrence data retrieval ...")
         start_time = timeit.default_timer()
         
         try:
