@@ -111,15 +111,15 @@ class RelationshipDataProcessor:
                     continue
                 try:
                     key_str, value_str = line.split(": ", 1)
-                    key = tuple(key_str.split(','))
-                    key = (int(key[0]), int(key[1]), key[2])
+                    key_parts = key_str.split(',')
+                    key = (int(key_parts[0]), int(key_parts[1]), key_parts[2])
                     value_dict = json.loads(value_str)
                     # Convert '__nan__' back to np.nan
                     for k, v in value_dict.items():
                         if v == "__nan__":
                             value_dict[k] = np.nan
                     all_data_connected[key] = value_dict
-                except json.JSONDecodeError as e:
+                except (json.JSONDecodeError, ValueError) as e:
                     logging.error(f"Error decoding JSON from line: {line}\n{e}")
         return all_data_connected
 
