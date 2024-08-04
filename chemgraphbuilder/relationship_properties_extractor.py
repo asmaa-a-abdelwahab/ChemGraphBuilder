@@ -503,7 +503,7 @@ class RelationshipPropertiesExtractor:
             return []
 
 
-    def _fetch_chemical_gene_data(self, cid):
+    def _fetch_chemical_gene_data(self, gid):
         """
         Fetches chemical-gene relationship data for a given CID.
 
@@ -513,8 +513,8 @@ class RelationshipPropertiesExtractor:
         Returns:
             list: List of chemical-gene relationship data.
         """
-        cpd_gene_url = ("https://pubchem.ncbi.nlm.nih.gov/link_db/link_db_server.cgi?format=JSON&type="
-                        f"ChemicalGeneSymbolNeighbor&operation=GetAllLinks&id_1={cid}&response_type=display")
+        cpd_gene_url = ("https://pubchem.ncbi.nlm.nih.gov/link_db/link_db_server.cgi?format=JSON&"
+                        "type=GeneSymbolChemicalNeighbor&operation=GetAllLinks&id_1={gid}&response_type=display)
         try:
             response = self._send_request(cpd_gene_url)
             data = response.json()
@@ -579,7 +579,7 @@ class RelationshipPropertiesExtractor:
 
                 start_time = timeit.default_timer()
                 with ThreadPoolExecutor(max_workers=rate_limit) as executor:
-                    futures = {executor.submit(self._fetch_cpd_cpd_data, int(cid)): cid for cid in IDs}
+                    futures = {executor.submit(self._fetch_chemical_neighbor_data, int(cid)): cid for cid in IDs}
                     for future in as_completed(futures):
                         future.result()
                         time.sleep(1 / rate_limit)  # Ensuring we don't exceed rate limit
@@ -589,27 +589,19 @@ class RelationshipPropertiesExtractor:
         return "Compound-compound data fetching and saving completed."
 
     
-    def compound_gene_cooccurrence(self, main_data, rate_limit=5, start_chunk=0):
+    def compound_gene_cooccurrence(self, gene_data, rate_limit=5, start_chunk=0):
         """
         Analyzes compound-gene co-occurrence relationships from the specified main data file and saves the results into structured CSV files.
         """
-        df = pd.read_csv(main_data, chunksize=3000)  # Reading in chunks for large files
-        for chunk_idx, chunk in enumerate(df):
-            if chunk_idx >= start_chunk:
-                chunk = chunk[chunk['Target GeneID'].isin([1576, 1544, 1557, 1559, 1565])]
-                chunk.dropna(subset=['CID'], inplace=True)
-                IDs = chunk['CID'].unique().tolist()
+        df = pd.read_csv(gene_data)  # Reading in chunks for large files
 
-                start_time = timeit.default_timer()
-                with ThreadPoolExecutor(max_workers=rate_limit) as executor:
-                    futures = {executor.submit(self._fetch_cpd_gene_data, int(cid)): cid for cid in IDs}
-                    for future in as_completed(futures):
-                        future.result()
-                        time.sleep(1 / rate_limit)  # Ensuring we don't exceed rate limit
-                elapsed = timeit.default_timer() - start_time
-                logging.info(f"Processed chunk {chunk_idx} in {elapsed:.2f} seconds")
+        IDs = chunk['GeneSymbol'].unique().tolist()
 
-        return "Compound-gene data fetching and saving completed."
+        start_time = timeit.default_timer()
+       for gid in IDs:
+           data = self._fetch_chemical_gene_data(gid)
+           self._write_data_to_csv(data, f"Data/Relationships/Cpd_Gene_CoOccurrence/Cpd_Gene_CoOccurrence_{gid}.csv")
+        logging.info("Compound-gene data fetching and saving completed.")
 
 
     # def compound_cooccurrence(self, main_data, rate_limit=5, start_chunk=0):
