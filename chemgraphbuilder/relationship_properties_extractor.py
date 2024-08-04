@@ -536,30 +536,29 @@ class RelationshipPropertiesExtractor:
             list: List of chemical-gene relationship data.
         """
         base_url = "https://pubchem.ncbi.nlm.nih.gov/sdq/sdqagent.cgi"
-        params = {
-            "infmt": "json",
-            "outfmt": "json",
-            "query": {
-                "download": "*",
-                "collection": "consolidatedcompoundtarget",
-                "order": ["cid,asc"],
-                "start": 1,
-                "limit": 10000000,
-                "downloadfilename": f"pubchem_geneid_{gid}_consolidatedcompoundtarget",
-                "where": {
-                    "ands": [
-                        {"geneid": f"{gid}"}
-                    ]
-                }
+        query = {
+            "download": "*",
+            "collection": "consolidatedcompoundtarget",
+            "order": ["cid,asc"],
+            "start": 1,
+            "limit": 10000000,
+            "downloadfilename": f"pubchem_geneid_{int(gid)}_consolidatedcompoundtarget",
+            "where": {
+                "ands": [
+                    {"geneid": f"{int(gid)}"}
+                ]
             }
         }
         
-        # Convert the 'query' parameter to a JSON string and then URL encode it
-        params["query"] = quote(json.dumps(params["query"]))
+        # Convert the query dictionary to a JSON string
+        query_json_str = json.dumps(query)
+        
+        # URL encode the JSON string
+        encoded_query = quote(query_json_str)
         
         # Construct the full URL
-        url = f"{base_url}?{urlencode(params)}"
-        
+        url = f"{base_url}?infmt=json&outfmt=json&query={encoded_query}"
+
         try:
             response = self._send_request(url)
             data = response.json()
