@@ -717,18 +717,18 @@ class RelationshipPropertiesExtractor:
             logging.error(f"Error reading {gene_data}: {e}")
             return "Error reading data file."
 
-        gene_symbols = df['GeneSymbol'].unique().tolist()
+        gene_symbols = df['GeneID'].unique().tolist()
         logging.info(f"Unique Gene Symbols to process: {len(gene_symbols)}")
 
         for gene_symbol in gene_symbols:
             logging.info(f"Processing Gene Symbol {gene_symbol}")
             try:
-                data = self._fetch_chemical_gene_interaction_data(gene_symbol)
-                filename = f"Data/Relationships/Compound_Gene_Relationship/Compound_Gene_Interaction_Outside_PubChem_{gene_symbol}.csv"
+                data = self._fetch_chemical_gene_interaction_data(int(gene_symbol))
+                filename = f"Data/Relationships/Compound_Gene_Relationship/Compound_Gene_Interaction_Outside_PubChem_{int(gene_symbol)}.csv"
                 self._write_data_to_csv(data, filename)
-                logging.info(f"Successfully wrote data for Gene Symbol {gene_symbol} to {filename}")
+                logging.info(f"Successfully wrote data for Gene Symbol {int(gene_symbol)} to {filename}")
             except Exception as e:
-                logging.error(f"Error processing Gene Symbol {gene_symbol}: {e}")
+                logging.error(f"Error processing Gene Symbol {int(gene_symbol)}: {e}")
             time.sleep(1 / rate_limit)  # Ensuring we don't exceed rate limit
 
         elapsed = timeit.default_timer() - start_time
