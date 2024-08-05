@@ -43,17 +43,26 @@ class GraphRelationshipsLoader:
         # Predefined settings for different relationship types
         self.relationship_settings = {
             "Compound_Gene": {
-                "file_path": "Data/Relationships/Compound_Gene_Relationship.csv",
+                "file_path": "Data/Relationships/Compound_Gene_Relationship/Compound_Gene_Relationship*.csv",
                 "source_label": "Compound",
                 "destination_label": "Gene",
-                "rel_type_column": "Activity"
+                "rel_type_column": "activity",
+                "is_directory": True
+            },
+            "Compound_Gene_Interaction": {
+                "file_path": "Data/Relationships/Compound_Gene_Relationship/Compound_Gene_Interaction*.csv",
+                "source_label": "Compound",
+                "destination_label": "Gene",
+                "relationship_type": "INTERACTS_WITH",
+                "is_directory": True
             },
             "Assay_Compound": {
-                "file_path": "Data/Relationships/Assay_Compound_Relationship.csv",
+                "file_path": "Data/Relationships/Assay_Compound_Relationship_Processed/Assay_Compound_Relationship*.csv",
                 "source_label": "BioAssay",
                 "destination_label": "Compound",
                 "rel_type_column": None,
-                "relationship_type": "EVALUATES"
+                "relationship_type": "EVALUATES",
+                "is_directory": True
             },
             "Assay_Gene": {
                 "file_path": "Data/Relationships/Assay_Gene_Relationship.csv",
@@ -69,7 +78,7 @@ class GraphRelationshipsLoader:
                 "rel_type_column": None,
                 "relationship_type": "IS_METABOLIZED_TO"
             },
-            "Gene_Enzyme": {
+            "Gene_Protein": {
                 "file_path": "Data/Relationships/Gene_Enzyme_Relationship.csv",
                 "source_label": "Gene",
                 "destination_label": "Protein",
@@ -77,7 +86,7 @@ class GraphRelationshipsLoader:
                 "relationship_type": "ENCODES"
             },
             "Compound_Similarities": {
-                "file_path": "Data/Relationships/Compound_Similarities",
+                "file_path": "Data/Relationships/Compound_Similarities/*",
                 "source_label": "Compound",
                 "destination_label": "Compound",
                 "rel_type_column": None,
@@ -85,7 +94,7 @@ class GraphRelationshipsLoader:
                 "is_directory": True
             },
             "Cpd_Cpd_CoOccurence": {
-                "file_path": "Data/Relationships/Cpd_Cpd_CoOccurence",
+                "file_path": "Data/Relationships/Cpd_Cpd_CoOccurence/*",
                 "source_label": "Compound",
                 "destination_label": "Compound",
                 "rel_type_column": None,
@@ -93,7 +102,7 @@ class GraphRelationshipsLoader:
                 "is_directory": True
             },
             "Cpd_Gene_CoOccurence": {
-                "file_path": "Data/Relationships/Cpd_Gene_CoOccurence",
+                "file_path": "Data/Relationships/Cpd_Gene_CoOccurence/*",
                 "source_label": "Compound",
                 "destination_label": "Gene",
                 "rel_type_column": None,
@@ -148,6 +157,12 @@ def main():
     parser.add_argument("--password", type=str, required=True,
                         help="Password for the Neo4j database.")
     parser.add_argument("--relationship_type", type=str, required=True,
+                        choices=['Assay_Compound', 'Assay_Enzyme', 'Gene_Enzyme',
+                                 'Compound_Gene', 'Compound_Similarity',
+                                 'Cpd_Cpd_CoOccurence',
+                                 'Cpd_Gene_CoOccurence',
+                                 'Compound_Gene_Interaction',
+                                 'Compound_Transformation'],
                         help="Type of the relationship to add.")
     args = parser.parse_args()
 
