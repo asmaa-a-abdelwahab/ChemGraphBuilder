@@ -239,10 +239,10 @@ class AddGraphRelationships(Neo4jBase):
         }
         self.logger.info(f"Reading data from CSV file: {file_path}")
         df = pd.read_csv(file_path)
-        df = df.dropna(axis=1, how="all")
-        source_column, destination_column = df.columns[:2]
+        source_column, destination_column = df.columns[:2] 
         print(destination_column)
         df = df.dropna(subset=[source_column, destination_column], how='any')
+        df = df.dropna(axis=1, how="all")
         if df.empty:
             self.logger.error("The CSV file %s is empty or contains no valid data.",
                               file_path)
