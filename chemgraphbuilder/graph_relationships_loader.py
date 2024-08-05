@@ -87,7 +87,7 @@ class GraphRelationshipsLoader:
                 "relationship_type": "ENCODES"
             },
             "Compound_Similarities": {
-                "file_path": "Data/Relationships/Compound_Similarities/*",
+                "file_path": "Data/Relationships/Compound_Similarities/*.csv",
                 "source_label": "Compound",
                 "destination_label": "Compound",
                 "rel_type_column": None,
@@ -95,7 +95,7 @@ class GraphRelationshipsLoader:
                 "is_directory": True
             },
             "Cpd_Cpd_CoOccurence": {
-                "file_path": "Data/Relationships/Cpd_Cpd_CoOccurence/*",
+                "file_path": "Data/Relationships/Cpd_Cpd_CoOccurence/*.csv",
                 "source_label": "Compound",
                 "destination_label": "Compound",
                 "rel_type_column": None,
@@ -103,7 +103,7 @@ class GraphRelationshipsLoader:
                 "is_directory": True
             },
             "Cpd_Gene_CoOccurence": {
-                "file_path": "Data/Relationships/Cpd_Gene_CoOccurence/*",
+                "file_path": "Data/Relationships/Cpd_Gene_CoOccurence/*.csv",
                 "source_label": "Gene",
                 "destination_label": "Compound",
                 "rel_type_column": None,
