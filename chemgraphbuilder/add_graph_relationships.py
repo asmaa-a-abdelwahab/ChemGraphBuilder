@@ -272,10 +272,11 @@ class AddGraphRelationships(Neo4jBase):
                     
             elif rel_type == 'CO_OCCURS_IN_LITERATURE':
                 source = ast.literal_eval(row[source_column])
+                destination = ast.literal_eval(row[destination_column])
                 if isinstance(source, dict):
+                    source_column = source.keys()[0]
+                    destination_column = destination.keys()[0]
                     source = list(source.values())[0]
-                    source_column = row[source_column].keys()[0]
-                    destination_column = row[destination_column].keys()[0]
                     print(source_column, destination_column)
                 targets = ast.literal_eval(row[destination_column])
                 if isinstance(targets, dict):
