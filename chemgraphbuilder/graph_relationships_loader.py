@@ -86,7 +86,7 @@ class GraphRelationshipsLoader:
                 "rel_type_column": None,
                 "relationship_type": "ENCODES"
             },
-            "Compound_Similarities": {
+            "Compound_Similarity": {
                 "file_path": "Data/Relationships/Compound_Similarities/*.csv",
                 "source_label": "Compound",
                 "destination_label": "Compound",
@@ -94,7 +94,7 @@ class GraphRelationshipsLoader:
                 "relationship_type": "IS_SIMILAR_TO",
                 "is_directory": True
             },
-            "Cpd_Cpd_CoOccurrence": {
+            "Compound_Compound_CoOccurrence": {
                 "file_path": "Data/Relationships/Cpd_Cpd_CoOccurrence/*.csv",
                 "source_label": "Compound",
                 "destination_label": "Compound",
@@ -102,7 +102,7 @@ class GraphRelationshipsLoader:
                 "relationship_type": "CO_OCCURS_IN_LITERATURE",
                 "is_directory": True
             },
-            "Cpd_Gene_CoOccurrence": {
+            "Compound_Gene_CoOccurrence": {
                 "file_path": "Data/Relationships/Cpd_Gene_CoOccurrence/*.csv",
                 "source_label": "Gene",
                 "destination_label": "Compound",
@@ -159,12 +159,13 @@ def main():
                         help="Password for the Neo4j database.")
     parser.add_argument("--relationship_type", type=str, required=True,
                         choices=['Assay_Compound', 'Assay_Gene', 'Gene_Protein',
-                                 'Compound_Gene', 'Compound_Similarities',
-                                 'Cpd_Cpd_CoOccurrence',
-                                 'Cpd_Gene_CoOccurrence',
+                                 'Compound_Gene', 'Compound_Similarity',
+                                 'Compound_Compound_CoOccurrence',
+                                 'Compound_Gene_CoOccurrence',
                                  'Compound_Gene_Interaction',
                                  'Compound_Transformation'],
                         help="Type of the relationship to add.")
+
     args = parser.parse_args()
 
     loader = GraphRelationshipsLoader(args.uri, args.username, args.password)
