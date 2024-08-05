@@ -172,10 +172,12 @@ class AddGraphRelationships(Neo4jBase):
         """
         source_value = self._generate_property_string(source)
         target_value = self._generate_property_string(target)
+        source_key = standard_id[source_column] if source_column in standard_id else source_column
+        destination_key = standard_id[destination_column] if destination_column in standard_id else destination_column
 
         query = (
-            f"MATCH (a:{source_label} {{{standard_id[source_column]}: {source_value}}}), "
-            f"(b:{destination_label} {{{standard_id[destination_column]}: {target_value}}}) "
+            f"MATCH (a:{source_label} {{{source_key}: {source_value}}}), "
+            f"(b:{destination_label} {{{destination_key}: {target_value}}}) "
             f"MERGE (a)-[r:{relationship_type}]->(b)"
         )
 
