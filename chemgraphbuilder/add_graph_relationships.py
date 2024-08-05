@@ -243,6 +243,7 @@ class AddGraphRelationships(Neo4jBase):
         self.logger.info(f"Reading data from CSV file: {file_path}")
         df = pd.read_csv(file_path, low_memory=False)
         df.replace("__nan__", np.nan, inplace=True)
+        df = df.dropna(axis=1, how='all')
         if rel_type == 'CO_OCCURS_IN_LITERATURE':
             df.rename(columns={df.columns[0]: list(ast.literal_eval(df[df.columns[0]][0]).keys())[0]},
                       inplace=True)
