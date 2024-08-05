@@ -252,7 +252,7 @@ class AddGraphRelationships(Neo4jBase):
         for _, row in df.iterrows():
             source = row[source_column]
             relationship_type = row[rel_type_column] if rel_type_column else rel_type
-            relationship_type = relationship_type.replace("/", "-")
+            relationship_type = relationship_type.replace("/", "OR")
             properties = self._process_properties(row, source_column,
                                                   destination_column,
                                                   rel_type_column, standard_id)
