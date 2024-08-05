@@ -73,7 +73,7 @@ class AddGraphRelationships(Neo4jBase):
             return float(value)
         except (TypeError, ValueError):
             escaped_value = str(value).replace("\\", "\\\\").replace("'", "\\'").replace('"', '\\"').replace("\n", "\\n")
-            return f"'{escaped_value}'"
+            return escaped_value
             
 
     def _process_properties(self, row, source_column, destination_column,
