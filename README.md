@@ -27,7 +27,7 @@ pip install chemgraphbuilder
 ```python
 from chemgraphbuilder.setup_data_folder import SetupDataFolder
 from chemgraphbuilder.node_collector_processor import NodesCollectorProcessor
-from relationship_collector_processor import RelationshipsCollectorProcessor
+from chemgraphbuilder.relationship_collector_processor import RelationshipsCollectorProcessor
 from chemgraphbuilder.graph_nodes_loader import GraphNodesLoader
 from chemgraphbuilder.graph_relationships_loader import GraphRelationshipsLoader
 
