@@ -239,11 +239,12 @@ class AddGraphRelationships(Neo4jBase):
         }
         self.logger.info(f"Reading data from CSV file: {file_path}")
         df = pd.read_csv(file_path)
-        print(file_path)
+        if rel_type == 'CO_OCCURS_IN_LITERATURE':
+            df.rename(columns={df.columns[0]: list(df[df.columns[0]][0].keys())[0],
+                               df.columns[1]: list(df[df.columns[1]][0].keys())[0]},
+                      inplace=True)
         source_column, destination_column = df.columns[:2] 
-        print(source_column, destination_column)
         df = df.dropna(subset=[source_column, destination_column], how='any')
-        print(df.head())
         if df.empty:
             self.logger.error("The CSV file %s is empty or contains no valid data.",
                               file_path)
@@ -274,10 +275,7 @@ class AddGraphRelationships(Neo4jBase):
                 source = ast.literal_eval(row[source_column])
                 destination = ast.literal_eval(row[destination_column])
                 if isinstance(source, dict):
-                    source_column = list(source.keys())[0]
-                    destination_column = list(destination.keys())[0]
                     source = list(source.values())[0]
-                    print(source_column, destination_column)
                 targets = ast.literal_eval(row[destination_column])
                 if isinstance(targets, dict):
                     for target in targets.values():
