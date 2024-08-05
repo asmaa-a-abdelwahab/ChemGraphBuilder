@@ -94,16 +94,16 @@ class GraphRelationshipsLoader:
                 "relationship_type": "IS_SIMILAR_TO",
                 "is_directory": True
             },
-            "Cpd_Cpd_CoOccurence": {
-                "file_path": "Data/Relationships/Cpd_Cpd_CoOccurence/*.csv",
+            "Cpd_Cpd_CoOccurrence": {
+                "file_path": "Data/Relationships/Cpd_Cpd_CoOccurrence/*.csv",
                 "source_label": "Compound",
                 "destination_label": "Compound",
                 "rel_type_column": None,
                 "relationship_type": "CO_OCCURS_IN_LITERATURE",
                 "is_directory": True
             },
-            "Cpd_Gene_CoOccurence": {
-                "file_path": "Data/Relationships/Cpd_Gene_CoOccurence/*.csv",
+            "Cpd_Gene_CoOccurrence": {
+                "file_path": "Data/Relationships/Cpd_Gene_CoOccurrence/*.csv",
                 "source_label": "Gene",
                 "destination_label": "Compound",
                 "rel_type_column": None,
@@ -160,8 +160,8 @@ def main():
     parser.add_argument("--relationship_type", type=str, required=True,
                         choices=['Assay_Compound', 'Assay_Gene', 'Gene_Protein',
                                  'Compound_Gene', 'Compound_Similarities',
-                                 'Cpd_Cpd_CoOccurence',
-                                 'Cpd_Gene_CoOccurence',
+                                 'Cpd_Cpd_CoOccurrence',
+                                 'Cpd_Gene_CoOccurrence',
                                  'Compound_Gene_Interaction',
                                  'Compound_Transformation'],
                         help="Type of the relationship to add.")
