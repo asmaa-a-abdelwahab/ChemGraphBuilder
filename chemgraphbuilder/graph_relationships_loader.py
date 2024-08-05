@@ -79,7 +79,7 @@ class GraphRelationshipsLoader:
                 "relationship_type": "IS_METABOLIZED_TO"
             },
             "Gene_Protein": {
-                "file_path": "Data/Relationships/Gene_Enzyme_Relationship.csv",
+                "file_path": "Data/Relationships/Gene_Protein_Relationship.csv",
                 "source_label": "Gene",
                 "destination_label": "Protein",
                 "rel_type_column": None,
@@ -157,7 +157,7 @@ def main():
     parser.add_argument("--password", type=str, required=True,
                         help="Password for the Neo4j database.")
     parser.add_argument("--relationship_type", type=str, required=True,
-                        choices=['Assay_Compound', 'Assay_Enzyme', 'Gene_Enzyme',
+                        choices=['Assay_Compound', 'Assay_Gene', 'Gene_Protein',
                                  'Compound_Gene', 'Compound_Similarity',
                                  'Cpd_Cpd_CoOccurence',
                                  'Cpd_Gene_CoOccurence',
