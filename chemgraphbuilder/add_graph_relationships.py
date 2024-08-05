@@ -240,7 +240,7 @@ class AddGraphRelationships(Neo4jBase):
             'cid': 'CompoundID'
         }
         self.logger.info(f"Reading data from CSV file: {file_path}")
-        df = pd.read_csv(file_path)
+        df = pd.read_csv(file_path, low_memory=False)
         if rel_type == 'CO_OCCURS_IN_LITERATURE':
             df.rename(columns={df.columns[0]: list(ast.literal_eval(df[df.columns[0]][0]).keys())[0],
                                df.columns[1]: list(ast.literal_eval(df[df.columns[1]][0]).keys())[0]},
