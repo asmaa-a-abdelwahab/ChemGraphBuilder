@@ -239,6 +239,7 @@ class AddGraphRelationships(Neo4jBase):
         }
         self.logger.info(f"Reading data from CSV file: {file_path}")
         df = pd.read_csv(file_path)
+        df = df.dropna(axis=1, how="all")
         source_column, destination_column = df.columns[:2]
         df = df.dropna(subset=[source_column, destination_column], how='any')
         if df.empty:
