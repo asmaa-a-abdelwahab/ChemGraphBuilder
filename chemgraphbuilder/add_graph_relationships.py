@@ -52,37 +52,6 @@ class AddGraphRelationships(Neo4jBase):
         self.logger.info("AddGraphRelationships class initialized.")
 
 
-    # @staticmethod
-    # def _generate_property_string(value):
-    #     """
-    #     Generate a property string for Cypher queries.
-
-    #     Parameters
-    #     ----------
-    #     value : any
-    #         The value to be converted to a string.
-
-    #     Returns
-    #     -------
-    #     str
-    #         The formatted string for the Cypher query.
-    #     """
-    #     if isinstance(value, (int, float)):
-    #         return value
-    #     try:
-    #         evaluated_value = ast.literal_eval(value)
-    #         if isinstance(evaluated_value, (int, float)):
-    #             return evaluated_value
-    #         if isinstance(evaluated_value, dict):
-    #             json_str = json.dumps(evaluated_value).replace('"', '\\"').replace("'", "\\'")
-    #             return f"'{json_str}'"
-    #     except (ValueError, SyntaxError):
-    #         pass
-
-    #     escaped_value = "'" + value.replace("'", "\\'").replace("\n", "\\n") + "'"
-    #     return escaped_value
-
-    
     @staticmethod
     def _generate_property_string(value):
         """
@@ -353,41 +322,6 @@ class AddGraphRelationships(Neo4jBase):
             for query in self.generate_cypher_queries_from_file(csv_file, rel_type, source_label, destination_label, rel_type_column):
                 yield query
 
-    # def generate_cypher_queries_from_directories(self, directory, rel_type,
-    #                                              source_label, destination_label,
-    #                                              rel_type_column=None):
-    #     """
-    #     Generate Cypher queries for creating relationships in Neo4j by merging CSV files from a directory.
-
-    #     Parameters
-    #     ----------
-    #     directory : str
-    #         The path to the directory containing the CSV files.
-    #     rel_type : str
-    #         The type of the relationship.
-    #     source_label : str
-    #         The label for the source node.
-    #     destination_label : str
-    #         The label for the destination node.
-    #     rel_type_column : str, optional
-    #         The column name for the relationship type, if it is to be extracted from the CSV file.
-
-    #     Yields
-    #     ------
-    #     str
-    #         A Cypher query string.
-    #     """
-    #     combined_df = self.combine_csv_files(directory)
-    #     if combined_df.empty:
-    #         self.logger.error("The directory %s is empty or contains no valid CSV files.",
-    #                           directory)
-    #         return []
-    #     file_path = os.path.join(directory, directory.split('/')[-1] + ".csv")
-    #     combined_df.to_csv(file_path, index=False)
-    #     return self.generate_cypher_queries_from_file(file_path,
-    #                                                   rel_type, source_label,
-    #                                                   destination_label,
-    #                                                   rel_type_column)
 
     def execute_queries(self, queries, batch_size=100):
         """
@@ -419,36 +353,7 @@ class AddGraphRelationships(Neo4jBase):
                                       i, str(e))
 
         self.logger.info("All queries executed.")
-        
 
-    # def combine_csv_files(self, input_directory):
-    #     """
-    #     Combine multiple CSV files with the same columns into a single DataFrame.
-
-    #     Parameters
-    #     ----------
-    #     input_directory : str
-    #         The directory containing the CSV files to be combined.
-
-    #     Returns
-    #     -------
-    #     pandas.DataFrame
-    #         A combined DataFrame containing data from all the CSV files.
-    #     """
-    #     self.logger.info("Combining CSV files from directory: %s", input_directory)
-    #     dfs = [
-    #         pd.read_csv(os.path.join(input_directory, file))
-    #         for file in os.listdir(input_directory)
-    #         if file.endswith(".csv")
-    #     ]
-    #     if not dfs:
-    #         self.logger.error("No valid CSV files found in the directory %s.",
-    #                           input_directory)
-    #         return pd.DataFrame()
-
-    #     combined_df = pd.concat(dfs, ignore_index=True)
-    #     self.logger.info("Successfully combined CSV files.")
-    #     return combined_df
 
     def process_and_add_relationships(self, file_path, rel_type, source_label,
                                       destination_label, rel_type_column=None):
@@ -478,6 +383,7 @@ class AddGraphRelationships(Neo4jBase):
         self.execute_queries(queries)
         self.logger.info("Successfully processed and added relationships from file: %s",
                          file_path)
+
 
     def process_and_add_relationships_from_directory(self, directory_path,
                                                      rel_type, source_label,
