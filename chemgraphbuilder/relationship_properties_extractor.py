@@ -235,13 +235,13 @@ class RelationshipPropertiesExtractor:
         df.to_csv(filename, index=False)
 
 
-    def assay_enzyme_relationship(self, main_data):
+    def assay_gene_relationship(self, main_data):
         """
-        Extracts and saves relationships between assays and enzymes from the
+        Extracts and saves relationships between assays and proteins from the
         specified dataset.
 
         This method processes assay data to identify relationships between
-        assays and their target enzymes. It selects relevant columns from the
+        assays and their target proteins. It selects relevant columns from the
         input data, removes duplicates to ensure unique relationships, and saves
         the cleaned data to a CSV file for further analysis or integration into
         knowledge graphs.
@@ -253,11 +253,11 @@ class RelationshipPropertiesExtractor:
 
         Returns:
             pandas.DataFrame: A DataFrame containing the unique relationships
-            between assays and enzymes, including the assay ID, target gene ID,
+            between assays and proteins, including the assay ID, target gene ID,
             and activity name.
 
         Side Effects:
-            - Writes a CSV file to 'Data/Relationships/Assay_Enzyme_Relationship.csv',
+            - Writes a CSV file to 'Data/Relationships/Assay_Gene_Relationship.csv',
             containing the processed relationships data.
         """
         df = pd.read_csv(main_data)
@@ -268,59 +268,59 @@ class RelationshipPropertiesExtractor:
         return df
 
 
-    def gene_enzyme_relationship(self, main_data):
+    def gene_protein_relationship(self, main_data):
         """
-        Extracts and saves relationships between genes and enzymes based on
+        Extracts and saves relationships between genes and proteins based on
         the provided dataset.
 
         This method selects relevant columns to highlight the relationships
-        between genes and their corresponding enzymes.
+        between genes and their corresponding proteins.
         It removes duplicate entries to ensure that each relationship is
         represented uniquely and saves the resultant data to
         a CSV file. This facilitates easy integration of genetic data into
         knowledge bases or further analysis.
 
         Parameters:
-            main_data (str): Path to the CSV file containing gene and enzyme data.
+            main_data (str): Path to the CSV file containing gene and protein data.
             Expected columns include 'Target GeneID' and 'Target Accession'.
 
         Returns:
-            pandas.DataFrame: A DataFrame of unique gene-enzyme relationships,
-            including gene ID and enzyme accession numbers.
+            pandas.DataFrame: A DataFrame of unique gene-protein relationships,
+            including gene ID and protein accession numbers.
 
         Side Effects:
-            - Writes the processed data to 'Data/Gene_Enzyme_Relationship.csv'
+            - Writes the processed data to 'Data/Gene_Protein_Relationship.csv'
             in a structured CSV format.
         """
         df = pd.read_csv(main_data)
         columns_to_select = ['Target GeneID', 'Target Accession']
         df = df[columns_to_select]
         df = df.drop_duplicates(keep='first', ignore_index=True)
-        df.to_csv(f'Data/Relationships/Gene_Enzyme_Relationship.csv', index=False)
+        df.to_csv(f'Data/Relationships/Gene_Protein_Relationship.csv', index=False)
         return df
 
 
     def compound_gene_relationship(self, main_data):
         """
-        Identifies and records relationships between compounds and enzymes from
+        Identifies and records relationships between compounds and proteins from
         the input data.
 
-        This method focuses on extracting compound-enzyme interaction data,
+        This method focuses on extracting compound-protein interaction data,
         including activity outcomes and values. It selects
         pertinent columns, removes duplicate records, and sorts the data by
         Compound ID and Target Accession for clarity. The cleaned dataset is
         then saved to a CSV file, providing a structured view  of how compounds
-        interact with various enzymes, which can be critical for drug discovery
+        interact with various proteins, which can be critical for drug discovery
         and pharmacological research.
 
         Parameters:
-            main_data (str): Path to the CSV file with compound and enzyme data.
+            main_data (str): Path to the CSV file with compound and protein data.
             This file should contain columns for 'CID' (Compound ID),
             'Target Accession', 'Activity Outcome', 'Activity Name', and
             'Activity Value [uM]'.
 
         Returns:
-            pandas.DataFrame: A DataFrame with processed compound-enzyme
+            pandas.DataFrame: A DataFrame with processed compound-protein
             relationships, sorted and cleaned for direct analysis or database
             insertion.
 
@@ -728,7 +728,10 @@ class RelationshipPropertiesExtractor:
                 filename = f"Data/Relationships/Compound_Gene_Relationship/Compound_Gene_Interaction_Outside_PubChem_{int(gene_symbol)}.csv"
                 df = pd.DataFrame(data)
                 if not df.empty:
-                    df = df[['ID_2', 'ID_1', 'Evidence']]
+                    # Reorder Columns
+                    all_columns = [col for col in df.columns if col not in ('cid', 'geneid')]
+                    all_columns = ['cid', 'geneid'] + all_columns
+                    df = df[all_columns]
                     df.to_csv(filename, index=False)
                 # self._write_data_to_csv(data, filename)
                 logging.info(f"Successfully wrote data for Gene Symbol {int(gene_symbol)} to {filename}")
