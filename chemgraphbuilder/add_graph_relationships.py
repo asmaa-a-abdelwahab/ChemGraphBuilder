@@ -293,7 +293,7 @@ class AddGraphRelationships(Neo4jBase):
                 
             else:
                 source = int(row[source_column])
-                target = int(row[destination_column])
+                target = int(float(row[destination_column]))
                 query = self._generate_query(
                     source, target, relationship_type, properties, source_label,
                     destination_label, standard_id, source_column, destination_column
