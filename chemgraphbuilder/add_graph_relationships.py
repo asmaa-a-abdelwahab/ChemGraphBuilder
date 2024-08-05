@@ -233,7 +233,8 @@ class AddGraphRelationships(Neo4jBase):
             'Similar CIDs': 'CompoundID',
             'Target Accession': 'ProteinRefSeqAccession',
             'geneid': 'GeneID',
-            'cid': 'CompoundID',
+            'target_geneid': 'GeneID',
+            'cid': 'CompoundID'
         }
         self.logger.info(f"Reading data from CSV file: {file_path}")
         df = pd.read_csv(file_path)
