@@ -274,8 +274,8 @@ class AddGraphRelationships(Neo4jBase):
                 source = ast.literal_eval(row[source_column])
                 destination = ast.literal_eval(row[destination_column])
                 if isinstance(source, dict):
-                    source_column = source.keys()[0]
-                    destination_column = destination.keys()[0]
+                    source_column = list(source.keys())[0]
+                    destination_column = list(destination.keys())[0]
                     source = list(source.values())[0]
                     print(source_column, destination_column)
                 targets = ast.literal_eval(row[destination_column])
