@@ -264,7 +264,7 @@ class RelationshipPropertiesExtractor:
         columns_to_select = ['AID', 'Target GeneID', 'Activity Name']
         df = df[columns_to_select]
         df = df.drop_duplicates(keep='first', ignore_index=True)
-        df.to_csv(f'Data/Relationships/Assay_Enzyme_Relationship.csv', index=False)
+        df.to_csv(f'Data/Relationships/Assay_Gene_Relationship.csv', index=False)
         return df
 
 
