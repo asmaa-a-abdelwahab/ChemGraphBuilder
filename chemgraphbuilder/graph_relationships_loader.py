@@ -47,6 +47,7 @@ class GraphRelationshipsLoader:
                 "source_label": "Compound",
                 "destination_label": "Gene",
                 "rel_type_column": "activity",
+                "relationship_type": None,
                 "is_directory": True
             },
             "Compound_Gene_Interaction": {
