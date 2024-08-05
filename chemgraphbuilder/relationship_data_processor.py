@@ -52,6 +52,7 @@ class RelationshipDataProcessor:
         if 'activity' not in self.unique_column_names:
             self.unique_column_names.append('activity')
 
+
     def _load_all_data_connected(self, file_path):
         """
         Loads additional data from a specified file and organizes it into a dictionary.
@@ -76,6 +77,7 @@ class RelationshipDataProcessor:
 
         return all_data_connected
 
+
     def _save_all_data_connected_to_file(self, all_data_connected):
         """
         Saves the all_data_connected dictionary to a file.
@@ -91,6 +93,7 @@ class RelationshipDataProcessor:
                     if pd.isna(v):
                         value[k] = "__nan__"
                 file.write(f"{key_str}: {json.dumps(value)}\n")
+
 
     def _load_all_data_connected_from_file(self, file_path):
         """
@@ -124,6 +127,7 @@ class RelationshipDataProcessor:
                     logging.error(f"Error decoding JSON from line: {line}\n{e}")
         return all_data_connected
 
+
     def _get_filtered_columns(self):
         """
         Extracts unique column names from the CSV files and additional data.
@@ -155,8 +159,14 @@ class RelationshipDataProcessor:
             all_columns.update(columns)
 
         all_columns.update(additional_columns)
+        all_columns = list(all_columns)
+        
+        # Reorder Columns
+        all_columns = [col for col in all_columns if col not in ('aid', 'cid')]
+        all_columns = ['aid', 'cid'] + all_columns
 
-        return list(all_columns)
+        return all_columns
+
 
     def _save_columns_to_file(self, file_path, columns):
         """
@@ -169,6 +179,7 @@ class RelationshipDataProcessor:
         with open(file_path, "w") as file:
             for item in columns:
                 file.write(f"{item}\n")
+
 
     def _load_columns_from_file(self, file_path):
         """
@@ -183,6 +194,7 @@ class RelationshipDataProcessor:
         with open(file_path, "r") as file:
             columns = [line.strip() for line in file]
         return columns
+
 
     def _add_all_data_connected_info(self, row):
         """
@@ -203,6 +215,7 @@ class RelationshipDataProcessor:
             logging.warning(f"Key {key} not found in all_data_connected.")
         return row
 
+
     def process_files(self):
         """
         Processes the CSV files by filtering, cleaning, and augmenting data.
@@ -211,6 +224,7 @@ class RelationshipDataProcessor:
         """
         self._filter_and_clean_data()
         logging.info("Data filtered, cleaned, and combined successfully.")
+
 
     def _filter_and_clean_data(self):
         """
@@ -238,6 +252,7 @@ class RelationshipDataProcessor:
                     self._process_file(file, self.unique_column_names, batch_output_file, batch_compound_gene_file)
 
                 logging.info(f"Processed batch {batch_index // batch_size + 1} of {total_files // batch_size + 1}")
+
 
     def _process_file(self, file, unique_column_names, output_file, compound_gene_file):
         """
