@@ -103,8 +103,8 @@ class GraphRelationshipsLoader:
             },
             "Cpd_Gene_CoOccurence": {
                 "file_path": "Data/Relationships/Cpd_Gene_CoOccurence/*",
-                "source_label": "Compound",
-                "destination_label": "Gene",
+                "source_label": "Gene",
+                "destination_label": "Compound",
                 "rel_type_column": None,
                 "relationship_type": "CO_OCCURS_IN_LITERATURE",
                 "is_directory": True
