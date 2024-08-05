@@ -49,6 +49,38 @@ class AddGraphRelationships(Neo4jBase):
         self.driver = driver
         self.logger.info("AddGraphRelationships class initialized.")
 
+
+    # @staticmethod
+    # def _generate_property_string(value):
+    #     """
+    #     Generate a property string for Cypher queries.
+
+    #     Parameters
+    #     ----------
+    #     value : any
+    #         The value to be converted to a string.
+
+    #     Returns
+    #     -------
+    #     str
+    #         The formatted string for the Cypher query.
+    #     """
+    #     if isinstance(value, (int, float)):
+    #         return value
+    #     try:
+    #         evaluated_value = ast.literal_eval(value)
+    #         if isinstance(evaluated_value, (int, float)):
+    #             return evaluated_value
+    #         if isinstance(evaluated_value, dict):
+    #             json_str = json.dumps(evaluated_value).replace('"', '\\"').replace("'", "\\'")
+    #             return f"'{json_str}'"
+    #     except (ValueError, SyntaxError):
+    #         pass
+
+    #     escaped_value = "'" + value.replace("'", "\\'").replace("\n", "\\n") + "'"
+    #     return escaped_value
+
+    
     @staticmethod
     def _generate_property_string(value):
         """
@@ -67,17 +99,11 @@ class AddGraphRelationships(Neo4jBase):
         if isinstance(value, (int, float)):
             return value
         try:
-            evaluated_value = ast.literal_eval(value)
-            if isinstance(evaluated_value, (int, float)):
-                return evaluated_value
-            if isinstance(evaluated_value, dict):
-                json_str = json.dumps(evaluated_value).replace('"', '\\"').replace("'", "\\'")
-                return f"'{json_str}'"
-        except (ValueError, SyntaxError):
-            pass
-
-        escaped_value = "'" + value.replace("'", "\\'").replace("\n", "\\n") + "'"
-        return escaped_value
+            return float(value)
+        except (TypeError, ValueError):
+            escaped_value = str(value).replace("\\", "\\\\").replace("'", "\\'").replace('"', '\\"').replace("\n", "\\n")
+            return f"'{escaped_value}'"
+            
 
     def _process_properties(self, row, source_column, destination_column,
                             rel_type_column, standard_id):
@@ -110,6 +136,7 @@ class AddGraphRelationships(Neo4jBase):
         properties = {standard_id.get(k, k): v for k, v in properties.items()}
         return properties
 
+    
     def _generate_query(self, source, target, relationship_type, properties,
                         source_label, destination_label, standard_id,
                         source_column, destination_column):
@@ -163,6 +190,7 @@ class AddGraphRelationships(Neo4jBase):
         self.logger.debug(f"Generated query: {query}")
         return query
 
+
     def generate_cypher_queries_from_file(self, file_path, rel_type, source_label,
                                           destination_label, rel_type_column=None):
         """
@@ -194,6 +222,7 @@ class AddGraphRelationships(Neo4jBase):
             'AssayID': 'AssayID',
             'Assay ID': 'AssayID',
             'AID': 'AssayID',
+            'aid': 'AssayID',
             'ID_1': 'CompoundID',
             'ID_2': 'CompoundID',
             'substratecid': 'CompoundID',
@@ -202,7 +231,9 @@ class AddGraphRelationships(Neo4jBase):
             'CompoundID': 'CompoundID',
             'CID': 'CompoundID',
             'Similar CIDs': 'CompoundID',
-            'Target Accession': 'ProteinRefSeqAccession'
+            'Target Accession': 'ProteinRefSeqAccession',
+            'geneid': 'GeneID',
+            'cid': 'CompoundID',
         }
         self.logger.info(f"Reading data from CSV file: {file_path}")
         df = pd.read_csv(file_path)
