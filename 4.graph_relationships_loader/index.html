@@ -22,7 +22,7 @@
       
       
       <link rel="icon" href="../docs/assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.30">
+      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.31">
     
     
       
@@ -858,14 +858,15 @@
 <h3 id="usage-in-different-contexts">Usage in Different Contexts</h3>
 <h4 id="available-relationships"><strong>Available Relationships</strong></h4>
 <ul>
-<li><code>Assay_Gene</code></li>
 <li><code>Assay_Compound</code></li>
+<li><code>Assay_Gene</code></li>
+<li><code>Gene_Protein</code></li>
 <li><code>Compound_Gene</code></li>
+<li><code>Compound_Similarity</code></li>
+<li><code>Compound_Compound_Cooccurrence</code></li>
+<li><code>Compound_Gene_Cooccurrence</code></li>
+<li><code>Compound_Gene_Interaction</code></li>
 <li><code>Compound_Transformation</code></li>
-<li><code>Gene_Enzyme</code></li>
-<li><code>Compound_Similarities</code></li>
-<li><code>Cpd_Cpd_CoOccurence</code></li>
-<li><code>Cpd_Gene_CoOccurence</code></li>
 </ul>
 <h4 id="1-python-code">1. <strong>Python Code</strong></h4>
 <pre><code class="language-python">from chemgraphbuilder.graph_relationships_loader import GraphRelationshipsLoader

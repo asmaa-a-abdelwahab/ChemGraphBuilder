@@ -22,7 +22,7 @@
       
       
       <link rel="icon" href="../docs/assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.30">
+      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.31">
     
     
       
@@ -989,10 +989,7 @@
 
               <details class="quote">
                 <summary>Source code in <code>chemgraphbuilder/graph_relationships_loader.py</code></summary>
-                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">  9</span>
-<span class="normal"> 10</span>
-<span class="normal"> 11</span>
-<span class="normal"> 12</span>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 12</span>
 <span class="normal"> 13</span>
 <span class="normal"> 14</span>
 <span class="normal"> 15</span>
@@ -1115,7 +1112,20 @@
 <span class="normal">132</span>
 <span class="normal">133</span>
 <span class="normal">134</span>
-<span class="normal">135</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">GraphRelationshipsLoader</span><span class="p">:</span>
+<span class="normal">135</span>
+<span class="normal">136</span>
+<span class="normal">137</span>
+<span class="normal">138</span>
+<span class="normal">139</span>
+<span class="normal">140</span>
+<span class="normal">141</span>
+<span class="normal">142</span>
+<span class="normal">143</span>
+<span class="normal">144</span>
+<span class="normal">145</span>
+<span class="normal">146</span>
+<span class="normal">147</span>
+<span class="normal">148</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">GraphRelationshipsLoader</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Class for loading graph relationships into a Neo4j database using the AddGraphRelationships class.</span>
 
@@ -1149,17 +1159,27 @@
         <span class="c1"># Predefined settings for different relationship types</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">relationship_settings</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s2">&quot;Compound_Gene&quot;</span><span class="p">:</span> <span class="p">{</span>
-                <span class="s2">&quot;file_path&quot;</span><span class="p">:</span> <span class="s2">&quot;Data/Relationships/Compound_Gene_Relationship.csv&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;file_path&quot;</span><span class="p">:</span> <span class="s2">&quot;Data/Relationships/Compound_Gene_Relationship/Compound_Gene_Relationship*.csv&quot;</span><span class="p">,</span>
                 <span class="s2">&quot;source_label&quot;</span><span class="p">:</span> <span class="s2">&quot;Compound&quot;</span><span class="p">,</span>
                 <span class="s2">&quot;destination_label&quot;</span><span class="p">:</span> <span class="s2">&quot;Gene&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;rel_type_column&quot;</span><span class="p">:</span> <span class="s2">&quot;Activity&quot;</span>
+                <span class="s2">&quot;rel_type_column&quot;</span><span class="p">:</span> <span class="s2">&quot;activity&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;relationship_type&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+                <span class="s2">&quot;is_directory&quot;</span><span class="p">:</span> <span class="kc">True</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;Compound_Gene_Interaction&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;file_path&quot;</span><span class="p">:</span> <span class="s2">&quot;Data/Relationships/Compound_Gene_Relationship/Compound_Gene_Interaction*.csv&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;source_label&quot;</span><span class="p">:</span> <span class="s2">&quot;Compound&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;destination_label&quot;</span><span class="p">:</span> <span class="s2">&quot;Gene&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;relationship_type&quot;</span><span class="p">:</span> <span class="s2">&quot;INTERACTS_WITH&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;is_directory&quot;</span><span class="p">:</span> <span class="kc">True</span>
             <span class="p">},</span>
             <span class="s2">&quot;Assay_Compound&quot;</span><span class="p">:</span> <span class="p">{</span>
-                <span class="s2">&quot;file_path&quot;</span><span class="p">:</span> <span class="s2">&quot;Data/Relationships/Assay_Compound_Relationship.csv&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;file_path&quot;</span><span class="p">:</span> <span class="s2">&quot;Data/Relationships/Assay_Compound_Relationship_Processed/Assay_Compound_Relationship*.csv&quot;</span><span class="p">,</span>
                 <span class="s2">&quot;source_label&quot;</span><span class="p">:</span> <span class="s2">&quot;BioAssay&quot;</span><span class="p">,</span>
                 <span class="s2">&quot;destination_label&quot;</span><span class="p">:</span> <span class="s2">&quot;Compound&quot;</span><span class="p">,</span>
                 <span class="s2">&quot;rel_type_column&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
-                <span class="s2">&quot;relationship_type&quot;</span><span class="p">:</span> <span class="s2">&quot;EVALUATES&quot;</span>
+                <span class="s2">&quot;relationship_type&quot;</span><span class="p">:</span> <span class="s2">&quot;EVALUATES&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;is_directory&quot;</span><span class="p">:</span> <span class="kc">True</span>
             <span class="p">},</span>
             <span class="s2">&quot;Assay_Gene&quot;</span><span class="p">:</span> <span class="p">{</span>
                 <span class="s2">&quot;file_path&quot;</span><span class="p">:</span> <span class="s2">&quot;Data/Relationships/Assay_Gene_Relationship.csv&quot;</span><span class="p">,</span>
@@ -1175,33 +1195,33 @@
                 <span class="s2">&quot;rel_type_column&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
                 <span class="s2">&quot;relationship_type&quot;</span><span class="p">:</span> <span class="s2">&quot;IS_METABOLIZED_TO&quot;</span>
             <span class="p">},</span>
-            <span class="s2">&quot;Gene_Enzyme&quot;</span><span class="p">:</span> <span class="p">{</span>
-                <span class="s2">&quot;file_path&quot;</span><span class="p">:</span> <span class="s2">&quot;Data/Relationships/Gene_Enzyme_Relationship.csv&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Gene_Protein&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;file_path&quot;</span><span class="p">:</span> <span class="s2">&quot;Data/Relationships/Gene_Protein_Relationship.csv&quot;</span><span class="p">,</span>
                 <span class="s2">&quot;source_label&quot;</span><span class="p">:</span> <span class="s2">&quot;Gene&quot;</span><span class="p">,</span>
                 <span class="s2">&quot;destination_label&quot;</span><span class="p">:</span> <span class="s2">&quot;Protein&quot;</span><span class="p">,</span>
                 <span class="s2">&quot;rel_type_column&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
                 <span class="s2">&quot;relationship_type&quot;</span><span class="p">:</span> <span class="s2">&quot;ENCODES&quot;</span>
             <span class="p">},</span>
-            <span class="s2">&quot;Compound_Similarities&quot;</span><span class="p">:</span> <span class="p">{</span>
-                <span class="s2">&quot;file_path&quot;</span><span class="p">:</span> <span class="s2">&quot;Data/Relationships/Compound_Similarities&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Compound_Similarity&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;file_path&quot;</span><span class="p">:</span> <span class="s2">&quot;Data/Relationships/Compound_Similarities/*.csv&quot;</span><span class="p">,</span>
                 <span class="s2">&quot;source_label&quot;</span><span class="p">:</span> <span class="s2">&quot;Compound&quot;</span><span class="p">,</span>
                 <span class="s2">&quot;destination_label&quot;</span><span class="p">:</span> <span class="s2">&quot;Compound&quot;</span><span class="p">,</span>
                 <span class="s2">&quot;rel_type_column&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
                 <span class="s2">&quot;relationship_type&quot;</span><span class="p">:</span> <span class="s2">&quot;IS_SIMILAR_TO&quot;</span><span class="p">,</span>
                 <span class="s2">&quot;is_directory&quot;</span><span class="p">:</span> <span class="kc">True</span>
             <span class="p">},</span>
-            <span class="s2">&quot;Cpd_Cpd_CoOccurence&quot;</span><span class="p">:</span> <span class="p">{</span>
-                <span class="s2">&quot;file_path&quot;</span><span class="p">:</span> <span class="s2">&quot;Data/Relationships/Cpd_Cpd_CoOccurence&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Compound_Compound_CoOccurrence&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;file_path&quot;</span><span class="p">:</span> <span class="s2">&quot;Data/Relationships/Cpd_Cpd_CoOccurrence/*.csv&quot;</span><span class="p">,</span>
                 <span class="s2">&quot;source_label&quot;</span><span class="p">:</span> <span class="s2">&quot;Compound&quot;</span><span class="p">,</span>
                 <span class="s2">&quot;destination_label&quot;</span><span class="p">:</span> <span class="s2">&quot;Compound&quot;</span><span class="p">,</span>
                 <span class="s2">&quot;rel_type_column&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
                 <span class="s2">&quot;relationship_type&quot;</span><span class="p">:</span> <span class="s2">&quot;CO_OCCURS_IN_LITERATURE&quot;</span><span class="p">,</span>
                 <span class="s2">&quot;is_directory&quot;</span><span class="p">:</span> <span class="kc">True</span>
             <span class="p">},</span>
-            <span class="s2">&quot;Cpd_Gene_CoOccurence&quot;</span><span class="p">:</span> <span class="p">{</span>
-                <span class="s2">&quot;file_path&quot;</span><span class="p">:</span> <span class="s2">&quot;Data/Relationships/Cpd_Gene_CoOccurence&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;source_label&quot;</span><span class="p">:</span> <span class="s2">&quot;Compound&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;destination_label&quot;</span><span class="p">:</span> <span class="s2">&quot;Gene&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Compound_Gene_CoOccurrence&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;file_path&quot;</span><span class="p">:</span> <span class="s2">&quot;Data/Relationships/Cpd_Gene_CoOccurrence/*.csv&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;source_label&quot;</span><span class="p">:</span> <span class="s2">&quot;Gene&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;destination_label&quot;</span><span class="p">:</span> <span class="s2">&quot;Compound&quot;</span><span class="p">,</span>
                 <span class="s2">&quot;rel_type_column&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
                 <span class="s2">&quot;relationship_type&quot;</span><span class="p">:</span> <span class="s2">&quot;CO_OCCURS_IN_LITERATURE&quot;</span><span class="p">,</span>
                 <span class="s2">&quot;is_directory&quot;</span><span class="p">:</span> <span class="kc">True</span>
@@ -1329,10 +1349,7 @@
 
             <details class="quote">
               <summary>Source code in <code>chemgraphbuilder/graph_relationships_loader.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 20</span>
-<span class="normal"> 21</span>
-<span class="normal"> 22</span>
-<span class="normal"> 23</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 23</span>
 <span class="normal"> 24</span>
 <span class="normal"> 25</span>
 <span class="normal"> 26</span>
@@ -1409,7 +1426,20 @@
 <span class="normal"> 97</span>
 <span class="normal"> 98</span>
 <span class="normal"> 99</span>
-<span class="normal">100</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uri</span><span class="p">,</span> <span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="p">):</span>
+<span class="normal">100</span>
+<span class="normal">101</span>
+<span class="normal">102</span>
+<span class="normal">103</span>
+<span class="normal">104</span>
+<span class="normal">105</span>
+<span class="normal">106</span>
+<span class="normal">107</span>
+<span class="normal">108</span>
+<span class="normal">109</span>
+<span class="normal">110</span>
+<span class="normal">111</span>
+<span class="normal">112</span>
+<span class="normal">113</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uri</span><span class="p">,</span> <span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Initializes the GraphRelationshipsLoader with Neo4j connection details.</span>
 
@@ -1432,17 +1462,27 @@
     <span class="c1"># Predefined settings for different relationship types</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">relationship_settings</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s2">&quot;Compound_Gene&quot;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s2">&quot;file_path&quot;</span><span class="p">:</span> <span class="s2">&quot;Data/Relationships/Compound_Gene_Relationship.csv&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;file_path&quot;</span><span class="p">:</span> <span class="s2">&quot;Data/Relationships/Compound_Gene_Relationship/Compound_Gene_Relationship*.csv&quot;</span><span class="p">,</span>
             <span class="s2">&quot;source_label&quot;</span><span class="p">:</span> <span class="s2">&quot;Compound&quot;</span><span class="p">,</span>
             <span class="s2">&quot;destination_label&quot;</span><span class="p">:</span> <span class="s2">&quot;Gene&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;rel_type_column&quot;</span><span class="p">:</span> <span class="s2">&quot;Activity&quot;</span>
+            <span class="s2">&quot;rel_type_column&quot;</span><span class="p">:</span> <span class="s2">&quot;activity&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;relationship_type&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="s2">&quot;is_directory&quot;</span><span class="p">:</span> <span class="kc">True</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;Compound_Gene_Interaction&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;file_path&quot;</span><span class="p">:</span> <span class="s2">&quot;Data/Relationships/Compound_Gene_Relationship/Compound_Gene_Interaction*.csv&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;source_label&quot;</span><span class="p">:</span> <span class="s2">&quot;Compound&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;destination_label&quot;</span><span class="p">:</span> <span class="s2">&quot;Gene&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;relationship_type&quot;</span><span class="p">:</span> <span class="s2">&quot;INTERACTS_WITH&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;is_directory&quot;</span><span class="p">:</span> <span class="kc">True</span>
         <span class="p">},</span>
         <span class="s2">&quot;Assay_Compound&quot;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s2">&quot;file_path&quot;</span><span class="p">:</span> <span class="s2">&quot;Data/Relationships/Assay_Compound_Relationship.csv&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;file_path&quot;</span><span class="p">:</span> <span class="s2">&quot;Data/Relationships/Assay_Compound_Relationship_Processed/Assay_Compound_Relationship*.csv&quot;</span><span class="p">,</span>
             <span class="s2">&quot;source_label&quot;</span><span class="p">:</span> <span class="s2">&quot;BioAssay&quot;</span><span class="p">,</span>
             <span class="s2">&quot;destination_label&quot;</span><span class="p">:</span> <span class="s2">&quot;Compound&quot;</span><span class="p">,</span>
             <span class="s2">&quot;rel_type_column&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
-            <span class="s2">&quot;relationship_type&quot;</span><span class="p">:</span> <span class="s2">&quot;EVALUATES&quot;</span>
+            <span class="s2">&quot;relationship_type&quot;</span><span class="p">:</span> <span class="s2">&quot;EVALUATES&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;is_directory&quot;</span><span class="p">:</span> <span class="kc">True</span>
         <span class="p">},</span>
         <span class="s2">&quot;Assay_Gene&quot;</span><span class="p">:</span> <span class="p">{</span>
             <span class="s2">&quot;file_path&quot;</span><span class="p">:</span> <span class="s2">&quot;Data/Relationships/Assay_Gene_Relationship.csv&quot;</span><span class="p">,</span>
@@ -1458,33 +1498,33 @@
             <span class="s2">&quot;rel_type_column&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
             <span class="s2">&quot;relationship_type&quot;</span><span class="p">:</span> <span class="s2">&quot;IS_METABOLIZED_TO&quot;</span>
         <span class="p">},</span>
-        <span class="s2">&quot;Gene_Enzyme&quot;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s2">&quot;file_path&quot;</span><span class="p">:</span> <span class="s2">&quot;Data/Relationships/Gene_Enzyme_Relationship.csv&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Gene_Protein&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;file_path&quot;</span><span class="p">:</span> <span class="s2">&quot;Data/Relationships/Gene_Protein_Relationship.csv&quot;</span><span class="p">,</span>
             <span class="s2">&quot;source_label&quot;</span><span class="p">:</span> <span class="s2">&quot;Gene&quot;</span><span class="p">,</span>
             <span class="s2">&quot;destination_label&quot;</span><span class="p">:</span> <span class="s2">&quot;Protein&quot;</span><span class="p">,</span>
             <span class="s2">&quot;rel_type_column&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
             <span class="s2">&quot;relationship_type&quot;</span><span class="p">:</span> <span class="s2">&quot;ENCODES&quot;</span>
         <span class="p">},</span>
-        <span class="s2">&quot;Compound_Similarities&quot;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s2">&quot;file_path&quot;</span><span class="p">:</span> <span class="s2">&quot;Data/Relationships/Compound_Similarities&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Compound_Similarity&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;file_path&quot;</span><span class="p">:</span> <span class="s2">&quot;Data/Relationships/Compound_Similarities/*.csv&quot;</span><span class="p">,</span>
             <span class="s2">&quot;source_label&quot;</span><span class="p">:</span> <span class="s2">&quot;Compound&quot;</span><span class="p">,</span>
             <span class="s2">&quot;destination_label&quot;</span><span class="p">:</span> <span class="s2">&quot;Compound&quot;</span><span class="p">,</span>
             <span class="s2">&quot;rel_type_column&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
             <span class="s2">&quot;relationship_type&quot;</span><span class="p">:</span> <span class="s2">&quot;IS_SIMILAR_TO&quot;</span><span class="p">,</span>
             <span class="s2">&quot;is_directory&quot;</span><span class="p">:</span> <span class="kc">True</span>
         <span class="p">},</span>
-        <span class="s2">&quot;Cpd_Cpd_CoOccurence&quot;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s2">&quot;file_path&quot;</span><span class="p">:</span> <span class="s2">&quot;Data/Relationships/Cpd_Cpd_CoOccurence&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Compound_Compound_CoOccurrence&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;file_path&quot;</span><span class="p">:</span> <span class="s2">&quot;Data/Relationships/Cpd_Cpd_CoOccurrence/*.csv&quot;</span><span class="p">,</span>
             <span class="s2">&quot;source_label&quot;</span><span class="p">:</span> <span class="s2">&quot;Compound&quot;</span><span class="p">,</span>
             <span class="s2">&quot;destination_label&quot;</span><span class="p">:</span> <span class="s2">&quot;Compound&quot;</span><span class="p">,</span>
             <span class="s2">&quot;rel_type_column&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
             <span class="s2">&quot;relationship_type&quot;</span><span class="p">:</span> <span class="s2">&quot;CO_OCCURS_IN_LITERATURE&quot;</span><span class="p">,</span>
             <span class="s2">&quot;is_directory&quot;</span><span class="p">:</span> <span class="kc">True</span>
         <span class="p">},</span>
-        <span class="s2">&quot;Cpd_Gene_CoOccurence&quot;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s2">&quot;file_path&quot;</span><span class="p">:</span> <span class="s2">&quot;Data/Relationships/Cpd_Gene_CoOccurence&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;source_label&quot;</span><span class="p">:</span> <span class="s2">&quot;Compound&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;destination_label&quot;</span><span class="p">:</span> <span class="s2">&quot;Gene&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Compound_Gene_CoOccurrence&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;file_path&quot;</span><span class="p">:</span> <span class="s2">&quot;Data/Relationships/Cpd_Gene_CoOccurrence/*.csv&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;source_label&quot;</span><span class="p">:</span> <span class="s2">&quot;Gene&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;destination_label&quot;</span><span class="p">:</span> <span class="s2">&quot;Compound&quot;</span><span class="p">,</span>
             <span class="s2">&quot;rel_type_column&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
             <span class="s2">&quot;relationship_type&quot;</span><span class="p">:</span> <span class="s2">&quot;CO_OCCURS_IN_LITERATURE&quot;</span><span class="p">,</span>
             <span class="s2">&quot;is_directory&quot;</span><span class="p">:</span> <span class="kc">True</span>
@@ -1540,20 +1580,7 @@
 
             <details class="quote">
               <summary>Source code in <code>chemgraphbuilder/graph_relationships_loader.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">106</span>
-<span class="normal">107</span>
-<span class="normal">108</span>
-<span class="normal">109</span>
-<span class="normal">110</span>
-<span class="normal">111</span>
-<span class="normal">112</span>
-<span class="normal">113</span>
-<span class="normal">114</span>
-<span class="normal">115</span>
-<span class="normal">116</span>
-<span class="normal">117</span>
-<span class="normal">118</span>
-<span class="normal">119</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">119</span>
 <span class="normal">120</span>
 <span class="normal">121</span>
 <span class="normal">122</span>
@@ -1569,7 +1596,20 @@
 <span class="normal">132</span>
 <span class="normal">133</span>
 <span class="normal">134</span>
-<span class="normal">135</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">add_relationships</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">relationship_type</span><span class="p">):</span>
+<span class="normal">135</span>
+<span class="normal">136</span>
+<span class="normal">137</span>
+<span class="normal">138</span>
+<span class="normal">139</span>
+<span class="normal">140</span>
+<span class="normal">141</span>
+<span class="normal">142</span>
+<span class="normal">143</span>
+<span class="normal">144</span>
+<span class="normal">145</span>
+<span class="normal">146</span>
+<span class="normal">147</span>
+<span class="normal">148</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">add_relationships</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">relationship_type</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Adds relationships to the Neo4j database based on the specified relationship type.</span>
 
@@ -1620,9 +1660,9 @@
 
             <details class="quote">
               <summary>Source code in <code>chemgraphbuilder/graph_relationships_loader.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">102</span>
-<span class="normal">103</span>
-<span class="normal">104</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">115</span>
+<span class="normal">116</span>
+<span class="normal">117</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Closes the Neo4j database driver connection.&quot;&quot;&quot;</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 </code></pre></div></td></tr></table></div>
@@ -1655,23 +1695,30 @@
 
             <details class="quote">
               <summary>Source code in <code>chemgraphbuilder/graph_relationships_loader.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">137</span>
-<span class="normal">138</span>
-<span class="normal">139</span>
-<span class="normal">140</span>
-<span class="normal">141</span>
-<span class="normal">142</span>
-<span class="normal">143</span>
-<span class="normal">144</span>
-<span class="normal">145</span>
-<span class="normal">146</span>
-<span class="normal">147</span>
-<span class="normal">148</span>
-<span class="normal">149</span>
-<span class="normal">150</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">150</span>
 <span class="normal">151</span>
 <span class="normal">152</span>
-<span class="normal">153</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+<span class="normal">153</span>
+<span class="normal">154</span>
+<span class="normal">155</span>
+<span class="normal">156</span>
+<span class="normal">157</span>
+<span class="normal">158</span>
+<span class="normal">159</span>
+<span class="normal">160</span>
+<span class="normal">161</span>
+<span class="normal">162</span>
+<span class="normal">163</span>
+<span class="normal">164</span>
+<span class="normal">165</span>
+<span class="normal">166</span>
+<span class="normal">167</span>
+<span class="normal">168</span>
+<span class="normal">169</span>
+<span class="normal">170</span>
+<span class="normal">171</span>
+<span class="normal">172</span>
+<span class="normal">173</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Main function to handle command-line arguments and run the GraphRelationshipsLoader.&quot;&quot;&quot;</span>
     <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Load graph relationships into&quot;</span>
                                                  <span class="s2">&quot;a Neo4j database.&quot;</span><span class="p">)</span>
@@ -1682,7 +1729,14 @@
     <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--password&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                         <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Password for the Neo4j database.&quot;</span><span class="p">)</span>
     <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--relationship_type&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                        <span class="n">choices</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Assay_Compound&#39;</span><span class="p">,</span> <span class="s1">&#39;Assay_Gene&#39;</span><span class="p">,</span> <span class="s1">&#39;Gene_Protein&#39;</span><span class="p">,</span>
+                                 <span class="s1">&#39;Compound_Gene&#39;</span><span class="p">,</span> <span class="s1">&#39;Compound_Similarity&#39;</span><span class="p">,</span>
+                                 <span class="s1">&#39;Compound_Compound_CoOccurrence&#39;</span><span class="p">,</span>
+                                 <span class="s1">&#39;Compound_Gene_CoOccurrence&#39;</span><span class="p">,</span>
+                                 <span class="s1">&#39;Compound_Gene_Interaction&#39;</span><span class="p">,</span>
+                                 <span class="s1">&#39;Compound_Transformation&#39;</span><span class="p">],</span>
                         <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Type of the relationship to add.&quot;</span><span class="p">)</span>
+
     <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
 
     <span class="n">loader</span> <span class="o">=</span> <span class="n">GraphRelationshipsLoader</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">uri</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">username</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">password</span><span class="p">)</span>

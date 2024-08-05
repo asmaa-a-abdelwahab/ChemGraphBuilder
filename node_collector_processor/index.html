@@ -22,7 +22,7 @@
       
       
       <link rel="icon" href="../docs/assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.30">
+      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.31">
     
     
       
@@ -954,8 +954,7 @@ a Neo4j graph database. The module supports command-line interface (CLI) usage f
 
               <details class="quote">
                 <summary>Source code in <code>chemgraphbuilder/node_collector_processor.py</code></summary>
-                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">23</span>
-<span class="normal">24</span>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">24</span>
 <span class="normal">25</span>
 <span class="normal">26</span>
 <span class="normal">27</span>
@@ -999,7 +998,8 @@ a Neo4j graph database. The module supports command-line interface (CLI) usage f
 <span class="normal">65</span>
 <span class="normal">66</span>
 <span class="normal">67</span>
-<span class="normal">68</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">NodesCollectorProcessor</span><span class="p">:</span>
+<span class="normal">68</span>
+<span class="normal">69</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">NodesCollectorProcessor</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A class to collect and process data for different types of nodes using NodePropertiesExtractor and NodeDataProcessor.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -1132,8 +1132,7 @@ a Neo4j graph database. The module supports command-line interface (CLI) usage f
 
             <details class="quote">
               <summary>Source code in <code>chemgraphbuilder/node_collector_processor.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">28</span>
-<span class="normal">29</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">29</span>
 <span class="normal">30</span>
 <span class="normal">31</span>
 <span class="normal">32</span>
@@ -1144,7 +1143,8 @@ a Neo4j graph database. The module supports command-line interface (CLI) usage f
 <span class="normal">37</span>
 <span class="normal">38</span>
 <span class="normal">39</span>
-<span class="normal">40</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_type</span><span class="p">,</span> <span class="n">enzyme_list</span><span class="p">,</span> <span class="n">start_chunk</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="normal">40</span>
+<span class="normal">41</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_type</span><span class="p">,</span> <span class="n">enzyme_list</span><span class="p">,</span> <span class="n">start_chunk</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Initializes the NodesCollectorProcessor with the node type to collect data for, and the list of enzymes.</span>
 
@@ -1178,8 +1178,7 @@ a Neo4j graph database. The module supports command-line interface (CLI) usage f
 
             <details class="quote">
               <summary>Source code in <code>chemgraphbuilder/node_collector_processor.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">42</span>
-<span class="normal">43</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">43</span>
 <span class="normal">44</span>
 <span class="normal">45</span>
 <span class="normal">46</span>
@@ -1204,7 +1203,8 @@ a Neo4j graph database. The module supports command-line interface (CLI) usage f
 <span class="normal">65</span>
 <span class="normal">66</span>
 <span class="normal">67</span>
-<span class="normal">68</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">collect_and_process_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="normal">68</span>
+<span class="normal">69</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">collect_and_process_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Collects and processes data based on the node type and saves it to the appropriate file.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -1261,8 +1261,7 @@ a Neo4j graph database. The module supports command-line interface (CLI) usage f
 
             <details class="quote">
               <summary>Source code in <code>chemgraphbuilder/node_collector_processor.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">70</span>
-<span class="normal">71</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">71</span>
 <span class="normal">72</span>
 <span class="normal">73</span>
 <span class="normal">74</span>
@@ -1274,7 +1273,8 @@ a Neo4j graph database. The module supports command-line interface (CLI) usage f
 <span class="normal">80</span>
 <span class="normal">81</span>
 <span class="normal">82</span>
-<span class="normal">83</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+<span class="normal">83</span>
+<span class="normal">84</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Main function to parse command-line arguments and collect data for the specified node type and enzyme list.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
