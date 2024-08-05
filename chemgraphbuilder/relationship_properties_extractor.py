@@ -726,7 +726,11 @@ class RelationshipPropertiesExtractor:
             try:
                 data = self._fetch_chemical_gene_interaction_data(int(gene_symbol))
                 filename = f"Data/Relationships/Compound_Gene_Relationship/Compound_Gene_Interaction_Outside_PubChem_{int(gene_symbol)}.csv"
-                self._write_data_to_csv(data, filename)
+                df = pd.DataFrame(data)
+                if not df.empty:
+                    df = df[['ID_2', 'ID_1', 'Evidence']]
+                    df.to_csv(filename, index=False)
+                # self._write_data_to_csv(data, filename)
                 logging.info(f"Successfully wrote data for Gene Symbol {int(gene_symbol)} to {filename}")
             except Exception as e:
                 logging.error(f"Error processing Gene Symbol {int(gene_symbol)}: {e}")
