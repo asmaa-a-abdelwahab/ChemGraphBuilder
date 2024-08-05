@@ -461,28 +461,6 @@ class RelationshipPropertiesExtractor:
                 logging.info(f"Processed chunk {i} for compound similarity relationships.")
 
 
-
-    # def _fetch_data(self, cid):
-    #     """
-    #     Fetches chemical-chemical and chemical-gene relationship data for a given
-    #     compound ID (CID). Checks if each data file exists before fetching.
-
-    #     Args:
-    #         cid (int): The compound ID for which data is to be fetched.
-
-    #     Returns:
-    #         tuple: A tuple containing the CID, and two lists of data
-    #         (chemical-chemical and chemical-gene relationships).
-    #     """
-    #     cpd_cpd_file = f'Data/Relationships/Cpd_Cpd_CoOcuurence/CID_{cid}.csv'
-    #     cpd_gene_file = f'Data/Relationships/Cpd_gene_CoOcuurence/CID_{cid}.csv'
-
-    #     cpd_cpd_data = self._fetch_chemical_neighbor_data(cid) if not os.path.exists(cpd_cpd_file) else []
-    #     cpd_gene_data = self._fetch_chemical_gene_data(cid) if not os.path.exists(cpd_gene_file) else []
-
-    #     return cid, cpd_cpd_data, cpd_gene_data
-
-
     def _fetch_chemical_neighbor_data(self, cid):
         """
         Fetches chemical-chemical relationship data for a given CID.
@@ -742,81 +720,7 @@ class RelationshipPropertiesExtractor:
         elapsed = timeit.default_timer() - start_time
         logging.info(f"Compound-gene data fetching and saving completed in {elapsed:.2f} seconds.")
 
-    
-    # def compound_cooccurrence(self, main_data, rate_limit=5, start_chunk=0):
-    #     """
-    #     Analyzes compound co-occurrence relationships from the specified main
-    #     data file and saves the results into structured CSV files.
 
-    #     This method takes a path to a CSV file containing compound data and
-    #     performs batch processing to extract relationships between compounds
-    #     and genes from the PubChem database. It filters compounds based on their
-    #     association with specific genes of interest, then fetches co-occurrence
-    #     data for each compound using parallel requests. The data fetched
-    #     includes both compound-compound and compound-gene co-occurrence
-    #     relationships. Results are saved in separate CSV files within specific
-    #     directories for later analysis.
-
-    #     Parameters:
-    #         main_data (str): Path to the CSV file containing the main data. This
-    #         file should include 'CID' (Compound ID) and 'Target GeneID' columns.
-    #         rate_limit (int): Controls the rate of API requests to avoid
-    #         exceeding PubChem's request limits. Specifies the maximum number of
-    #         requests that can be made per second.
-    #         start_chunk (int): The starting index for processing chunks.
-
-    #     Returns:
-    #         str: A message indicating the successful completion of data
-    #         processing and saving.
-
-    #     Raises:
-    #         FileNotFoundError: If the specified 'main_data' file does not exist
-    #         or cannot be read.
-    #         ValueError: If 'main_data' does not contain the required columns
-    #         ('CID' and 'Target GeneID').
-
-    #     Example:
-    #         >>> extractor = RelationshipPropertiesExtractor()
-    #         >>> completion_message = extractor.compound_cooccurrence('Data/AllDataConnected.csv', rate_limit=5)
-    #         >>> print(completion_message)
-    #         This would process the compound data, fetch co-occurrence data from
-    #         PubChem, and save the results into CSV files.
-    #         The completion message would indicate successful processing.
-
-    #     Note:
-    #         The 'main_data' file must be properly formatted, with at least 'CID'
-    #         and 'Target GeneID' columns present. The method assumes the existence
-    #         of 'Data/Relationships/Cpd_Cpd_CoOcuurence' and
-    #         'Data/Relationships/Cpd_gene_CoOcuurence' directories for saving
-    #         the output CSV files. It is recommended to check and adhere to
-    #         PubChem's current rate limits when setting the 'rate_limit'
-    #         parameter to avoid potential blocks or restrictions on your
-    #         IP address due to excessive requests.
-    #     """
-    #     df = pd.read_csv(main_data, chunksize=3000)  # Reading in chunks for large files
-    #     for chunk_idx, chunk in enumerate(df):
-    #         if chunk_idx >= start_chunk:
-    #             chunk = chunk[chunk['Target GeneID'].isin([1576, 1544, 1557, 1559, 1565])]
-    #             chunk.dropna(subset=['CID'], inplace=True)
-    #             IDs = chunk['CID'].unique().tolist()
-
-    #             start_time = timeit.default_timer()
-    #             with ThreadPoolExecutor(max_workers=rate_limit) as executor:
-    #                 futures = {executor.submit(self._fetch_data, int(cid)): cid for cid in IDs}
-    #                 for future in as_completed(futures):
-    #                     cid, cpd_cpd_data, cpd_gene_data = future.result()
-    #                     self._write_data_to_csv(cpd_cpd_data, f'Data/Relationships/Cpd_Cpd_CoOccurrence/CID_{cid}.csv')
-    #                     self._write_data_to_csv(cpd_gene_data, f'Data/Relationships/Cpd_gene_CoOccurrence/CID_{cid}.csv',
-    #                                             filter_condition={"ID_2": ["{'GeneSymbol': 'cyp3a4'}", "{'GeneSymbol': 'cyp1a2'}",
-    #                                                                        "{'GeneSymbol': 'cyp2c9'}", "{'GeneSymbol': 'cyp2c19'}",
-    #                                                                        "{'GeneSymbol': 'cyp2d6'}"]})
-    #                     time.sleep(1 / rate_limit)  # Ensuring we don't exceed rate limit
-    #             elapsed = timeit.default_timer() - start_time
-    #             logging.info(f"Processed chunk {chunk_idx} in {elapsed:.2f} seconds")
-
-    #     return "Data fetching and saving completed."
-
-    
     def compound_transformation(self, gene_properties):
         """
         Analyzes compound transformation data based on gene properties, focusing
