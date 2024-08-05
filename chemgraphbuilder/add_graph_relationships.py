@@ -241,8 +241,11 @@ class AddGraphRelationships(Neo4jBase):
             'cid': 'CompoundID'
         }
         self.logger.info(f"Reading data from CSV file: {file_path}")
+        # Step 1: Read the CSV file
         df = pd.read_csv(file_path, low_memory=False)
+        # Step 2: Replace specific values with NaN
         df.replace("__nan__", np.nan, inplace=True)
+        # Step 3: Drop columns that are completely empty (all NaN values)
         df = df.dropna(axis=1, how='all')
         df.to_csv("Data/test.csv", index=False)
         if rel_type == 'CO_OCCURS_IN_LITERATURE':
