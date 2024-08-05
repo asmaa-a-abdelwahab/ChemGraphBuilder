@@ -264,10 +264,12 @@ class AddGraphRelationships(Neo4jBase):
                         source_column, destination_column
                     )
                     yield query
+                    
             elif rel_type == 'CO_OCCURS_IN_LITERATURE':
                 source = ast.literal_eval(row[source_column])
                 if isinstance(source, dict):
                     source = list(source.values())[0]
+                    source_column = list(source.keys())[0]
                 targets = ast.literal_eval(row[destination_column])
                 if isinstance(targets, dict):
                     for target in targets.values():
@@ -277,6 +279,7 @@ class AddGraphRelationships(Neo4jBase):
                             source_column, destination_column
                         )
                         yield query
+                        
             elif rel_type == 'ENCODES':
                 source = int(row[source_column])
                 target = str(row[destination_column])
@@ -285,6 +288,7 @@ class AddGraphRelationships(Neo4jBase):
                     destination_label, standard_id, source_column, destination_column
                 )
                 yield query
+                
             else:
                 source = int(row[source_column])
                 target = int(row[destination_column])
