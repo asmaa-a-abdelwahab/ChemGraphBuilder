@@ -10,6 +10,7 @@ import glob
 import ast
 import json
 import pandas as pd
+import numpy as np
 from chemgraphbuilder.neo4jdriver import Neo4jBase
 import logging
 
