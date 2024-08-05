@@ -159,7 +159,7 @@ def main():
                         help="Password for the Neo4j database.")
     parser.add_argument("--relationship_type", type=str, required=True,
                         choices=['Assay_Compound', 'Assay_Gene', 'Gene_Protein',
-                                 'Compound_Gene', 'Compound_Similarity',
+                                 'Compound_Gene', 'Compound_Similarities',
                                  'Cpd_Cpd_CoOccurence',
                                  'Cpd_Gene_CoOccurence',
                                  'Compound_Gene_Interaction',
