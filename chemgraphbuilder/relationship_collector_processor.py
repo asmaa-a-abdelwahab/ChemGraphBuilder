@@ -54,10 +54,10 @@ class RelationshipsCollectorProcessor:
         if self.relationship_type == 'Assay_Compound':
             self.extractor.assay_compound_relationship(self.data_file, start_chunk=self.start_chunk)
             self.processor.process_files()
-        elif self.relationship_type == 'Assay_Enzyme':
+        elif self.relationship_type == 'Assay_Gene':
             self.extractor.assay_enzyme_relationship(self.data_file)
-        elif self.relationship_type == 'Gene_Enzyme':
-            self.extractor.gene_enzyme_relationship(self.data_file)
+        elif self.relationship_type == 'Gene_Protein':
+            self.extractor.gene_protein_relationship(self.data_file)
         elif self.relationship_type == 'Compound_Gene':
             self.extractor.compound_gene_relationship(self.data_file)
         elif self.relationship_type == 'Compound_Similarity':
@@ -81,7 +81,7 @@ def main():
     parser.add_argument('--relationship_type',
                         type=str,
                         required=True,
-                        choices=['Assay_Compound', 'Assay_Enzyme', 'Gene_Enzyme',
+                        choices=['Assay_Compound', 'Assay_Gene', 'Gene_Protein',
                                  'Compound_Gene', 'Compound_Similarity',
                                  'Compound_Compound_Cooccurrence',
                                  'Compound_Gene_Cooccurrence',
