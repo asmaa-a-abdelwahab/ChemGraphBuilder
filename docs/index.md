@@ -11,8 +11,6 @@ At its core, `chemgraphbuilder` integrates data from PubChem and utilize Neo4j, 
 - **Compound Similarities**: Highlighting chemical similarities between compounds, which can suggest similar biological activities or shared molecular properties.
 - **Compound Co-occurrence**: Identifying instances where compounds or genes co-occur in scientific literature, indicating potential interactions or co-regulation.
 
-This comprehensive approach allows researchers to explore and analyze data across multiple levels of biological organization, from molecular interactions to broader biological pathways. The insights gained from these knowledge graphs can drive innovation in drug discovery, toxicology, and personalized medicine by revealing new drug targets, understanding adverse drug reactions, and exploring the molecular basis of diseases.
-
 ---
 
 The `chemgraphbuilder` package is versatile and can be utilized both in Python code and via the command line interface. For practical examples and use cases, please refer to the "Usage Examples" section available in the menu on the left sidebar. For comprehensive documentation of the main classes and their functionalities, visit [the Documentation Page](https://asmaa-a-abdelwahab.github.io/ChemGraphBuilder/documentation/).
@@ -21,7 +19,7 @@ The `chemgraphbuilder` package is versatile and can be utilized both in Python c
 
 ## Installation:
 
-You can visit this page to get the installation command: [PyPI Project Page](https://test.pypi.org/project/chemgraphbuilder)
+You can visit this page to get the installation command: [PyPI Project Page](https://pypi.org/project/chemgraphbuilder)
 ```sh
 !pip install -i https://test.pypi.org/simple/ chemgraphbuilder==1.14.0
 ```
