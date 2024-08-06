@@ -1,4 +1,4 @@
-# Welcome to ChemGraphBuilder
+# Welcome to ChemGraphBuilder    [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.13237900.svg)](https://doi.org/10.5281/zenodo.13237900)
 
 The `chemgraphbuilder` package is a specialized tool designed for researchers in bioinformatics, cheminformatics, and computational biology. It enables the construction of detailed knowledge graphs that map the complex interactions between chemical compounds, genes, proteins, and bioassays. These knowledge graphs are critical for visualizing and understanding the multifaceted relationships in biochemical networks.
 
