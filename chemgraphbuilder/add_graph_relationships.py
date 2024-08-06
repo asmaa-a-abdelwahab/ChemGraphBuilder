@@ -421,3 +421,42 @@ class AddGraphRelationships(Neo4jBase):
         self.execute_queries(queries)
         self.logger.info("Successfully processed and added relationships from directory: %s",
                          directory_path)
+
+    def remove_self_relationships(self):
+        """
+        Remove self-relationships from the Neo4j database.
+        """
+        query = """
+        MATCH (a)-[r]->(a)
+        DELETE r
+        """
+        self.logger.info("Removing self-relationships from the database.")
+        with self.driver.session() as session:
+            try:
+                session.run(query)
+                self.logger.info("Self-relationships removed successfully.")
+            except Exception as e:
+                self.logger.error("Failed to remove self-relationships: %s", str(e))
+
+
+    def make_relationships_bidirectional(self, relationship_type):
+        """
+        Ensure all relationships of a given type are bidirectional in the Neo4j database.
+
+        Parameters
+        ----------
+        relationship_type : str
+            The type of the relationship to make bidirectional.
+        """
+        query = f"""
+        MATCH (a)-[r:{relationship_type}]->(b)
+        WHERE NOT (b)-[:{relationship_type}]->(a)
+        CREATE (b)-[:{relationship_type}]->(a)
+        """
+        self.logger.info(f"Making {relationship_type} relationships bidirectional.")
+        with self.driver.session() as session:
+            try:
+                session.run(query)
+                self.logger.info(f"Bidirectional relationships for {relationship_type} created successfully.")
+            except Exception as e:
+                self.logger.error(f"Failed to create bidirectional relationships for {relationship_type}: {str(e)}")
