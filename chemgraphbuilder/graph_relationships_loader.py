@@ -92,7 +92,8 @@ class GraphRelationshipsLoader:
                 "destination_label": "Compound",
                 "rel_type_column": None,
                 "relationship_type": "IS_SIMILAR_TO",
-                "is_directory": True
+                "is_directory": True,
+                "is_bidirectional": True
             },
             "Compound_Compound_CoOccurrence": {
                 "file_path": "Data/Relationships/Cpd_Cpd_CoOccurrence/*.csv",
@@ -100,7 +101,8 @@ class GraphRelationshipsLoader:
                 "destination_label": "Compound",
                 "rel_type_column": None,
                 "relationship_type": "CO_OCCURS_IN_LITERATURE",
-                "is_directory": True
+                "is_directory": True,
+                "is_bidirectional": True
             },
             "Compound_Gene_CoOccurrence": {
                 "file_path": "Data/Relationships/Cpd_Gene_CoOccurrence/*.csv",
@@ -108,7 +110,8 @@ class GraphRelationshipsLoader:
                 "destination_label": "Compound",
                 "rel_type_column": None,
                 "relationship_type": "CO_OCCURS_IN_LITERATURE",
-                "is_directory": True
+                "is_directory": True,
+                "is_bidirectional": True
             }
         }
 
@@ -133,6 +136,7 @@ class GraphRelationshipsLoader:
         destination_label = settings["destination_label"]
         rel_type_column = settings.get("rel_type_column")
         is_directory = settings.get("is_directory", False)
+        is_bidirectional = settings.get("is_bidirectional", False)
 
         if is_directory:
             self.add_graph_relationships.process_and_add_relationships_from_directory(file_path,
@@ -146,6 +150,11 @@ class GraphRelationshipsLoader:
                                                                        source_label,
                                                                        destination_label,
                                                                        rel_type_column)
+        if is_bidirectional:
+            self.add_graph_relationships.remove_self_relationships()
+            self.add_graph_relationships.make_relationships_bidirectional(settings["relationship_type"])
+        else:
+            self.add_graph_relationships.remove_self_relationships()
 
 def main():
     """Main function to handle command-line arguments and run the GraphRelationshipsLoader."""
