@@ -1,4 +1,4 @@
-# ChemGraphBuilder
+# ChemGraphBuilder [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.13237900.svg)](https://doi.org/10.5281/zenodo.13237900)
 chemgraphbuilder is a Python package designed for transforming chemical data into knowledge graphs. Leveraging PubChem for data extraction and Neo4j for building graph databases, it enables researchers to efficiently extract, process, and visualize complex chemical relationships with precision. The package is built in a way that allows for easy extension to include other data sources in future releases.
 
 ## Table of Contents
