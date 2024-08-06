@@ -105,6 +105,7 @@ class AddGraphRelationships(Neo4jBase):
         properties = row.drop(labels=columns_to_drop).to_dict()
         properties = {k: v for k, v in properties.items() if not pd.isna(v)}
         properties = {standard_id.get(k, k): v for k, v in properties.items()}
+        properties = {f"`{k}`": v for k, v in properties.items()} ##last_edit
         return properties
 
     
