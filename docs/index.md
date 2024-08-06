@@ -21,7 +21,7 @@ The `chemgraphbuilder` package is versatile and can be utilized both in Python c
 
 You can visit this page to get the installation command: [PyPI Project Page](https://pypi.org/project/chemgraphbuilder)
 ```sh
-!pip install -i https://test.pypi.org/simple/ chemgraphbuilder==1.14.0
+!pip install chemgraphbuilder
 ```
 
 ## Project layout
