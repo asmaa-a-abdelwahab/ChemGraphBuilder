@@ -32,7 +32,10 @@ from urllib.parse import quote, urlencode
 import pandas as pd
 import numpy as np
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+)
+
 
 class RelationshipPropertiesExtractor:
     """
@@ -64,9 +67,8 @@ class RelationshipPropertiesExtractor:
 
     def __init__(self):
         """Initializes a RelationshipPropertiesExtractor with a Requests session
-         for efficient network calls."""
+        for efficient network calls."""
         self.session = requests.Session()
-
 
     def _send_request(self, url, max_retries=5, initial_wait=1):
         for attempt in range(max_retries):
@@ -76,19 +78,20 @@ class RelationshipPropertiesExtractor:
                 return response
             except requests.HTTPError as e:
                 if response.status_code == 503:
-                    wait = initial_wait * (2 ** attempt)
-                    print(f"Server busy or under maintenance. Retrying in {wait} seconds...")
+                    wait = initial_wait * (2**attempt)
+                    print(
+                        f"Server busy or under maintenance. Retrying in {wait} seconds..."
+                    )
                     time.sleep(wait)
                 else:
                     print(f"HTTP Error: {e}")
                     break  # Break the loop for non-503 HTTP errors
             except requests.RequestException as e:
                 print(f"Request Exception: {e}")
-                wait = initial_wait * (2 ** attempt)
+                wait = initial_wait * (2**attempt)
                 print(f"Network error. Retrying in {wait} seconds...")
                 time.sleep(wait)
         return None  # Return None to indicate failure after all retries
-
 
     def fetch_data_for_aid(self, aid, columns_to_remove):
         """
@@ -162,26 +165,34 @@ class RelationshipPropertiesExtractor:
         response = self._send_request(url)
         if response and response.status_code == 200:
             try:
-                compound_df = pd.read_csv(StringIO(response.text), sep=',')
+                compound_df = pd.read_csv(StringIO(response.text), sep=",")
                 # Drop specified columns and process column names in-place for memory efficiency
                 columns_to_remove_set = set(columns_to_remove)
                 existing_columns_set = set(compound_df.columns)
-                columns_to_actually_remove = list(columns_to_remove_set & existing_columns_set)
-                compound_df.drop(columns=columns_to_actually_remove,
-                                 errors='ignore', inplace=True)
-                compound_df.rename(columns=lambda x: x.replace('PUBCHEM_', '') if x.startswith('PUBCHEM_') else x, inplace=True)
+                columns_to_actually_remove = list(
+                    columns_to_remove_set & existing_columns_set
+                )
+                compound_df.drop(
+                    columns=columns_to_actually_remove, errors="ignore", inplace=True
+                )
+                compound_df.rename(
+                    columns=lambda x: x.replace("PUBCHEM_", "")
+                    if x.startswith("PUBCHEM_")
+                    else x,
+                    inplace=True,
+                )
 
                 # compound_df.drop(columns=[col for col in columns_to_remove if col in compound_df.columns], errors='ignore', inplace=True)
                 # compound_df.columns = [col.replace('PUBCHEM_', '') if col.startswith('PUBCHEM_') else col for col in compound_df.columns]
-                compound_df['AID'] = aid
+                compound_df["AID"] = aid
                 return compound_df
             except pd.errors.ParserError as e:
                 logging.error(f"CSV parsing failed for AID {aid}: {e}")
         else:
-            logging.error(f"Failed to fetch data for AID {aid}. Status code: {response.status_code if response else 'No Response'}")
+            logging.error(
+                f"Failed to fetch data for AID {aid}. Status code: {response.status_code if response else 'No Response'}"
+            )
         return pd.DataFrame()  # Return an empty DataFrame in case of failure
-
-
 
     def _process_dataframe(self, df, aid, columns_to_remove):
         """
@@ -194,12 +205,17 @@ class RelationshipPropertiesExtractor:
         """
         # Drop unnecessary columns efficiently
         columns_to_remove_set = set(columns_to_remove)
-        df = df.drop(columns=list(columns_to_remove_set.intersection(df.columns)), errors='ignore')
+        df = df.drop(
+            columns=list(columns_to_remove_set.intersection(df.columns)),
+            errors="ignore",
+        )
 
         # Efficiently rename columns that start with 'PUBCHEM_'
-        df.columns = [col.replace('PUBCHEM_', '') if col.startswith('PUBCHEM_') else col for col in df.columns]
-        df['AID'] = aid
-
+        df.columns = [
+            col.replace("PUBCHEM_", "") if col.startswith("PUBCHEM_") else col
+            for col in df.columns
+        ]
+        df["AID"] = aid
 
     def assay_compound_relationship(self, assays_data, start_chunk=0):
         """
@@ -212,28 +228,31 @@ class RelationshipPropertiesExtractor:
         """
         for chunk_idx, chunk in enumerate(pd.read_csv(assays_data, chunksize=100)):
             if chunk_idx >= start_chunk:
-                columns_to_remove = ['PUBCHEM_RESULT_TAG', 'PUBCHEM_SID', 'PUBCHEM_EXT_DATASOURCE_SMILES']
-                output_dir = 'Data/Relationships/Assay_Compound_Relationship'
+                columns_to_remove = [
+                    "PUBCHEM_RESULT_TAG",
+                    "PUBCHEM_SID",
+                    "PUBCHEM_EXT_DATASOURCE_SMILES",
+                ]
+                output_dir = "Data/Relationships/Assay_Compound_Relationship"
 
-                for aid in chunk['AID']:
-                    if not os.path.exists(f'{output_dir}/AID_{aid}.csv'):
+                for aid in chunk["AID"]:
+                    if not os.path.exists(f"{output_dir}/AID_{aid}.csv"):
                         df = self.fetch_data_for_aid(aid, columns_to_remove)
                         if not df.empty:
                             if not os.path.exists(output_dir):
                                 os.makedirs(output_dir)
-                            df.to_csv(f'{output_dir}/AID_{aid}.csv', index=False)
-                logging.info(f"Processed chunk {chunk_idx} for assay-compound relationships.")
+                            df.to_csv(f"{output_dir}/AID_{aid}.csv", index=False)
+                logging.info(
+                    f"Processed chunk {chunk_idx} for assay-compound relationships."
+                )
             else:
                 logging.info(f"No More Chunck to Process.")
-
-
 
     def _write_to_csv(self, df, filename):
         """
         Writes a DataFrame to a CSV file.
         """
         df.to_csv(filename, index=False)
-
 
     def assay_gene_relationship(self, main_data):
         """
@@ -261,12 +280,11 @@ class RelationshipPropertiesExtractor:
             containing the processed relationships data.
         """
         df = pd.read_csv(main_data)
-        columns_to_select = ['AID', 'Target GeneID', 'Activity Name']
+        columns_to_select = ["AID", "Target GeneID", "Activity Name"]
         df = df[columns_to_select]
-        df = df.drop_duplicates(keep='first', ignore_index=True)
-        df.to_csv(f'Data/Relationships/Assay_Gene_Relationship.csv', index=False)
+        df = df.drop_duplicates(keep="first", ignore_index=True)
+        df.to_csv(f"Data/Relationships/Assay_Gene_Relationship.csv", index=False)
         return df
-
 
     def gene_protein_relationship(self, main_data):
         """
@@ -293,12 +311,11 @@ class RelationshipPropertiesExtractor:
             in a structured CSV format.
         """
         df = pd.read_csv(main_data)
-        columns_to_select = ['Target GeneID', 'Target Accession']
+        columns_to_select = ["Target GeneID", "Target Accession"]
         df = df[columns_to_select]
-        df = df.drop_duplicates(keep='first', ignore_index=True)
-        df.to_csv(f'Data/Relationships/Gene_Protein_Relationship.csv', index=False)
+        df = df.drop_duplicates(keep="first", ignore_index=True)
+        df.to_csv(f"Data/Relationships/Gene_Protein_Relationship.csv", index=False)
         return df
-
 
     def compound_gene_relationship(self, main_data):
         """
@@ -330,16 +347,20 @@ class RelationshipPropertiesExtractor:
             facilitating easy access and integration.
         """
         df = pd.read_csv(main_data)
-        columns_to_select = ['CID', 'Target GeneID', 'Target Accession',
-                             'Activity Outcome', 'Activity Name',
-                             'Activity Value [uM]']
+        columns_to_select = [
+            "CID",
+            "Target GeneID",
+            "Target Accession",
+            "Activity Outcome",
+            "Activity Name",
+            "Activity Value [uM]",
+        ]
         df = df[columns_to_select]
-        df = df.drop_duplicates(keep='first', ignore_index=True)
-        df = df.sort_values(['CID', 'Target Accession'])
-        df.dropna(axis=0 , thresh=1, inplace=True) ###
-        df.to_csv(f'Data/Relationships/Compound_Gene_Relationship.csv', index=False)
+        df = df.drop_duplicates(keep="first", ignore_index=True)
+        df = df.sort_values(["CID", "Target Accession"])
+        df.dropna(axis=0, thresh=1, inplace=True)  ###
+        df.to_csv(f"Data/Relationships/Compound_Gene_Relationship.csv", index=False)
         return df
-
 
     def fetch_similar_cids(self, cid):
         """
@@ -371,8 +392,10 @@ class RelationshipPropertiesExtractor:
             the error and returns the original CID with an empty list,
             allowing the calling function to handle the exception as needed.
         """
-        url = ("https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/"
-               f"fastsimilarity_2d/cid/{int(cid)}/cids/XML?Threshold=95&MaxRecords=100")
+        url = (
+            "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/"
+            f"fastsimilarity_2d/cid/{int(cid)}/cids/XML?Threshold=95&MaxRecords=100"
+        )
         try:
             response = requests.get(url)
             response.raise_for_status()
@@ -383,12 +406,16 @@ class RelationshipPropertiesExtractor:
             root = tree.getroot()
 
             # Extracting CID values
-            similar_cids = [element.text for element in root.findall('{http://pubchem.ncbi.nlm.nih.gov/pug_rest}CID')]
+            similar_cids = [
+                element.text
+                for element in root.findall(
+                    "{http://pubchem.ncbi.nlm.nih.gov/pug_rest}CID"
+                )
+            ]
             return cid, similar_cids
         except Exception as e:
             logging.error(f"Error processing CID {cid}: {e}")
             return cid, []
-
 
     def process_chunk(self, chunk):
         """
@@ -418,7 +445,6 @@ class RelationshipPropertiesExtractor:
             results = [future.result() for future in as_completed(futures)]
         return results
 
-
     def compound_similarity_relationship(self, main_data, start_chunk=0):
         """
         Identifies and records the similarity relationships between compounds
@@ -444,22 +470,26 @@ class RelationshipPropertiesExtractor:
             execution.
         """
         df = pd.read_csv(main_data)
-        df = df[df['Target GeneID'].isin([1576, 1544, 1557, 1559, 1565])]
-        df = df.dropna(subset=['CID'])
-        IDs = df['CID'].unique().tolist()
+        df = df[df["Target GeneID"].isin([1576, 1544, 1557, 1559, 1565])]
+        df = df.dropna(subset=["CID"])
+        IDs = df["CID"].unique().tolist()
 
-        chunk_size=10000
-        chunks = [IDs[i:i + chunk_size] for i in range(0, len(IDs), chunk_size)]
+        chunk_size = 10000
+        chunks = [IDs[i : i + chunk_size] for i in range(0, len(IDs), chunk_size)]
 
         for i, chunk in enumerate(chunks, start=0):
             if i >= start_chunk:
                 chunk_results = self.process_chunk(chunk)
-                chunk_df = pd.DataFrame(chunk_results, columns=['CID', 'Similar CIDs'])
-                if not os.path.exists('Data/Relationships/Compound_Similarities'):
-                    os.makedirs('Data/Relationships/Compound_Similarities')
-                chunk_df.to_csv(f'Data/Relationships/Compound_Similarities/Chunk_{i}.csv', index=False)
-                logging.info(f"Processed chunk {i} for compound similarity relationships.")
-
+                chunk_df = pd.DataFrame(chunk_results, columns=["CID", "Similar CIDs"])
+                if not os.path.exists("Data/Relationships/Compound_Similarities"):
+                    os.makedirs("Data/Relationships/Compound_Similarities")
+                chunk_df.to_csv(
+                    f"Data/Relationships/Compound_Similarities/Chunk_{i}.csv",
+                    index=False,
+                )
+                logging.info(
+                    f"Processed chunk {i} for compound similarity relationships."
+                )
 
     def _fetch_chemical_neighbor_data(self, cid):
         """
@@ -471,18 +501,19 @@ class RelationshipPropertiesExtractor:
         Returns:
             list: List of chemical-chemical relationship data.
         """
-        cpd_cpd_url = ("https://pubchem.ncbi.nlm.nih.gov/link_db/link_db_server.cgi?format=JSON&type="
-                       f"ChemicalNeighbor&operation=GetAllLinks&id_1={int(cid)}&response_type=display")
+        cpd_cpd_url = (
+            "https://pubchem.ncbi.nlm.nih.gov/link_db/link_db_server.cgi?format=JSON&type="
+            f"ChemicalNeighbor&operation=GetAllLinks&id_1={int(cid)}&response_type=display"
+        )
         # print('url', cpd_cpd_url)
         try:
             response = self._send_request(cpd_cpd_url)
             data = response.json()
             # print(data)
-            return data.get('LinkDataSet', {}).get('LinkData', [])
+            return data.get("LinkDataSet", {}).get("LinkData", [])
         except Exception as e:
             logging.error(f"Failed to fetch chemical-chemical data for CID {cid}: {e}")
             return []
-
 
     def _fetch_chemical_gene_data(self, gid):
         """
@@ -494,17 +525,18 @@ class RelationshipPropertiesExtractor:
         Returns:
             list: List of chemical-gene relationship data.
         """
-        cpd_gene_url = ("https://pubchem.ncbi.nlm.nih.gov/link_db/link_db_server.cgi?format=JSON&"
-                        f"type=GeneSymbolChemicalNeighbor&operation=GetAllLinks&id_1={gid}&response_type=display")
+        cpd_gene_url = (
+            "https://pubchem.ncbi.nlm.nih.gov/link_db/link_db_server.cgi?format=JSON&"
+            f"type=GeneSymbolChemicalNeighbor&operation=GetAllLinks&id_1={gid}&response_type=display"
+        )
         try:
             response = self._send_request(cpd_gene_url)
             data = response.json()
-            return data.get('LinkDataSet', {}).get('LinkData', [])
+            return data.get("LinkDataSet", {}).get("LinkData", [])
         except Exception as e:
             logging.error(f"Failed to fetch chemical-gene data for CID {gid}: {e}")
             return []
 
-    
     def _fetch_chemical_gene_interaction_data(self, gid):
         """
         Fetches chemical-gene relationship data for a given CID.
@@ -523,19 +555,15 @@ class RelationshipPropertiesExtractor:
             "start": 1,
             "limit": 10000000,
             "downloadfilename": f"pubchem_geneid_{int(gid)}_consolidatedcompoundtarget",
-            "where": {
-                "ands": [
-                    {"geneid": f"{int(gid)}"}
-                ]
-            }
+            "where": {"ands": [{"geneid": f"{int(gid)}"}]},
         }
-        
+
         # Convert the query dictionary to a JSON string
         query_json_str = json.dumps(query)
-        
+
         # URL encode the JSON string
         encoded_query = quote(query_json_str)
-        
+
         # Construct the full URL
         url = f"{base_url}?infmt=json&outfmt=json&query={encoded_query}"
 
@@ -546,7 +574,6 @@ class RelationshipPropertiesExtractor:
         except Exception as e:
             logging.error(f"Failed to fetch chemical-gene data for CID {gid}: {e}")
             return []
-            
 
     def _write_data_to_csv(self, data, filename, filter_condition=None):
         """
@@ -590,21 +617,20 @@ class RelationshipPropertiesExtractor:
         if not df.empty:
             df.to_csv(filename, index=False)
 
-        
     def compound_compound_cooccurrence(self, main_data, rate_limit=5):
         """
         Analyzes compound-compound co-occurrence relationships from the specified main data file and saves the results into structured CSV files.
-        
+
         Args:
             main_data (str): Path to the main data file.
             rate_limit (int): The maximum number of requests per second.
-        
+
         Returns:
             str: A message indicating the completion of data fetching and saving.
         """
         logging.info("Starting compound-compound co-occurrence data retrieval ...")
         start_time = timeit.default_timer()
-        
+
         try:
             df = pd.read_csv(main_data)
             logging.info(f"Loaded data from {main_data}. Total rows: {len(df)}")
@@ -617,25 +643,28 @@ class RelationshipPropertiesExtractor:
         except Exception as e:
             logging.error(f"Error reading {main_data}: {e}")
             return "Error reading data file."
-    
-        compound_ids = df['CID'].dropna().unique().tolist()
+
+        compound_ids = df["CID"].dropna().unique().tolist()
         logging.info(f"Unique Compound IDs to process: {len(compound_ids)}")
-    
+
         for compound_id in compound_ids:
             logging.info(f"Processing Compound ID {int(compound_id)}")
             try:
                 data = self._fetch_chemical_neighbor_data(int(compound_id))
                 filename = f"Data/Relationships/Cpd_Cpd_CoOccurrence/CID_{int(compound_id)}.csv"
                 self._write_data_to_csv(data, filename)
-                logging.info(f"Successfully wrote data for Compound ID {int(compound_id)} to {filename}")
+                logging.info(
+                    f"Successfully wrote data for Compound ID {int(compound_id)} to {filename}"
+                )
             except Exception as e:
                 logging.error(f"Error processing Compound ID {int(compound_id)}: {e}")
             time.sleep(1 / rate_limit)  # Ensuring we don't exceed rate limit
-    
-        elapsed = timeit.default_timer() - start_time
-        logging.info(f"Compound-compound data fetching and saving completed in {elapsed:.2f} seconds.")
-        return "Compound-compound data fetching and saving completed."
 
+        elapsed = timeit.default_timer() - start_time
+        logging.info(
+            f"Compound-compound data fetching and saving completed in {elapsed:.2f} seconds."
+        )
+        return "Compound-compound data fetching and saving completed."
 
     def compound_gene_cooccurrence(self, gene_data, rate_limit=5):
         """
@@ -643,7 +672,7 @@ class RelationshipPropertiesExtractor:
         """
         logging.info("Starting compound-gene co-occurrence analysis...")
         start_time = timeit.default_timer()
-        
+
         try:
             df = pd.read_csv(gene_data)
             logging.info(f"Loaded data from {gene_data}. Total rows: {len(df)}")
@@ -657,7 +686,7 @@ class RelationshipPropertiesExtractor:
             logging.error(f"Error reading {gene_data}: {e}")
             return "Error reading data file."
 
-        gene_symbols = df['GeneSymbol'].unique().tolist()
+        gene_symbols = df["GeneSymbol"].unique().tolist()
         logging.info(f"Unique Gene Symbols to process: {len(gene_symbols)}")
 
         for gene_symbol in gene_symbols:
@@ -666,23 +695,26 @@ class RelationshipPropertiesExtractor:
                 data = self._fetch_chemical_gene_data(gene_symbol)
                 filename = f"Data/Relationships/Cpd_Gene_CoOccurrence/Cpd_Gene_CoOccurrence_{gene_symbol}.csv"
                 self._write_data_to_csv(data, filename)
-                logging.info(f"Successfully wrote data for Gene Symbol {gene_symbol} to {filename}")
+                logging.info(
+                    f"Successfully wrote data for Gene Symbol {gene_symbol} to {filename}"
+                )
             except Exception as e:
                 logging.error(f"Error processing Gene Symbol {gene_symbol}: {e}")
             time.sleep(1 / rate_limit)  # Ensuring we don't exceed rate limit
 
         elapsed = timeit.default_timer() - start_time
-        logging.info(f"Compound-gene data fetching and saving completed in {elapsed:.2f} seconds.")
+        logging.info(
+            f"Compound-gene data fetching and saving completed in {elapsed:.2f} seconds."
+        )
         return "Compound-gene data fetching and saving completed."
 
-    
     def compound_gene_interaction(self, gene_data, rate_limit=5):
         """
         Analyzes compound-gene co-occurrence relationships from the specified main data file and saves the results into structured CSV files.
         """
         logging.info("Starting compound-gene co-occurrence analysis...")
         start_time = timeit.default_timer()
-        
+
         try:
             df = pd.read_csv(gene_data)
             logging.info(f"Loaded data from {gene_data}. Total rows: {len(df)}")
@@ -696,7 +728,7 @@ class RelationshipPropertiesExtractor:
             logging.error(f"Error reading {gene_data}: {e}")
             return "Error reading data file."
 
-        gene_symbols = df['GeneID'].unique().tolist()
+        gene_symbols = df["GeneID"].unique().tolist()
         logging.info(f"Unique Gene Symbols to process: {len(gene_symbols)}")
 
         for gene_symbol in gene_symbols:
@@ -707,19 +739,24 @@ class RelationshipPropertiesExtractor:
                 df = pd.DataFrame(data)
                 if not df.empty:
                     # Reorder Columns
-                    all_columns = [col for col in df.columns if col not in ('cid', 'geneid')]
-                    all_columns = ['cid', 'geneid'] + all_columns
+                    all_columns = [
+                        col for col in df.columns if col not in ("cid", "geneid")
+                    ]
+                    all_columns = ["cid", "geneid"] + all_columns
                     df = df[all_columns]
                     df.to_csv(filename, index=False)
                 # self._write_data_to_csv(data, filename)
-                logging.info(f"Successfully wrote data for Gene Symbol {int(gene_symbol)} to {filename}")
+                logging.info(
+                    f"Successfully wrote data for Gene Symbol {int(gene_symbol)} to {filename}"
+                )
             except Exception as e:
                 logging.error(f"Error processing Gene Symbol {int(gene_symbol)}: {e}")
             time.sleep(1 / rate_limit)  # Ensuring we don't exceed rate limit
 
         elapsed = timeit.default_timer() - start_time
-        logging.info(f"Compound-gene data fetching and saving completed in {elapsed:.2f} seconds.")
-
+        logging.info(
+            f"Compound-gene data fetching and saving completed in {elapsed:.2f} seconds."
+        )
 
     def compound_transformation(self, gene_properties):
         """
@@ -727,13 +764,13 @@ class RelationshipPropertiesExtractor:
         on metabolic transformations involving specified genes. This method
         queries the PubChem database for transformation data related
         to compounds associated with the genes identified in the provided CSV file.
-    
+
         Parameters:
             gene_properties (str): Path to the CSV file containing gene properties
             generated by the NodePropertiesExtractor class, which should include
             'GeneID' as one of its columns. This file is used to identify genes
             of interest for which compound transformation data will be fetched.
-    
+
         Processing Steps:
             1. Reads the provided CSV file to extract unique gene identifiers.
             2. For each gene identifier, constructs a query to fetch relevant
@@ -748,7 +785,7 @@ class RelationshipPropertiesExtractor:
             5. Saves the aggregated and filtered DataFrame to a CSV file for
             further analysis or integration into knowledge graphs or other
             data models.
-    
+
         Returns:
             pandas.DataFrame: A DataFrame containing processed compound
             transformation data, including substrate and metabolite CIDs,
@@ -756,20 +793,20 @@ class RelationshipPropertiesExtractor:
             The DataFrame structure facilitates further analysis or use in
             constructing detailed views of metabolic pathways involving the
             specified genes.
-    
+
         Side Effects:
             - Saves the aggregated compound transformation data to
             'Data/Relationships/Compound_Transformation.csv'
             in the current working directory. This file captures the relationship
             between substrates, metabolites, and genes based on the input gene
             properties.
-    
+
         Raises:
             FileNotFoundError: If the specified 'gene_properties' file does not
             exist or cannot be read.
             ValueError: If 'gene_properties' does not contain the required
             'GeneID' column.
-    
+
         Example:
             >>> extractor = RelationshipPropertiesExtractor()
             >>> transformation_df = extractor.compound_transformation('Data/Nodes/gene_properties.csv')
@@ -778,7 +815,7 @@ class RelationshipPropertiesExtractor:
             'path/to/gene_properties.csv', queries PubChem for
             compound transformation data related to the genes,
             and compiles the results into a DataFrame.
-    
+
         Note:
             The method assumes that the input 'gene_properties' file is
             accessible and correctly formatted.
@@ -788,14 +825,14 @@ class RelationshipPropertiesExtractor:
             directory and have appropriate permissions to write files to it.
         """
         df = pd.read_csv(gene_properties)
-        IDs = df['Target GeneID'].unique().tolist()
-    
+        IDs = df["Target GeneID"].unique().tolist()
+
         transformation_dfs = []
-    
+
         for gid in IDs:
             if not np.isnan(gid):
                 gid = int(gid)
-                base_url = 'https://pubchem.ncbi.nlm.nih.gov/sdq/sdqagent.cgi?infmt=json&outfmt=csv&query='
+                base_url = "https://pubchem.ncbi.nlm.nih.gov/sdq/sdqagent.cgi?infmt=json&outfmt=csv&query="
                 query = {
                     "download": "*",
                     "collection": "chemblmetabolism",
@@ -803,45 +840,62 @@ class RelationshipPropertiesExtractor:
                     "start": 1,
                     "limit": 10000000,
                     "downloadfilename": f"pubchem_geneid_{gid}_chemblmetabolism",
-                    "where": {
-                        "ands": [{"geneid": gid}]
-                    }
+                    "where": {"ands": [{"geneid": gid}]},
                 }
-                
+
                 # Convert the dictionary to a JSON string
                 query_string = json.dumps(query)
                 # URL encode the JSON string
                 encoded_query = quote(query_string)
                 # Construct the final URL
                 url = f"{base_url}{encoded_query}"
-    
+
                 response = self._send_request(url)
                 if response:
                     try:
                         # Read the CSV data
-                        transformation_df = pd.read_csv(StringIO(response.text), sep=',', header=0, low_memory=False)
+                        transformation_df = pd.read_csv(
+                            StringIO(response.text), sep=",", header=0, low_memory=False
+                        )
                         print(response.text)
-    
+
                         # Ensure columns exist
-                        transformation_df = transformation_df[['substratecid',
-                                                               'metabolitecid',
-                                                               'metconversion',
-                                                               'geneids',
-                                                               'pmids',
-                                                               'dois']]
-    
+                        transformation_df = transformation_df[
+                            [
+                                "substratecid",
+                                "metabolitecid",
+                                "metconversion",
+                                "geneids",
+                                "pmids",
+                                "dois",
+                            ]
+                        ]
+
                         # Append the DataFrame to the list
                         transformation_dfs.append(transformation_df)
                     except pd.errors.ParserError as e:
-                        logging.error(f"Error parsing CSV for gene ID {gid}: {e}\nurl:{url}")
+                        logging.error(
+                            f"Error parsing CSV for gene ID {gid}: {e}\nurl:{url}"
+                        )
                         continue  # Skip this gene ID and continue with others
-    
+
         # Concatenate all DataFrames
         if transformation_dfs:
             transformation_df = pd.concat(transformation_dfs, ignore_index=True)
         else:
-            transformation_df = pd.DataFrame(columns=['substratecid', 'metabolitecid', 'metconversion', 'geneids', 'pmids', 'dois'])
-    
-        self._write_to_csv(transformation_df, 'Data/Relationships/Compound_Transformation.csv')
-    
+            transformation_df = pd.DataFrame(
+                columns=[
+                    "substratecid",
+                    "metabolitecid",
+                    "metconversion",
+                    "geneids",
+                    "pmids",
+                    "dois",
+                ]
+            )
+
+        self._write_to_csv(
+            transformation_df, "Data/Relationships/Compound_Transformation.csv"
+        )
+
         return transformation_df

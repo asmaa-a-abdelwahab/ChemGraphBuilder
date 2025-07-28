@@ -14,6 +14,7 @@ Functions:
 
 import os
 
+
 class SetupDataFolder:
     """
     Class to set up a data directory with a predefined structure.
@@ -38,8 +39,8 @@ class SetupDataFolder:
                 "Cpd_Cpd_CoOccurrence",
                 "Cpd_Gene_CoOccurrence",
                 "Compound_Gene_Relationship",
-                "Assay_Compound_Relationship_Processed"
-            ]
+                "Assay_Compound_Relationship_Processed",
+            ],
         }
 
     @staticmethod
@@ -75,6 +76,7 @@ class SetupDataFolder:
         for folder in self.structure["Relationships"]:
             self.create_folder(os.path.join(relationships_path, folder))
 
+
 def main():
     """
     Main function to set up the data directory.
@@ -82,5 +84,6 @@ def main():
     data_folder_setup = SetupDataFolder()
     data_folder_setup.setup()
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()

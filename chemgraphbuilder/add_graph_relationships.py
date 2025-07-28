@@ -15,7 +15,10 @@ from chemgraphbuilder.neo4jdriver import Neo4jBase
 import logging
 
 # Set up logging configuration
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+)
+
 
 class AddGraphRelationships(Neo4jBase):
     """
@@ -51,7 +54,6 @@ class AddGraphRelationships(Neo4jBase):
         self.driver = driver
         self.logger.info("AddGraphRelationships class initialized.")
 
-
     @staticmethod
     def _generate_property_string(value):
         """
@@ -72,12 +74,18 @@ class AddGraphRelationships(Neo4jBase):
         try:
             return float(value)
         except (TypeError, ValueError):
-            escaped_value = str(value).replace("\\", "\\\\").replace("'", "\\'").replace('"', '\\"').replace("\n", "\\\n")
+            escaped_value = (
+                str(value)
+                .replace("\\", "\\\\")
+                .replace("'", "\\'")
+                .replace('"', '\\"')
+                .replace("\n", "\\\n")
+            )
             return f"'{escaped_value}'"
 
-
-    def _process_properties(self, row, source_column, destination_column,
-                            rel_type_column, standard_id):
+    def _process_properties(
+        self, row, source_column, destination_column, rel_type_column, standard_id
+    ):
         """
         Process the properties for the relationship from the CSV row.
 
@@ -105,13 +113,21 @@ class AddGraphRelationships(Neo4jBase):
         properties = row.drop(labels=columns_to_drop).to_dict()
         properties = {k: v for k, v in properties.items() if not pd.isna(v)}
         properties = {standard_id.get(k, k): v for k, v in properties.items()}
-        properties = {f"`{k}`": v for k, v in properties.items()} ##last_edit
+        properties = {f"`{k}`": v for k, v in properties.items()}  ##last_edit
         return properties
 
-    
-    def _generate_query(self, source, target, relationship_type, properties,
-                        source_label, destination_label, standard_id,
-                        source_column, destination_column):
+    def _generate_query(
+        self,
+        source,
+        target,
+        relationship_type,
+        properties,
+        source_label,
+        destination_label,
+        standard_id,
+        source_column,
+        destination_column,
+    ):
         """
         Generate a Cypher query for creating a relationship in Neo4j.
 
@@ -143,8 +159,16 @@ class AddGraphRelationships(Neo4jBase):
         """
         source_value = self._generate_property_string(source)
         target_value = self._generate_property_string(target)
-        source_key = standard_id[source_column] if source_column in standard_id else source_column
-        destination_key = standard_id[destination_column] if destination_column in standard_id else destination_column
+        source_key = (
+            standard_id[source_column]
+            if source_column in standard_id
+            else source_column
+        )
+        destination_key = (
+            standard_id[destination_column]
+            if destination_column in standard_id
+            else destination_column
+        )
 
         query = (
             f"MATCH (a:{source_label} {{{source_key}: {source_value}}}), "
@@ -164,9 +188,9 @@ class AddGraphRelationships(Neo4jBase):
         self.logger.debug(f"Generated query: {query}")
         return query
 
-
-    def generate_cypher_queries_from_file(self, file_path, rel_type, source_label,
-                                          destination_label, rel_type_column=None):
+    def generate_cypher_queries_from_file(
+        self, file_path, rel_type, source_label, destination_label, rel_type_column=None
+    ):
         """
         Generate Cypher queries for creating relationships in Neo4j based on the provided CSV file.
 
@@ -189,26 +213,26 @@ class AddGraphRelationships(Neo4jBase):
             A Cypher query string.
         """
         standard_id = {
-            'GeneID': 'GeneID',
-            'Gene ID': 'GeneID',
-            'Target GeneID': 'GeneID',
-            'geneids': 'GeneID',
-            'AssayID': 'AssayID',
-            'Assay ID': 'AssayID',
-            'AID': 'AssayID',
-            'aid': 'AssayID',
-            'ID_1': 'CompoundID',
-            'ID_2': 'CompoundID',
-            'substratecid': 'CompoundID',
-            'metabolitecid': 'CompoundID',
-            'Compound ID': 'CompoundID',
-            'CompoundID': 'CompoundID',
-            'CID': 'CompoundID',
-            'Similar CIDs': 'CompoundID',
-            'Target Accession': 'ProteinRefSeqAccession',
-            'geneid': 'GeneID',
-            'target_geneid': 'GeneID',
-            'cid': 'CompoundID'
+            "GeneID": "GeneID",
+            "Gene ID": "GeneID",
+            "Target GeneID": "GeneID",
+            "geneids": "GeneID",
+            "AssayID": "AssayID",
+            "Assay ID": "AssayID",
+            "AID": "AssayID",
+            "aid": "AssayID",
+            "ID_1": "CompoundID",
+            "ID_2": "CompoundID",
+            "substratecid": "CompoundID",
+            "metabolitecid": "CompoundID",
+            "Compound ID": "CompoundID",
+            "CompoundID": "CompoundID",
+            "CID": "CompoundID",
+            "Similar CIDs": "CompoundID",
+            "Target Accession": "ProteinRefSeqAccession",
+            "geneid": "GeneID",
+            "target_geneid": "GeneID",
+            "cid": "CompoundID",
         }
         self.logger.info(f"Reading data from CSV file: {file_path}")
         # Read only the column names
@@ -219,16 +243,23 @@ class AddGraphRelationships(Neo4jBase):
         # Step 2: Replace specific values with NaN
         df.replace("__nan__", np.nan, inplace=True)
         # Step 3: Drop columns that are completely empty (all NaN values)
-        df = df.dropna(axis=1, how='all')
+        df = df.dropna(axis=1, how="all")
         df.to_csv("Data/test.csv", index=False)
-        if rel_type == 'CO_OCCURS_IN_LITERATURE':
-            df.rename(columns={df.columns[0]: list(ast.literal_eval(df[df.columns[0]][0]).keys())[0]},
-                      inplace=True)
-        source_column, destination_column = df.columns[:2] 
-        df = df.dropna(subset=[source_column, destination_column], how='any')
+        if rel_type == "CO_OCCURS_IN_LITERATURE":
+            df.rename(
+                columns={
+                    df.columns[0]: list(ast.literal_eval(df[df.columns[0]][0]).keys())[
+                        0
+                    ]
+                },
+                inplace=True,
+            )
+        source_column, destination_column = df.columns[:2]
+        df = df.dropna(subset=[source_column, destination_column], how="any")
         if df.empty:
-            self.logger.error("The CSV file %s is empty or contains no valid data.",
-                              file_path)
+            self.logger.error(
+                "The CSV file %s is empty or contains no valid data.", file_path
+            )
             return
         if rel_type_column:
             df = df.dropna(subset=[rel_type_column])
@@ -238,21 +269,27 @@ class AddGraphRelationships(Neo4jBase):
             destination = row[destination_column]
             relationship_type = row[rel_type_column] if rel_type_column else rel_type
             relationship_type = relationship_type.replace("/", "OR")
-            properties = self._process_properties(row, source_column,
-                                                  destination_column,
-                                                  rel_type_column, standard_id)
+            properties = self._process_properties(
+                row, source_column, destination_column, rel_type_column, standard_id
+            )
 
-            if rel_type == 'IS_SIMILAR_TO':
+            if rel_type == "IS_SIMILAR_TO":
                 targets = ast.literal_eval(row[destination_column])
                 for target in targets:
                     query = self._generate_query(
-                        source, target, relationship_type, properties,
-                        source_label,destination_label, standard_id,
-                        source_column, destination_column
+                        source,
+                        target,
+                        relationship_type,
+                        properties,
+                        source_label,
+                        destination_label,
+                        standard_id,
+                        source_column,
+                        destination_column,
                     )
                     yield query
-                    
-            elif rel_type == 'CO_OCCURS_IN_LITERATURE':
+
+            elif rel_type == "CO_OCCURS_IN_LITERATURE":
                 source = ast.literal_eval(row[source_column])
                 destination = ast.literal_eval(row[destination_column])
                 if isinstance(source, dict):
@@ -261,39 +298,58 @@ class AddGraphRelationships(Neo4jBase):
                 if isinstance(targets, dict):
                     for target in targets.values():
                         query = self._generate_query(
-                            source, target, relationship_type, properties,
-                            source_label, destination_label, standard_id,
-                            source_column, destination_column
+                            source,
+                            target,
+                            relationship_type,
+                            properties,
+                            source_label,
+                            destination_label,
+                            standard_id,
+                            source_column,
+                            destination_column,
                         )
                         yield query
-                        
-            elif rel_type == 'ENCODES':
+
+            elif rel_type == "ENCODES":
                 source = int(row[source_column])
                 target = str(row[destination_column])
                 query = self._generate_query(
-                    source, target, relationship_type, properties, source_label,
-                    destination_label, standard_id, source_column, destination_column
+                    source,
+                    target,
+                    relationship_type,
+                    properties,
+                    source_label,
+                    destination_label,
+                    standard_id,
+                    source_column,
+                    destination_column,
                 )
                 yield query
-                
+
             else:
                 source = int(row[source_column])
                 target = int(row[destination_column])
                 query = self._generate_query(
-                    source, target, relationship_type, properties, source_label,
-                    destination_label, standard_id, source_column, destination_column
+                    source,
+                    target,
+                    relationship_type,
+                    properties,
+                    source_label,
+                    destination_label,
+                    standard_id,
+                    source_column,
+                    destination_column,
                 )
                 yield query
 
         self.logger.info("Cypher queries generated successfully.")
 
-
-    def generate_cypher_queries_from_directories(self, directory, rel_type,
-                                                 source_label, destination_label,
-                                                 rel_type_column=None):
+    def generate_cypher_queries_from_directories(
+        self, directory, rel_type, source_label, destination_label, rel_type_column=None
+    ):
         """
         Generate Cypher queries for creating relationships in Neo4j by processing each CSV file in a directory.
-    
+
         Parameters
         ----------
         directory : str
@@ -306,23 +362,26 @@ class AddGraphRelationships(Neo4jBase):
             The label for the destination node.
         rel_type_column : str, optional
             The column name for the relationship type, if it is to be extracted from the CSV file.
-    
+
         Yields
         ------
         str
             A Cypher query string.
-        """    
+        """
         csv_files = glob.glob(directory)
-        
+
         if not csv_files:
-            self.logger.error("The directory %s contains no valid CSV files.", directory)
+            self.logger.error(
+                "The directory %s contains no valid CSV files.", directory
+            )
             return []
-    
+
         for csv_file in csv_files:
             self.logger.info("Processing file: %s", csv_file)
-            for query in self.generate_cypher_queries_from_file(csv_file, rel_type, source_label, destination_label, rel_type_column):
+            for query in self.generate_cypher_queries_from_file(
+                csv_file, rel_type, source_label, destination_label, rel_type_column
+            ):
                 yield query
-
 
     def execute_queries(self, queries, batch_size=100):
         """
@@ -342,22 +401,25 @@ class AddGraphRelationships(Neo4jBase):
         self.logger.info("Executing Cypher queries...")
         with self.driver.session() as session:
             for i in range(0, len(queries), batch_size):
-                batch = queries[i:i + batch_size]
+                batch = queries[i : i + batch_size]
                 try:
                     for query in batch:
                         session.run(query)
                         self.logger.debug(f"Executed query: {query}")
-                    self.logger.info(f"Executed batch {i // batch_size + 1}"
-                                     f"of {len(queries) // batch_size + 1}")
+                    self.logger.info(
+                        f"Executed batch {i // batch_size + 1}"
+                        f"of {len(queries) // batch_size + 1}"
+                    )
                 except Exception as e:
-                    self.logger.error("Failed to execute batch starting at query %s: %s",
-                                      i, str(e))
+                    self.logger.error(
+                        "Failed to execute batch starting at query %s: %s", i, str(e)
+                    )
 
         self.logger.info("All queries executed.")
 
-
-    def process_and_add_relationships(self, file_path, rel_type, source_label,
-                                      destination_label, rel_type_column=None):
+    def process_and_add_relationships(
+        self, file_path, rel_type, source_label, destination_label, rel_type_column=None
+    ):
         """
         Process the CSV file and add relationship data to the Neo4j database.
 
@@ -374,22 +436,25 @@ class AddGraphRelationships(Neo4jBase):
         rel_type_column : str, optional
             The column name for the relationship type, if it is to be extracted from the CSV file.
         """
-        self.logger.info("Processing and adding relationships from file: %s",
-                         file_path)
-        queries = list(self.generate_cypher_queries_from_file(file_path,
-                                                              rel_type,
-                                                              source_label,
-                                                              destination_label,
-                                                              rel_type_column))
+        self.logger.info("Processing and adding relationships from file: %s", file_path)
+        queries = list(
+            self.generate_cypher_queries_from_file(
+                file_path, rel_type, source_label, destination_label, rel_type_column
+            )
+        )
         self.execute_queries(queries)
-        self.logger.info("Successfully processed and added relationships from file: %s",
-                         file_path)
+        self.logger.info(
+            "Successfully processed and added relationships from file: %s", file_path
+        )
 
-
-    def process_and_add_relationships_from_directory(self, directory_path,
-                                                     rel_type, source_label,
-                                                     destination_label,
-                                                     rel_type_column=None):
+    def process_and_add_relationships_from_directory(
+        self,
+        directory_path,
+        rel_type,
+        source_label,
+        destination_label,
+        rel_type_column=None,
+    ):
         """
         Combine CSV files from a directory and add relationship data to the Neo4j database.
 
@@ -406,21 +471,29 @@ class AddGraphRelationships(Neo4jBase):
         rel_type_column : str, optional
             The column name for the relationship type, if it is to be extracted from the CSV file.
         """
-        self.logger.info("Processing and adding relationships from directory: %s",
-                         directory_path)
-        queries = list(self.generate_cypher_queries_from_directories(directory_path,
-                                                                     rel_type,
-                                                                     source_label,
-                                                                     destination_label,
-                                                                     rel_type_column))
+        self.logger.info(
+            "Processing and adding relationships from directory: %s", directory_path
+        )
+        queries = list(
+            self.generate_cypher_queries_from_directories(
+                directory_path,
+                rel_type,
+                source_label,
+                destination_label,
+                rel_type_column,
+            )
+        )
         if not queries:
-            self.logger.error("No valid relationships found in the directory %s.",
-                              directory_path)
+            self.logger.error(
+                "No valid relationships found in the directory %s.", directory_path
+            )
             return
 
         self.execute_queries(queries)
-        self.logger.info("Successfully processed and added relationships from directory: %s",
-                         directory_path)
+        self.logger.info(
+            "Successfully processed and added relationships from directory: %s",
+            directory_path,
+        )
 
     def remove_self_relationships(self):
         """
@@ -437,7 +510,6 @@ class AddGraphRelationships(Neo4jBase):
                 self.logger.info("Self-relationships removed successfully.")
             except Exception as e:
                 self.logger.error("Failed to remove self-relationships: %s", str(e))
-
 
     def make_relationships_bidirectional(self, relationship_type):
         """
@@ -457,6 +529,10 @@ class AddGraphRelationships(Neo4jBase):
         with self.driver.session() as session:
             try:
                 session.run(query)
-                self.logger.info(f"Bidirectional relationships for {relationship_type} created successfully.")
+                self.logger.info(
+                    f"Bidirectional relationships for {relationship_type} created successfully."
+                )
             except Exception as e:
-                self.logger.error(f"Failed to create bidirectional relationships for {relationship_type}: {str(e)}")
+                self.logger.error(
+                    f"Failed to create bidirectional relationships for {relationship_type}: {str(e)}"
+                )

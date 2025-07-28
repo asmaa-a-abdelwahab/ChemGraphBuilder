@@ -23,5 +23,5 @@ __all__ = [
     "GraphNodesLoader",
     "GraphRelationshipsLoader",
     "AddGraphNodes",
-    "AddGraphRelationships"
+    "AddGraphRelationships",
 ]

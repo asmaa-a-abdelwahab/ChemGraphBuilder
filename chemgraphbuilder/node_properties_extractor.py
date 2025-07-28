@@ -43,7 +43,10 @@ import pandas as pd
 import xmltodict
 
 # Set up logging configuration
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+)
+
 
 class NodePropertiesExtractor:
     """
@@ -94,9 +97,12 @@ class NodePropertiesExtractor:
     _CONCURRENT_REQUEST_LIMIT = 2
     _RETRY_ATTEMPTS = 3  # number of times to retry a failed request
 
-    def __init__(self, enzyme_list,
-                 base_url="https://pubchem.ncbi.nlm.nih.gov/rest/pug/assay/target/genesymbol",
-                 sep=","):
+    def __init__(
+        self,
+        enzyme_list,
+        base_url="https://pubchem.ncbi.nlm.nih.gov/rest/pug/assay/target/genesymbol",
+        sep=",",
+    ):
         """
         Initializes a NodePropertiesExtractor instance, setting up the base URL
         for API requests, the separator for CSV parsing, and the list of enzymes
@@ -151,11 +157,16 @@ class NodePropertiesExtractor:
                 response.raise_for_status()  # Checks for HTTP errors
                 return response
             except requests.RequestException as e:
-                logging.warning("Attempt %s of %s failed for URL: %s. Error: %s",
-                                attempt + 1, self._RETRY_ATTEMPTS, url, e)
+                logging.warning(
+                    "Attempt %s of %s failed for URL: %s. Error: %s",
+                    attempt + 1,
+                    self._RETRY_ATTEMPTS,
+                    url,
+                    e,
+                )
                 if attempt + 1 == self._RETRY_ATTEMPTS:
                     raise  # All attempts failed; re-raise the last exception
-                time.sleep(2 ** attempt)  # Exponential backoff
+                time.sleep(2**attempt)  # Exponential backoff
 
     def get_enzyme_assays(self, enzyme):
         """
@@ -195,11 +206,12 @@ class NodePropertiesExtractor:
         assays_csv_string = response.text
         assays_csv_string_io = StringIO(assays_csv_string)
         try:
-            assays_df = pd.read_csv(assays_csv_string_io,
-                                    sep=self._sep,
-                                    low_memory=False)
-            logging.info("Assays DataFrame for enzyme %s has shape: %s",
-                         enzyme, assays_df.shape)
+            assays_df = pd.read_csv(
+                assays_csv_string_io, sep=self._sep, low_memory=False
+            )
+            logging.info(
+                "Assays DataFrame for enzyme %s has shape: %s", enzyme, assays_df.shape
+            )
             return assays_df
         except pd.errors.EmptyDataError:
             logging.warning("No data available for enzyme %s.", enzyme)
@@ -314,7 +326,9 @@ class NodePropertiesExtractor:
                 response = requests.get(url)
                 # Check for a successful response (status code 200)
                 if response.status_code == 200:
-                    enzymes_with_response.append(enzyme)  # Keep the enzyme in the new list
+                    enzymes_with_response.append(
+                        enzyme
+                    )  # Keep the enzyme in the new list
             except requests.RequestException:
                 # If there's an exception, skip adding the enzyme to the new list
                 pass
@@ -323,17 +337,23 @@ class NodePropertiesExtractor:
         self.enzyme_list = enzymes_with_response
 
         # Identify and print the removed enzymes
-        removed_enzymes = [enzyme for enzyme in original_enzyme_list if enzyme not in enzymes_with_response]
+        removed_enzymes = [
+            enzyme
+            for enzyme in original_enzyme_list
+            if enzyme not in enzymes_with_response
+        ]
         if removed_enzymes:
-            logging.info("These enzymes were removed because their names aren't correct: %s",
-                         ", ".join(removed_enzymes))
+            logging.info(
+                "These enzymes were removed because their names aren't correct: %s",
+                ", ".join(removed_enzymes),
+            )
 
         df_list = self._process_enzymes(self.enzyme_list)
         df = self._concatenate_data(df_list)
-        substrings_to_filter = ['CYP', 'Cytochrome']
-        pattern = '|'.join(substrings_to_filter)
-        df = df[df['Assay Name'].str.contains(pattern, case=False, na=False)]
-        df.to_csv('Data/AllDataConnected.csv', index=False)
+        substrings_to_filter = ["CYP", "Cytochrome"]
+        pattern = "|".join(substrings_to_filter)
+        df = df[df["Assay Name"].str.contains(pattern, case=False, na=False)]
+        df.to_csv("Data/AllDataConnected.csv", index=False)
         return df
 
     def _fetch_gene_details(self, gene_id):
@@ -353,10 +373,12 @@ class NodePropertiesExtractor:
             data = response.json()
 
             # Extracting the necessary details
-            symbol = data['GeneSummaries']['GeneSummary'][0].get('Symbol', None)
-            taxonomy = data['GeneSummaries']['GeneSummary'][0].get('Taxonomy', None)
-            taxonomy_id = data['GeneSummaries']['GeneSummary'][0].get('TaxonomyID', None)
-            synonyms = data['GeneSummaries']['GeneSummary'][0].get('Synonym', None)
+            symbol = data["GeneSummaries"]["GeneSummary"][0].get("Symbol", None)
+            taxonomy = data["GeneSummaries"]["GeneSummary"][0].get("Taxonomy", None)
+            taxonomy_id = data["GeneSummaries"]["GeneSummary"][0].get(
+                "TaxonomyID", None
+            )
+            synonyms = data["GeneSummaries"]["GeneSummary"][0].get("Synonym", None)
             # print(type(synonyms))
             return gene_id, symbol, taxonomy, taxonomy_id, synonyms
         except Exception as e:
@@ -410,40 +432,48 @@ class NodePropertiesExtractor:
             to match the focus of your study or application.
         """
         df = pd.read_csv(main_data)
-        df_gene = pd.DataFrame(columns=['GeneID', 'Symbol', 'Taxonomy',
-                                        'Taxonomy ID', 'Synonyms'])
+        df_gene = pd.DataFrame(
+            columns=["GeneID", "Symbol", "Taxonomy", "Taxonomy ID", "Synonyms"]
+        )
 
-        unique_gene_ids = df['Target GeneID'].unique().tolist()
+        unique_gene_ids = df["Target GeneID"].unique().tolist()
 
         gene_details = []
 
         for gene_id in unique_gene_ids:
             try:
-                gene_id, symbol, taxonomy, taxonomy_id, synonyms = self._fetch_gene_details(gene_id)
-                gene_details.append({
-                    'GeneID': gene_id,
-                    'Symbol': symbol,
-                    'Taxonomy': taxonomy,
-                    'Taxonomy ID': taxonomy_id,
-                    'Synonyms': str(synonyms)
-                })
+                gene_id, symbol, taxonomy, taxonomy_id, synonyms = (
+                    self._fetch_gene_details(gene_id)
+                )
+                gene_details.append(
+                    {
+                        "GeneID": gene_id,
+                        "Symbol": symbol,
+                        "Taxonomy": taxonomy,
+                        "Taxonomy ID": taxonomy_id,
+                        "Synonyms": str(synonyms),
+                    }
+                )
             except Exception as exc:
-                logging.error("Error occurred while processing gene_id %s: %s",
-                              gene_id, exc)
-                gene_details.append({
-                    'GeneID': gene_id,
-                    'Symbol': None,
-                    'Taxonomy': None,
-                    'Taxonomy ID': None,
-                    'Synonyms': None
-                })
+                logging.error(
+                    "Error occurred while processing gene_id %s: %s", gene_id, exc
+                )
+                gene_details.append(
+                    {
+                        "GeneID": gene_id,
+                        "Symbol": None,
+                        "Taxonomy": None,
+                        "Taxonomy ID": None,
+                        "Synonyms": None,
+                    }
+                )
 
         # Now create the DataFrame from the list of dictionaries
         df_gene = pd.DataFrame(gene_details)
         n = self._enzyme_count
-        gene_ids = df['Target GeneID'].value_counts().head(n).index.tolist()
-        df_gene = df_gene[df_gene['GeneID'].isin([int(item) for item in gene_ids])]
-        df_gene.to_csv('Data/Nodes/Gene_Properties.csv', sep=',', index=False)
+        gene_ids = df["Target GeneID"].value_counts().head(n).index.tolist()
+        df_gene = df_gene[df_gene["GeneID"].isin([int(item) for item in gene_ids])]
+        df_gene.to_csv("Data/Nodes/Gene_Properties.csv", sep=",", index=False)
         return df_gene
 
     def _fetch_assay_details(self, aid):
@@ -466,15 +496,32 @@ class NodePropertiesExtractor:
         try:
             # Parsing the XML response
             data_dict = xmltodict.parse(xml_data)
-            properties = ['AID', 'SourceName', 'SourceID', 'Name', 'Description',
-                          'Protocol', 'Comment', 'Method', 'Target', 'CIDCountAll',
-                          'CIDCountActive', 'CIDCountInactive', 'CIDCountInconclusive',
-                          'CIDCountUnspecified', 'CIDCountProbe']
+            properties = [
+                "AID",
+                "SourceName",
+                "SourceID",
+                "Name",
+                "Description",
+                "Protocol",
+                "Comment",
+                "Method",
+                "Target",
+                "CIDCountAll",
+                "CIDCountActive",
+                "CIDCountInactive",
+                "CIDCountInconclusive",
+                "CIDCountUnspecified",
+                "CIDCountProbe",
+            ]
 
             assay_data = {}
             # Extracting required properties from the parsed XML
             for prop in properties:
-                assay_data[prop] = data_dict.get('AssaySummaries', {}).get('AssaySummary', {}).get(prop, None)
+                assay_data[prop] = (
+                    data_dict.get("AssaySummaries", {})
+                    .get("AssaySummary", {})
+                    .get(prop, None)
+                )
             return assay_data
         except Exception as e:
             logging.error(f"Error parsing XML for AID {aid}: {e}")
@@ -530,22 +577,43 @@ class NodePropertiesExtractor:
         df = pd.read_csv(main_data)
 
         # Check if the DataFrame is valid
-        if df.empty or 'AID' not in df.columns:
+        if df.empty or "AID" not in df.columns:
             logging.error("DataFrame is empty or does not contain 'AID' column.")
             return pd.DataFrame()
 
-        unique_aids = df['AID'].unique().tolist()  # Extracting unique assay IDs
+        unique_aids = df["AID"].unique().tolist()  # Extracting unique assay IDs
 
-        columns = ['AID', 'Assay Type', 'Activity Name', 'SourceName',
-                   'SourceID', 'Name', 'Description', 'Protocol',
-                   'Comment', 'Method', 'Target', 'CIDCountAll',
-                   'CIDCountActive', 'CIDCountInactive', 'CIDCountInconclusive',
-                   'CIDCountUnspecified', 'CIDCountProbe']
-        assay_df = pd.DataFrame(columns=columns)  # Initializing a DataFrame to store assay properties
+        columns = [
+            "AID",
+            "Assay Type",
+            "Activity Name",
+            "SourceName",
+            "SourceID",
+            "Name",
+            "Description",
+            "Protocol",
+            "Comment",
+            "Method",
+            "Target",
+            "CIDCountAll",
+            "CIDCountActive",
+            "CIDCountInactive",
+            "CIDCountInconclusive",
+            "CIDCountUnspecified",
+            "CIDCountProbe",
+        ]
+        assay_df = pd.DataFrame(
+            columns=columns
+        )  # Initializing a DataFrame to store assay properties
 
         # Using ThreadPoolExecutor for concurrent fetching of assay details
-        with concurrent.futures.ThreadPoolExecutor(max_workers=self._CONCURRENT_REQUEST_LIMIT) as executor:
-            future_to_aid = {executor.submit(self._fetch_assay_details, aid): aid for aid in unique_aids}
+        with concurrent.futures.ThreadPoolExecutor(
+            max_workers=self._CONCURRENT_REQUEST_LIMIT
+        ) as executor:
+            future_to_aid = {
+                executor.submit(self._fetch_assay_details, aid): aid
+                for aid in unique_aids
+            }
 
             # Iterating over completed futures
             for future in concurrent.futures.as_completed(future_to_aid):
@@ -555,19 +623,25 @@ class NodePropertiesExtractor:
                     if assay_data:
                         # Preparing a new row with the fetched data
                         new_row = {
-                            'AID': aid,
-                            'Assay Type': df.loc[df['AID'] == aid, 'Assay Type'].iloc[0],
-                            'Activity Name': df.loc[df['AID'] == aid, 'Activity Name'].iloc[0],
-                            **assay_data
+                            "AID": aid,
+                            "Assay Type": df.loc[df["AID"] == aid, "Assay Type"].iloc[
+                                0
+                            ],
+                            "Activity Name": df.loc[
+                                df["AID"] == aid, "Activity Name"
+                            ].iloc[0],
+                            **assay_data,
                         }
                         # Adding the new row to the DataFrame
-                        assay_df = pd.concat([assay_df, pd.DataFrame([new_row])], ignore_index=True)
+                        assay_df = pd.concat(
+                            [assay_df, pd.DataFrame([new_row])], ignore_index=True
+                        )
                 except Exception as exc:
                     # Logging any errors encountered during the fetch
                     logging.error(f"Error occurred while processing AID {aid}: {exc}")
 
         # Saving the updated DataFrame to a CSV file
-        assay_df.to_csv('Data/Nodes/Assay_Properties.csv', sep=',', index=False)
+        assay_df.to_csv("Data/Nodes/Assay_Properties.csv", sep=",", index=False)
         return assay_df
 
     def extract_protein_properties(self, main_data):
@@ -628,9 +702,9 @@ class NodePropertiesExtractor:
 
         n = self._enzyme_count
         df = pd.read_csv(main_data)
-        gene_ids = df['Target GeneID'].value_counts().head(n).index.tolist()
-        df = df[df['Target GeneID'].isin([int(item) for item in gene_ids])]
-        Accessions = df['Target Accession'].unique().tolist()
+        gene_ids = df["Target GeneID"].value_counts().head(n).index.tolist()
+        df = df[df["Target GeneID"].isin([int(item) for item in gene_ids])]
+        Accessions = df["Target Accession"].unique().tolist()
         # Iterate over each protein accession number in the DataFrame
         for accession in Accessions:
             # Construct the URL to query the NCBI protein database
@@ -641,26 +715,31 @@ class NodePropertiesExtractor:
                 response = requests.get(url)
 
                 # Parse the HTML content of the response
-                soup = BeautifulSoup(response.text, 'html.parser')
+                soup = BeautifulSoup(response.text, "html.parser")
 
                 # Extract the title from the parsed HTML
-                title = soup.title.string if soup.title else 'Title Not Found'
+                title = soup.title.string if soup.title else "Title Not Found"
 
                 # Append the extracted data to the list
-                data.append({'RefSeq Accession': accession,
-                             'URL': url, 'Description': title})
+                data.append(
+                    {"RefSeq Accession": accession, "URL": url, "Description": title}
+                )
             except Exception as e:
                 # In case of an error, log the error message
                 logging.error(f"Error fetching data for accession {accession}: {e}")
-                data.append({'RefSeq Accession': accession, 'URL': url,
-                             'Description': f'Error: {e}'})
+                data.append(
+                    {
+                        "RefSeq Accession": accession,
+                        "URL": url,
+                        "Description": f"Error: {e}",
+                    }
+                )
 
         # Convert the list of data into a DataFrame
         protein_df = pd.DataFrame(data)
 
         # Save the DataFrame to a CSV file
-        protein_df.to_csv('Data/Nodes/Protein_Properties.csv',
-                          sep=',', index=False)
+        protein_df.to_csv("Data/Nodes/Protein_Properties.csv", sep=",", index=False)
 
         # Return the DataFrame
         return protein_df
@@ -716,23 +795,28 @@ class NodePropertiesExtractor:
             return pd.DataFrame()  # Return an empty DataFrame for NaN CIDs
 
         cid = int(cid)  # Convert CID to integer
-        url = (f"https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/{cid}/property/"
-               "MolecularFormula,MolecularWeight,CanonicalSMILES,IsomericSMILES,InChI,"
-               "InChIKey,IUPACName,Title,XLogP,ExactMass,MonoisotopicMass,TPSA,Complexity,"
-               "Charge,HBondDonorCount,HBondAcceptorCount,RotatableBondCount,HeavyAtomCount,"
-               "IsotopeAtomCount,AtomStereoCount,DefinedAtomStereoCount,UndefinedAtomStereoCount,"
-               "BondStereoCount,DefinedBondStereoCount,UndefinedBondStereoCount,CovalentUnitCount,"
-               "PatentCount,PatentFamilyCount,LiteratureCount,Volume3D,XStericQuadrupole3D,"
-               "YStericQuadrupole3D,ZStericQuadrupole3D,FeatureCount3D,FeatureAcceptorCount3D,"
-               "FeatureDonorCount3D,FeatureAnionCount3D,FeatureCationCount3D,FeatureRingCount3D,"
-               "FeatureHydrophobeCount3D,ConformerModelRMSD3D,EffectiveRotorCount3D,ConformerCount3D,"
-               "Fingerprint2D/CSV")
+        url = (
+            f"https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/{cid}/property/"
+            "MolecularFormula,MolecularWeight,CanonicalSMILES,IsomericSMILES,InChI,"
+            "InChIKey,IUPACName,Title,XLogP,ExactMass,MonoisotopicMass,TPSA,Complexity,"
+            "Charge,HBondDonorCount,HBondAcceptorCount,RotatableBondCount,HeavyAtomCount,"
+            "IsotopeAtomCount,AtomStereoCount,DefinedAtomStereoCount,UndefinedAtomStereoCount,"
+            "BondStereoCount,DefinedBondStereoCount,UndefinedBondStereoCount,CovalentUnitCount,"
+            "PatentCount,PatentFamilyCount,LiteratureCount,Volume3D,XStericQuadrupole3D,"
+            "YStericQuadrupole3D,ZStericQuadrupole3D,FeatureCount3D,FeatureAcceptorCount3D,"
+            "FeatureDonorCount3D,FeatureAnionCount3D,FeatureCationCount3D,FeatureRingCount3D,"
+            "FeatureHydrophobeCount3D,ConformerModelRMSD3D,EffectiveRotorCount3D,ConformerCount3D,"
+            "Fingerprint2D/CSV"
+        )
         try:
             response = requests.get(url)
             response.raise_for_status()
-            compound_data = pd.read_csv(StringIO(response.text),
-                                        sep=',', low_memory=False)
-            compound_data['StructureImage2DURL'] = f"https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/{cid}/PNG"
+            compound_data = pd.read_csv(
+                StringIO(response.text), sep=",", low_memory=False
+            )
+            compound_data["StructureImage2DURL"] = (
+                f"https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/{cid}/PNG"
+            )
             return compound_data
         except Exception as e:
             logging.error(f"Error processing CID {cid}: {e}")
@@ -796,10 +880,10 @@ class NodePropertiesExtractor:
 
         n = self._enzyme_count
         df = pd.read_csv(main_data)
-        gene_ids = df['Target GeneID'].value_counts().head(n).index.tolist()
-        df = df[df['Target GeneID'].isin([int(item) for item in gene_ids])]
-        df = df.dropna(subset=['CID'])
-        IDs = df['CID'].unique().tolist()
+        gene_ids = df["Target GeneID"].value_counts().head(n).index.tolist()
+        df = df[df["Target GeneID"].isin([int(item) for item in gene_ids])]
+        df = df.dropna(subset=["CID"])
+        IDs = df["CID"].unique().tolist()
 
         # Define chunk size and calculate number of chunks
         chunk_size = 10000
@@ -817,7 +901,9 @@ class NodePropertiesExtractor:
 
                 # Use ThreadPoolExecutor to parallelize requests for the chunk
                 with ThreadPoolExecutor(max_workers=5) as executor:
-                    future_to_cid = {executor.submit(self.fetch_data, cid): cid for cid in chunk_cids}
+                    future_to_cid = {
+                        executor.submit(self.fetch_data, cid): cid for cid in chunk_cids
+                    }
                     results = []
 
                     for future in as_completed(future_to_cid):
@@ -832,7 +918,10 @@ class NodePropertiesExtractor:
                 chunk_df = pd.concat(results, ignore_index=True)
 
                 # Save the concatenated DataFrame to a CSV file for the chunk
-                chunk_df.to_csv(f'Data/Nodes/Compound_Properties/Chunk_{i}.csv',
-                                sep=',', index=False)
+                chunk_df.to_csv(
+                    f"Data/Nodes/Compound_Properties/Chunk_{i}.csv",
+                    sep=",",
+                    index=False,
+                )
         else:
             logging.info("No more chunks to process.")

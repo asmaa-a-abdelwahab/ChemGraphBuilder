@@ -18,7 +18,10 @@ from neo4j import GraphDatabase
 from chemgraphbuilder.add_graph_nodes import AddGraphNodes
 
 # Set up logging configuration
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+)
+
 
 class GraphNodesLoader:
     """
@@ -46,20 +49,20 @@ class GraphNodesLoader:
         self.label_mapping = {
             "Compound": {
                 "unique_property": "CompoundID",
-                "file_path": "Data/Nodes/Compound_Properties_Processed.csv"
+                "file_path": "Data/Nodes/Compound_Properties_Processed.csv",
             },
             "BioAssay": {
                 "unique_property": "AssayID",
-                "file_path": "Data/Nodes/Assay_Properties_Processed.csv"
+                "file_path": "Data/Nodes/Assay_Properties_Processed.csv",
             },
             "Gene": {
                 "unique_property": "GeneID",
-                "file_path": "Data/Nodes/Gene_Properties_Processed.csv"
+                "file_path": "Data/Nodes/Gene_Properties_Processed.csv",
             },
             "Protein": {
                 "unique_property": "ProteinRefSeqAccession",
-                "file_path": "Data/Nodes/Protein_Properties_Processed.csv"
-            }
+                "file_path": "Data/Nodes/Protein_Properties_Processed.csv",
+            },
         }
 
     def create_uniqueness_constraint(self, label, unique_property):
@@ -109,16 +112,15 @@ def main():
     """
     Main function to parse command-line arguments and load data for the specified node type.
     """
-    parser = argparse.ArgumentParser(description="Load data into"
-                                                 "Neo4j graph database.")
-    parser.add_argument('--uri', required=True,
-                        help='URI for the Neo4j database')
-    parser.add_argument('--username', required=True,
-                        help='Username for the Neo4j database')
-    parser.add_argument('--password', required=True,
-                        help='Password for the Neo4j database')
-    parser.add_argument('--label', required=True,
-                        help='Label of the node')
+    parser = argparse.ArgumentParser(description="Load data intoNeo4j graph database.")
+    parser.add_argument("--uri", required=True, help="URI for the Neo4j database")
+    parser.add_argument(
+        "--username", required=True, help="Username for the Neo4j database"
+    )
+    parser.add_argument(
+        "--password", required=True, help="Password for the Neo4j database"
+    )
+    parser.add_argument("--label", required=True, help="Label of the node")
 
     args = parser.parse_args()
 

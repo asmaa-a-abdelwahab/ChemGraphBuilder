@@ -13,7 +13,10 @@ from chemgraphbuilder.neo4jdriver import Neo4jBase
 import logging
 
 # Set up logging configuration
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+)
+
 
 class AddGraphNodes(Neo4jBase):
     """
@@ -73,7 +76,9 @@ class AddGraphNodes(Neo4jBase):
                 session.run(constraint_query)
                 logging.info(
                     "Uniqueness constraint created successfully on %s property of %s nodes.",
-                    unique_property, label)
+                    unique_property,
+                    label,
+                )
             except Exception as e:
                 logging.error("Failed to create uniqueness constraint: %s", e)
 
@@ -84,9 +89,14 @@ class AddGraphNodes(Neo4jBase):
         try:
             return float(value)
         except (TypeError, ValueError):
-            escaped_value = str(value).replace("\\", "\\\\").replace("'", "\\'").replace('"', '\\"').replace("\n", "\\n")
+            escaped_value = (
+                str(value)
+                .replace("\\", "\\\\")
+                .replace("'", "\\'")
+                .replace('"', '\\"')
+                .replace("\n", "\\n")
+            )
             return f"'{escaped_value}'"
-
 
     def generate_cypher_queries(self, node_dict, label, unique_property):
         """
@@ -107,7 +117,9 @@ class AddGraphNodes(Neo4jBase):
             A Cypher query string.
         """
         # Create an index for the unique_property
-        create_index_query = f"CREATE INDEX IF NOT EXISTS FOR (n:{label}) ON (n.{unique_property})"
+        create_index_query = (
+            f"CREATE INDEX IF NOT EXISTS FOR (n:{label}) ON (n.{unique_property})"
+        )
         self.logger.debug(create_index_query)
         yield create_index_query
 
@@ -162,12 +174,14 @@ class AddGraphNodes(Neo4jBase):
             A dictionary with unique identifiers as keys and extracted data as values.
         """
         self.logger.info("Reading data from CSV file: %s", file_path)
-        df = pd.read_csv(file_path).dropna(subset=[unique_property], how='any')
+        df = pd.read_csv(file_path).dropna(subset=[unique_property], how="any")
         node_dict = {
             row[unique_property]: row.drop(labels=[unique_property]).to_dict()
             for _, row in df.iterrows()
         }
-        self.logger.info("Successfully read data for %d nodes from CSV.", len(node_dict))
+        self.logger.info(
+            "Successfully read data for %d nodes from CSV.", len(node_dict)
+        )
         return node_dict
 
     def combine_csv_files(self, input_directory):
@@ -211,9 +225,13 @@ class AddGraphNodes(Neo4jBase):
         node_dict = self.read_csv_file(file_path, unique_property)
         queries = list(self.generate_cypher_queries(node_dict, label, unique_property))
         self.execute_queries(queries)
-        self.logger.info("Successfully processed and added nodes from file: %s", file_path)
+        self.logger.info(
+            "Successfully processed and added nodes from file: %s", file_path
+        )
 
-    def process_and_add_nodes_from_directory(self, directory_path, label, unique_property):
+    def process_and_add_nodes_from_directory(
+        self, directory_path, label, unique_property
+    ):
         """
         Combine CSV files from a directory and add node data to the Neo4j database.
 
@@ -226,14 +244,17 @@ class AddGraphNodes(Neo4jBase):
         unique_property : str
             The unique property of the node.
         """
-        self.logger.info("Processing and adding nodes from directory: %s", directory_path)
+        self.logger.info(
+            "Processing and adding nodes from directory: %s", directory_path
+        )
         combined_df = self.combine_csv_files(directory_path)
         temp_file = os.path.join(directory_path, "combined_temp.csv")
         combined_df.to_csv(temp_file, index=False)
         self.process_and_add_nodes(temp_file, label, unique_property)
         os.remove(temp_file)
-        self.logger.info("Successfully processed and added nodes from directory: %s",
-                         directory_path)
+        self.logger.info(
+            "Successfully processed and added nodes from directory: %s", directory_path
+        )
 
     def public_generate_property_string(self, value):
         """

@@ -12,11 +12,15 @@ import os
 import logging
 import argparse
 import warnings
-from chemgraphbuilder.relationship_properties_extractor import RelationshipPropertiesExtractor
+from chemgraphbuilder.relationship_properties_extractor import (
+    RelationshipPropertiesExtractor,
+)
 from chemgraphbuilder.relationship_data_processor import RelationshipDataProcessor
 
 # Set up logging configuration
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+)
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 
@@ -44,59 +48,79 @@ class RelationshipsCollectorProcessor:
         self.gene_data = "Data/Nodes/Gene_Properties_Processed.csv"
         self.start_chunk = start_chunk
         self.extractor = RelationshipPropertiesExtractor()
-        self.processor = RelationshipDataProcessor(path="Data/Relationships/Assay_Compound_Relationship")
-
+        self.processor = RelationshipDataProcessor(
+            path="Data/Relationships/Assay_Compound_Relationship"
+        )
 
     def collect_relationship_data(self):
         """
         Collects and processes relationship data based on the relationship type and saves it to the appropriate file.
         """
-        if self.relationship_type == 'Assay_Compound':
-            self.extractor.assay_compound_relationship(self.data_file, start_chunk=self.start_chunk)
+        if self.relationship_type == "Assay_Compound":
+            self.extractor.assay_compound_relationship(
+                self.data_file, start_chunk=self.start_chunk
+            )
             self.processor.process_files()
-        elif self.relationship_type == 'Assay_Gene':
-            self.extractor.assay_enzyme_relationship(self.data_file)
-        elif self.relationship_type == 'Gene_Protein':
+        elif self.relationship_type == "Assay_Gene":
+            self.extractor.assay_gene_relationship(self.data_file)
+        elif self.relationship_type == "Gene_Protein":
             self.extractor.gene_protein_relationship(self.data_file)
-        elif self.relationship_type == 'Compound_Gene':
+        elif self.relationship_type == "Compound_Gene":
             self.extractor.compound_gene_relationship(self.data_file)
-        elif self.relationship_type == 'Compound_Similarity':
-            self.extractor.compound_similarity_relationship(self.data_file, start_chunk=self.start_chunk)
-        elif self.relationship_type == 'Compound_Compound_Cooccurrence':
+        elif self.relationship_type == "Compound_Similarity":
+            self.extractor.compound_similarity_relationship(
+                self.data_file, start_chunk=self.start_chunk
+            )
+        elif self.relationship_type == "Compound_Compound_Cooccurrence":
             self.extractor.compound_compound_cooccurrence(self.data_file)
-        elif self.relationship_type == 'Compound_Gene_Cooccurrence':
+        elif self.relationship_type == "Compound_Gene_Cooccurrence":
             self.extractor.compound_gene_cooccurrence(self.gene_data)
-        elif self.relationship_type == 'Compound_Gene_Interaction':
+        elif self.relationship_type == "Compound_Gene_Interaction":
             self.extractor.compound_gene_interaction(self.gene_data)
-        elif self.relationship_type == 'Compound_Transformation':
+        elif self.relationship_type == "Compound_Transformation":
             self.extractor.compound_transformation(self.data_file)
         else:
             logging.error(f"Unsupported relationship type: {self.relationship_type}")
+
 
 def main():
     """
     Main function to parse command-line arguments and collect relationship data for the specified type.
     """
-    parser = argparse.ArgumentParser(description="Collect relationship data for different types of relationships.")
-    parser.add_argument('--relationship_type',
-                        type=str,
-                        required=True,
-                        choices=['Assay_Compound', 'Assay_Gene', 'Gene_Protein',
-                                 'Compound_Gene', 'Compound_Similarity',
-                                 'Compound_Compound_Cooccurrence',
-                                 'Compound_Gene_Cooccurrence',
-                                 'Compound_Gene_Interaction',
-                                 'Compound_Transformation'],
-                        help='The type of relationship to collect data for')
-    parser.add_argument('--start_chunk',
-                        type=int,
-                        default=0,
-                        help='The starting chunk index for processing data')
+    parser = argparse.ArgumentParser(
+        description="Collect relationship data for different types of relationships."
+    )
+    parser.add_argument(
+        "--relationship_type",
+        type=str,
+        required=True,
+        choices=[
+            "Assay_Compound",
+            "Assay_Gene",
+            "Gene_Protein",
+            "Compound_Gene",
+            "Compound_Similarity",
+            "Compound_Compound_Cooccurrence",
+            "Compound_Gene_Cooccurrence",
+            "Compound_Gene_Interaction",
+            "Compound_Transformation",
+        ],
+        help="The type of relationship to collect data for",
+    )
+    parser.add_argument(
+        "--start_chunk",
+        type=int,
+        default=0,
+        help="The starting chunk index for processing data",
+    )
 
     args = parser.parse_args()
 
-    collector = RelationshipsCollectorProcessor(relationship_type=args.relationship_type, start_chunk=args.start_chunk)
+    collector = RelationshipsCollectorProcessor(
+        relationship_type=args.relationship_type, start_chunk=args.start_chunk
+    )
     collector.collect_relationship_data()
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()

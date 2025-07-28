@@ -1,4 +1,3 @@
-
 """
 Module for managing connections to a Neo4j database.
 
@@ -12,11 +11,16 @@ import os
 from neo4j import GraphDatabase
 
 # Set up logging configuration
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+)
+
 
 class Neo4jConnectionError(Exception):
     """Custom exception for Neo4j connection errors."""
+
     # No need for pass statement, docstring is sufficient
+
 
 class Neo4jBase:
     """
@@ -38,12 +42,16 @@ class Neo4jBase:
         self.driver = None
 
         # Set up logging configuration
-        logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+        logging.basicConfig(
+            level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+        )
         self.logger = logger or logging.getLogger(__name__)
 
     def connect_to_neo4j(self):
         """Establish a connection to the Neo4j database using provided URI and username."""
-        password = os.getenv("NEO4J_PASSWORD")  # Check if password is set in environment variables
+        password = os.getenv(
+            "NEO4J_PASSWORD"
+        )  # Check if password is set in environment variables
         if not password:
             password = getpass.getpass(prompt="Enter Neo4j password: ")
 
@@ -52,7 +60,9 @@ class Neo4jBase:
             self.logger.info("Successfully connected to the Neo4j database.")
         except Exception as e:
             self.logger.error("Failed to connect to the Neo4j database: %s", e)
-            raise Neo4jConnectionError("Failed to connect to the Neo4j database.") from e
+            raise Neo4jConnectionError(
+                "Failed to connect to the Neo4j database."
+            ) from e
 
     def close(self):
         """Close the connection to the Neo4j database."""
