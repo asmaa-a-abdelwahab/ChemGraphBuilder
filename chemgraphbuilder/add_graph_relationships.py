@@ -5,10 +5,8 @@ This module provides a class and methods to read relationship data from CSV file
 and add them to a Neo4j database, including generating Cypher queries.
 """
 
-import os
 import glob
 import ast
-import json
 import pandas as pd
 import numpy as np
 from chemgraphbuilder.neo4jdriver import Neo4jBase

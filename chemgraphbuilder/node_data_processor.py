@@ -120,7 +120,7 @@ class NodeDataProcessor:
         path = f"{self.data_dir}/Nodes/Compound_Properties"
         all_csv_files = glob.glob(path + "/*.csv")
         first_file = True
-        output_file = f"Data/Nodes/Compound_Properties.csv"
+        output_file = "Data/Nodes/Compound_Properties.csv"
 
         with open(output_file, "w", newline="", encoding="utf-8") as f_out:
             for file in all_csv_files:

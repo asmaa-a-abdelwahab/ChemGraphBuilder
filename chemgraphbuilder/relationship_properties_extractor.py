@@ -28,7 +28,7 @@ from io import StringIO
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import xml.etree.ElementTree as ET
 import requests
-from urllib.parse import quote, urlencode
+from urllib.parse import quote
 import pandas as pd
 import numpy as np
 
@@ -246,7 +246,7 @@ class RelationshipPropertiesExtractor:
                     f"Processed chunk {chunk_idx} for assay-compound relationships."
                 )
             else:
-                logging.info(f"No More Chunck to Process.")
+                logging.info("No More Chunck to Process.")
 
     def _write_to_csv(self, df, filename):
         """
@@ -283,7 +283,7 @@ class RelationshipPropertiesExtractor:
         columns_to_select = ["AID", "Target GeneID", "Activity Name"]
         df = df[columns_to_select]
         df = df.drop_duplicates(keep="first", ignore_index=True)
-        df.to_csv(f"Data/Relationships/Assay_Gene_Relationship.csv", index=False)
+        df.to_csv("Data/Relationships/Assay_Gene_Relationship.csv", index=False)
         return df
 
     def gene_protein_relationship(self, main_data):
@@ -314,7 +314,7 @@ class RelationshipPropertiesExtractor:
         columns_to_select = ["Target GeneID", "Target Accession"]
         df = df[columns_to_select]
         df = df.drop_duplicates(keep="first", ignore_index=True)
-        df.to_csv(f"Data/Relationships/Gene_Protein_Relationship.csv", index=False)
+        df.to_csv("Data/Relationships/Gene_Protein_Relationship.csv", index=False)
         return df
 
     def compound_gene_relationship(self, main_data):
@@ -359,7 +359,7 @@ class RelationshipPropertiesExtractor:
         df = df.drop_duplicates(keep="first", ignore_index=True)
         df = df.sort_values(["CID", "Target Accession"])
         df.dropna(axis=0, thresh=1, inplace=True)  ###
-        df.to_csv(f"Data/Relationships/Compound_Gene_Relationship.csv", index=False)
+        df.to_csv("Data/Relationships/Compound_Gene_Relationship.csv", index=False)
         return df
 
     def fetch_similar_cids(self, cid):

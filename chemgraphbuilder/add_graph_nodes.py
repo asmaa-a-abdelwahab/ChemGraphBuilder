@@ -10,7 +10,6 @@ import os
 import logging
 import pandas as pd
 from chemgraphbuilder.neo4jdriver import Neo4jBase
-import logging
 
 # Set up logging configuration
 logging.basicConfig(

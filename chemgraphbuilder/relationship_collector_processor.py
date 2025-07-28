@@ -8,7 +8,6 @@ Functions:
     main: Main function to parse command-line arguments and collect relationship data for the specified type.
 """
 
-import os
 import logging
 import argparse
 import warnings
