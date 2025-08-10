@@ -1,0 +1,41 @@
+[build-system]
+requires = ["setuptools>=69", "wheel", "build"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "chemgraphbuilder"
+version = "1.18.3"
+description = "A package to build chemical knowledge graphs using data from PubChem and Neo4j"
+readme = { file = "README.md", content-type = "text/markdown" }
+requires-python = ">=3.8"
+license = { file = "LICENSE" }
+authors = [{ name = "Asmaa Ali Abdelwahab", email = "asmaa.a.abdelwahab@gmail.com" }]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+  "Operating System :: OS Independent",
+]
+dependencies = [
+  "beautifulsoup4",
+  "matplotlib",
+  "numpy",
+  "pandas",
+  "neo4j",
+  "requests",
+  "xmltodict",
+  "dask",
+]
+
+[project.scripts]
+setup-data-folder = "chemgraphbuilder.setup_data_folder:main"
+collect-process-nodes = "chemgraphbuilder.node_collector_processor:main"
+collect-process-relationships = "chemgraphbuilder.relationship_collector_processor:main"
+load-graph-nodes = "chemgraphbuilder.graph_nodes_loader:main"
+load-graph-relationships = "chemgraphbuilder.graph_relationships_loader:main"
+
+[tool.setuptools.packages.find]
+include = ["chemgraphbuilder*"]
+
+[tool.setuptools]
+include-package-data = true
+license-files = [] 

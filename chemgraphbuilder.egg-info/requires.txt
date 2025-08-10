@@ -5,5 +5,4 @@ pandas
 neo4j
 requests
 xmltodict
-setuptools
 dask

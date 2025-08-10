@@ -3,5 +3,4 @@ dask==2024.7.1
 neo4j==5.22.0
 pandas==2.0.3
 Requests==2.32.3
-setuptools==71.0.4
 xmltodict==0.13.0

@@ -1,6 +1,6 @@
 LICENSE
 README.md
-setup.py
+pyproject.toml
 chemgraphbuilder/__init__.py
 chemgraphbuilder/add_graph_nodes.py
 chemgraphbuilder/add_graph_relationships.py
