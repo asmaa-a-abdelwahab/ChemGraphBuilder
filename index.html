@@ -487,6 +487,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#2-install-chemgraphbuilder" class="md-nav__link">
+    <span class="md-ellipsis">
+      2️⃣ Install chemgraphbuilder
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#3-connect-to-neo4j-in-python" class="md-nav__link">
     <span class="md-ellipsis">
       3️⃣ Connect to Neo4j in Python
@@ -870,6 +879,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#2-install-chemgraphbuilder" class="md-nav__link">
+    <span class="md-ellipsis">
+      2️⃣ Install chemgraphbuilder
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#3-connect-to-neo4j-in-python" class="md-nav__link">
     <span class="md-ellipsis">
       3️⃣ Connect to Neo4j in Python
@@ -973,28 +991,23 @@
   -p 7474:7474 -p 7687:7687 \
   -e NEO4J_AUTH=neo4j/testpassword \
   neo4j:5.14
-````
-
-* Bolt URI: `bolt://localhost:7687`
-* Username: `neo4j`
-* Password: `testpassword`
-* Web UI: [http://localhost:7474](http://localhost:7474)
-
-**Option B – Neo4j Desktop**
-
-1. Download from: [https://neo4j.com/download/](https://neo4j.com/download/)
-2. Create a **new project** and database.
-3. Note the **Bolt URI**, **username**, and **password**.
-
----
-
-### 2️⃣ Install `chemgraphbuilder`
-
-```bash
-pip install chemgraphbuilder
+</code></pre>
+<ul>
+<li>Bolt URI: <code>bolt://localhost:7687</code></li>
+<li>Username: <code>neo4j</code></li>
+<li>Password: <code>testpassword</code></li>
+<li>Web UI: <a href="http://localhost:7474">http://localhost:7474</a></li>
+</ul>
+<p><strong>Option B – Neo4j Desktop</strong></p>
+<ol>
+<li>Download from: <a href="https://neo4j.com/download/">https://neo4j.com/download/</a></li>
+<li>Create a <strong>new project</strong> and database.</li>
+<li>Note the <strong>Bolt URI</strong>, <strong>username</strong>, and <strong>password</strong>.</li>
+</ol>
+<h3 id="2-install-chemgraphbuilder">2️⃣ Install <code>chemgraphbuilder</code></h3>
+<pre><code class="language-bash">pip install chemgraphbuilder
 </code></pre>
 <p>Or visit the <a href="https://pypi.org/project/chemgraphbuilder">PyPI Project Page</a> for the latest release.</p>
-<hr />
 <h3 id="3-connect-to-neo4j-in-python">3️⃣ Connect to Neo4j in Python</h3>
 <pre><code class="language-python">from chemgraphbuilder import Neo4jBase
 
