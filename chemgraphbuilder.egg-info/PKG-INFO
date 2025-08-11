@@ -1,6 +1,6 @@
 Metadata-Version: 2.4
 Name: chemgraphbuilder
-Version: 1.18.3
+Version: 0.1.2
 Summary: A package to build chemical knowledge graphs using data from PubChem and Neo4j
 Author-email: Asmaa Ali Abdelwahab <asmaa.a.abdelwahab@gmail.com>
 License:                     GNU GENERAL PUBLIC LICENSE
@@ -694,27 +694,115 @@ Requires-Dist: dask
 
 # ChemGraphBuilder [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.13148036.svg)](https://doi.org/10.5281/zenodo.13148036)
 
-chemgraphbuilder is a Python package designed for transforming chemical data into knowledge graphs. Leveraging PubChem for data extraction and Neo4j for building graph databases, it enables researchers to efficiently extract, process, and visualize complex chemical relationships with precision. The package is built in a way that allows for easy extension to include other data sources in future releases.
+`chemgraphbuilder` is a Python package designed for transforming chemical data into knowledge graphs.  
+It leverages **PubChem** for data extraction and **Neo4j** for building graph databases, enabling researchers to efficiently extract, process, and visualize complex chemical relationships with precision.  
+The package is designed for easy extension to include other data sources in future releases.
+
+---
 
 ## Table of Contents
+- [ChemGraphBuilder ](#chemgraphbuilder-)
+  - [Table of Contents](#table-of-contents)
+  - [Neo4j Requirements](#neo4j-requirements)
+  - [🚀 Quick Start](#-quick-start)
+    - [1️⃣ Install and Run Neo4j](#1️⃣-install-and-run-neo4j)
+    - [2️⃣ Install `chemgraphbuilder`](#2️⃣-install-chemgraphbuilder)
+    - [3️⃣ Connect to Neo4j in Python](#3️⃣-connect-to-neo4j-in-python)
+    - [4️⃣ First Example](#4️⃣-first-example)
+  - [Usage](#usage)
+    - [From Python](#from-python)
+    - [From Command Line](#from-command-line)
+  - [Features](#features)
+  - [Documentation](#documentation)
+  - [Contributing](#contributing)
+  - [License](#license)
+  - [Contact](#contact)
+  - [Acknowledgments](#acknowledgments)
 
-1. [Installation](#installation)
-2. [Usage](#usage)
-3. [Features](#features)
-4. [Documentation](#documentation)
-5. [Contributing](#contributing)
-6. [License](#license)
-7. [Contact](#contact)
-8. [Acknowledgments](#acknowledgments)
+---
 
-## Installation
+## Neo4j Requirements
 
-To install ChemGraphBuilder, use pip:
+`chemgraphbuilder` requires a running **Neo4j** database that is accessible via **Bolt URI**, **username**, and **password**.
+
+You can run Neo4j:
+- **Locally** (Neo4j Desktop or Docker)
+- **Remotely** (Neo4j Aura Cloud)
+
+**Default Bolt port:** `7687`  
+**Default Web UI port:** `7474`
+
+---
+
+## 🚀 Quick Start
+
+Follow these steps to get up and running with `chemgraphbuilder` and Neo4j in under 5 minutes.
+
+### 1️⃣ Install and Run Neo4j
+
+**Option A – Docker (fastest)**
+```bash
+docker run \
+  --name neo4j \
+  -p 7474:7474 -p 7687:7687 \
+  -e NEO4J_AUTH=neo4j/testpassword \
+  neo4j:5.14
+````
+
+* Bolt URI: `bolt://localhost:7687`
+* Username: `neo4j`
+* Password: `testpassword`
+* Web UI: [http://localhost:7474](http://localhost:7474)
+
+**Option B – Neo4j Desktop**
+
+1. Download from: [https://neo4j.com/download/](https://neo4j.com/download/)
+2. Create a **new project** and database.
+3. Note the **Bolt URI**, **username**, and **password**.
+
+---
+
+### 2️⃣ Install `chemgraphbuilder`
 
 ```bash
 pip install chemgraphbuilder
 ```
-You can visit this page to get the installation command: [PyPI Project Page](https://pypi.org/project/chemgraphbuilder)
+Or visit the [PyPI Project Page](https://pypi.org/project/chemgraphbuilder) for the latest release.
+
+---
+
+### 3️⃣ Connect to Neo4j in Python
+
+```python
+from chemgraphbuilder import Neo4jBase
+
+# Connection details
+NEO4J_URI = "bolt://localhost:7687"
+NEO4J_USER = "neo4j"
+NEO4J_PASSWORD = "testpassword"
+
+# Connect and test
+db = Neo4jBase(uri=NEO4J_URI, user=NEO4J_USER, password=NEO4J_PASSWORD)
+db.test_connection()
+```
+
+---
+
+### 4️⃣ First Example
+
+```python
+# Create a simple test node
+db.run_query("CREATE (:Test {name: 'Hello Neo4j'})")
+print("Node created!")
+```
+
+Check in the Neo4j Browser:
+
+```cypher
+MATCH (n) RETURN n;
+```
+
+---
 
 ## Usage
 
@@ -727,24 +815,24 @@ from chemgraphbuilder.relationship_collector_processor import RelationshipsColle
 from chemgraphbuilder.graph_nodes_loader import GraphNodesLoader
 from chemgraphbuilder.graph_relationships_loader import GraphRelationshipsLoader
 
-# Initialize and setup the data directory before collecting any data
+# Setup data folder
 setup_folder = SetupDataFolder()
 setup_folder.setup()
 
-# Initialize the collector & Collect and process the data
+# Collect nodes
 collector = NodesCollectorProcessor(node_type=node_type, enzyme_list=enzyme_list, start_chunk=0)
 collector.collect_and_process_data()
 
-# Initialize the collector & Collect and process the relationship data
+# Collect relationships
 collector = RelationshipsCollectorProcessor(relationship_type=relationship_type, start_chunk=0)
 collector.collect_relationship_data()
 
-# Initialize the loader & load nodes into neo4j database
+# Load nodes into Neo4j
 graph_nodes_loader = GraphNodesLoader(uri, username, password)
 graph_nodes_loader.load_data_for_node_type(label)
 graph_nodes_loader.close()
 
-# Initialize the loader & load relationships into neo4j database
+# Load relationships into Neo4j
 graph_relationships_loader = GraphRelationshipsLoader(uri, username, password)
 graph_relationships_loader.add_relationships(relationship_type)
 graph_relationships_loader.close()
@@ -754,37 +842,51 @@ graph_relationships_loader.close()
 
 ```bash
 setup-data-folder
-collect-process-nodes --node_type Compound --enzyme_list gene1,gene2 --start_chunk 0 # the default start-chunk is 0
+collect-process-nodes --node_type Compound --enzyme_list gene1,gene2 --start_chunk 0
 collect-process-relationships --relationship_type Assay_Compound --start_chunk 0
 load-graph-nodes --uri bolt://localhost:7687 --username neo4j --password password --label Compound
 load-graph_relationships --uri bolt://localhost:7687 --username neo4j --password password --relationship_type Assay_Gene
 ```
 
-For more detailed examples, visit the [Usage Examples](https://asmaa-a-abdelwahab.github.io/ChemGraphBuilder/1.node_collector_processor/).
+More examples: [Usage Examples](https://asmaa-a-abdelwahab.github.io/ChemGraphBuilder/1.node_collector_processor/).
+
+---
 
 ## Features
 
-- **Node Representation:** Incorporates diverse nodes such as compounds, genes, proteins, and bioassays.
-- **Comprehensive Relationships:** Maps out various interactions, including gene-protein relationships, bioassay-gene relationships, bioassay-compound relationships, compound similarities, compound co-occurrences in literature, and more nuanced interactions like inhibitor, activator, ligand, and other roles between compounds and genes.
-- **Data Integration:** The knowledge graph schema is designed to support the integration of additional data sources, enhancing the depth and accuracy of the knowledge graph.
-- **Command Line and Programmatic Access:** Provides flexibility in usage, allowing for integration into larger workflows or standalone analyses.
+* **Node Representation:** Compounds, genes, proteins, bioassays.
+* **Comprehensive Relationships:** Includes assay-compound, assay-gene, compound similarity, co-occurrence, inhibitor/activator/ligand, etc.
+* **Data Integration:** Schema supports adding new sources.
+* **Flexible Access:** Command line & Python API.
+
+---
 
 ## Documentation
 
-Full documentation is available at [ChemGraphBuilder Documentation](https://asmaa-a-abdelwahab.github.io/ChemGraphBuilder/).
+Full docs: [ChemGraphBuilder Documentation](https://asmaa-a-abdelwahab.github.io/ChemGraphBuilder/)
+
+---
 
 ## Contributing
 
-Contributions are welcome! If any issues are found or suggestions for improvements arise, they can be reported via the [GitHub Issues](https://github.com/asmaa-a-abdelwahab/chemgraphbuilder/issues) page. Contributions to the codebase through pull requests are also encouraged.
+Issues: [GitHub Issues](https://github.com/asmaa-a-abdelwahab/chemgraphbuilder/issues)
+Pull requests welcome.
+
+---
 
 ## License
 
-This project is licensed under the GPL-3.0 License - see the [LICENSE](https://github.com/asmaa-a-abdelwahab/ChemGraphBuilder#GPL-3.0-1-ov-file) file for details.
+GPL-3.0 – see [LICENSE](https://github.com/asmaa-a-abdelwahab/chemgraphbuilder/blob/main/LICENSE).
+
+---
 
 ## Contact
 
-For questions or support, please contact [Asmaa A. Abdelwahab](mailto:asmaa.a.abdelwahab@gmail.com).
+**Asmaa A. Abdelwahab** – [asmaa.a.abdelwahab@gmail.com](mailto:asmaa.a.abdelwahab@gmail.com)
+
+---
 
 ## Acknowledgments
 
-This project utilizes the PubChem Database and its API for accessing chemical and bioassay data. We acknowledge the efforts of the PubChem team for maintaining such a valuable resource.
+* **PubChem** – for chemical and bioassay data.
+* **Neo4j** – for graph database capabilities.

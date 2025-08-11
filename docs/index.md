@@ -17,13 +17,87 @@ The `chemgraphbuilder` package is versatile and can be utilized both in Python c
 
 ---
 
-## Installation:
+## Neo4j Requirements
 
-You can visit this page to get the installation command: [PyPI Project Page](https://pypi.org/project/chemgraphbuilder)
-```sh
-!pip install chemgraphbuilder
+`chemgraphbuilder` requires a running **Neo4j** database that is accessible via **Bolt URI**, **username**, and **password**.
+
+You can run Neo4j:
+- **Locally** (Neo4j Desktop or Docker)
+- **Remotely** (Neo4j Aura Cloud)
+
+**Default Bolt port:** `7687`  
+**Default Web UI port:** `7474`
+
+---
+
+## 🚀 Quick Start
+
+Follow these steps to get up and running with `chemgraphbuilder` and Neo4j in under 5 minutes.
+
+### 1️⃣ Install and Run Neo4j
+
+**Option A – Docker (fastest)**
+```bash
+docker run \
+  --name neo4j \
+  -p 7474:7474 -p 7687:7687 \
+  -e NEO4J_AUTH=neo4j/testpassword \
+  neo4j:5.14
 ```
 
+* Bolt URI: `bolt://localhost:7687`
+* Username: `neo4j`
+* Password: `testpassword`
+* Web UI: [http://localhost:7474](http://localhost:7474)
+
+**Option B – Neo4j Desktop**
+
+1. Download from: [https://neo4j.com/download/](https://neo4j.com/download/)
+2. Create a **new project** and database.
+3. Note the **Bolt URI**, **username**, and **password**.
+
+
+### 2️⃣ Install `chemgraphbuilder`
+
+```bash
+pip install chemgraphbuilder
+```
+Or visit the [PyPI Project Page](https://pypi.org/project/chemgraphbuilder) for the latest release.
+
+
+
+### 3️⃣ Connect to Neo4j in Python
+
+```python
+from chemgraphbuilder import Neo4jBase
+
+# Connection details
+NEO4J_URI = "bolt://localhost:7687"
+NEO4J_USER = "neo4j"
+NEO4J_PASSWORD = "testpassword"
+
+# Connect and test
+db = Neo4jBase(uri=NEO4J_URI, user=NEO4J_USER, password=NEO4J_PASSWORD)
+db.test_connection()
+```
+
+---
+
+### 4️⃣ First Example
+
+```python
+# Create a simple test node
+db.run_query("CREATE (:Test {name: 'Hello Neo4j'})")
+print("Node created!")
+```
+
+Check in the Neo4j Browser:
+
+```cypher
+MATCH (n) RETURN n;
+```
+
+---
 ## Project layout
 
     chemgraphbuilder/                 # Main source code directory for the chemgraphbuilder package.
