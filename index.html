@@ -459,11 +459,53 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#installation" class="md-nav__link">
+  <a href="#neo4j-requirements" class="md-nav__link">
     <span class="md-ellipsis">
-      Installation:
+      Neo4j Requirements
     </span>
   </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#quick-start" class="md-nav__link">
+    <span class="md-ellipsis">
+      🚀 Quick Start
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="🚀 Quick Start">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-install-and-run-neo4j" class="md-nav__link">
+    <span class="md-ellipsis">
+      1️⃣ Install and Run Neo4j
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-connect-to-neo4j-in-python" class="md-nav__link">
+    <span class="md-ellipsis">
+      3️⃣ Connect to Neo4j in Python
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-first-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      4️⃣ First Example
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -800,11 +842,53 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#installation" class="md-nav__link">
+  <a href="#neo4j-requirements" class="md-nav__link">
     <span class="md-ellipsis">
-      Installation:
+      Neo4j Requirements
     </span>
   </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#quick-start" class="md-nav__link">
+    <span class="md-ellipsis">
+      🚀 Quick Start
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="🚀 Quick Start">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-install-and-run-neo4j" class="md-nav__link">
+    <span class="md-ellipsis">
+      1️⃣ Install and Run Neo4j
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-connect-to-neo4j-in-python" class="md-nav__link">
+    <span class="md-ellipsis">
+      3️⃣ Connect to Neo4j in Python
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-first-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      4️⃣ First Example
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -872,10 +956,67 @@
 <hr />
 <p>The <code>chemgraphbuilder</code> package is versatile and can be utilized both in Python code and via the command line interface. For practical examples and use cases, please refer to the "Usage Examples" section available in the menu on the left sidebar. For comprehensive documentation of the main classes and their functionalities, visit <a href="https://asmaa-a-abdelwahab.github.io/ChemGraphBuilder/documentation/">the Documentation Page</a>.</p>
 <hr />
-<h2 id="installation">Installation:</h2>
-<p>You can visit this page to get the installation command: <a href="https://pypi.org/project/chemgraphbuilder">PyPI Project Page</a></p>
-<pre><code class="language-sh">!pip install chemgraphbuilder
+<h2 id="neo4j-requirements">Neo4j Requirements</h2>
+<p><code>chemgraphbuilder</code> requires a running <strong>Neo4j</strong> database that is accessible via <strong>Bolt URI</strong>, <strong>username</strong>, and <strong>password</strong>.</p>
+<p>You can run Neo4j:
+- <strong>Locally</strong> (Neo4j Desktop or Docker)
+- <strong>Remotely</strong> (Neo4j Aura Cloud)</p>
+<p><strong>Default Bolt port:</strong> <code>7687</code><br />
+<strong>Default Web UI port:</strong> <code>7474</code></p>
+<hr />
+<h2 id="quick-start">🚀 Quick Start</h2>
+<p>Follow these steps to get up and running with <code>chemgraphbuilder</code> and Neo4j in under 5 minutes.</p>
+<h3 id="1-install-and-run-neo4j">1️⃣ Install and Run Neo4j</h3>
+<p><strong>Option A – Docker (fastest)</strong></p>
+<pre><code class="language-bash">docker run \
+  --name neo4j \
+  -p 7474:7474 -p 7687:7687 \
+  -e NEO4J_AUTH=neo4j/testpassword \
+  neo4j:5.14
+````
+
+* Bolt URI: `bolt://localhost:7687`
+* Username: `neo4j`
+* Password: `testpassword`
+* Web UI: [http://localhost:7474](http://localhost:7474)
+
+**Option B – Neo4j Desktop**
+
+1. Download from: [https://neo4j.com/download/](https://neo4j.com/download/)
+2. Create a **new project** and database.
+3. Note the **Bolt URI**, **username**, and **password**.
+
+---
+
+### 2️⃣ Install `chemgraphbuilder`
+
+```bash
+pip install chemgraphbuilder
 </code></pre>
+<p>Or visit the <a href="https://pypi.org/project/chemgraphbuilder">PyPI Project Page</a> for the latest release.</p>
+<hr />
+<h3 id="3-connect-to-neo4j-in-python">3️⃣ Connect to Neo4j in Python</h3>
+<pre><code class="language-python">from chemgraphbuilder import Neo4jBase
+
+# Connection details
+NEO4J_URI = &quot;bolt://localhost:7687&quot;
+NEO4J_USER = &quot;neo4j&quot;
+NEO4J_PASSWORD = &quot;testpassword&quot;
+
+# Connect and test
+db = Neo4jBase(uri=NEO4J_URI, user=NEO4J_USER, password=NEO4J_PASSWORD)
+db.test_connection()
+</code></pre>
+<hr />
+<h3 id="4-first-example">4️⃣ First Example</h3>
+<pre><code class="language-python"># Create a simple test node
+db.run_query(&quot;CREATE (:Test {name: 'Hello Neo4j'})&quot;)
+print(&quot;Node created!&quot;)
+</code></pre>
+<p>Check in the Neo4j Browser:</p>
+<pre><code class="language-cypher">MATCH (n) RETURN n;
+</code></pre>
+<hr />
 <h2 id="project-layout">Project layout</h2>
 <pre><code>chemgraphbuilder/                 # Main source code directory for the chemgraphbuilder package.
 build/
