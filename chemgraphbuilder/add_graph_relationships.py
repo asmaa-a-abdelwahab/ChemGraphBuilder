@@ -51,6 +51,36 @@ class AddGraphRelationships(Neo4jBase):
         super().__init__()
         self.driver = driver
         self.logger.info("AddGraphRelationships class initialized.")
+        
+    def _normalize_headers(self, cols):
+        # Trim whitespace only; keep case for readability
+        return [c.strip() if isinstance(c, str) else c for c in cols]
+
+    def _detect_rel_type_col(self, file_path, requested_name: str | None):
+        """
+        Return the actual column name (case-insensitive) if present; else None.
+        """
+        try:
+            hdr = pd.read_csv(file_path, nrows=0, dtype=str, keep_default_na=True)
+        except Exception as e:
+            self.logger.error("Failed reading headers for %s: %s", file_path, e)
+            return None
+
+        cols = self._normalize_headers(list(hdr.columns))
+        # If the caller asked for a specific name, try that first (case-insensitive)
+        candidates = []
+        if requested_name:
+            candidates.append(requested_name)
+        # Also try some common aliases automatically
+        candidates += ["activity", "relationship_type", "relation", "rel_type"]
+
+        lower_map = {c.lower(): c for c in cols}
+        for cand in candidates:
+            lc = cand.strip().lower()
+            if lc in lower_map:
+                return lower_map[lc]
+        return None
+
 
     @staticmethod
     def _generate_property_string(value):
@@ -211,134 +241,111 @@ class AddGraphRelationships(Neo4jBase):
             A Cypher query string.
         """
         standard_id = {
-            "GeneID": "GeneID",
-            "Gene ID": "GeneID",
-            "Target GeneID": "GeneID",
-            "geneids": "GeneID",
-            "AssayID": "AssayID",
-            "Assay ID": "AssayID",
-            "AID": "AssayID",
-            "aid": "AssayID",
-            "ID_1": "CompoundID",
-            "ID_2": "CompoundID",
-            "substratecid": "CompoundID",
-            "metabolitecid": "CompoundID",
-            "Compound ID": "CompoundID",
-            "CompoundID": "CompoundID",
-            "CID": "CompoundID",
-            "Similar CIDs": "CompoundID",
-            "Target Accession": "ProteinRefSeqAccession",
-            "geneid": "GeneID",
-            "target_geneid": "GeneID",
-            "cid": "CompoundID",
+            "GeneID": "GeneID", "Gene ID": "GeneID", "Target GeneID": "GeneID",
+            "geneids": "GeneID", "AssayID": "AssayID", "Assay ID": "AssayID",
+            "AID": "AssayID", "aid": "AssayID", "ID_1": "CompoundID", "ID_2": "CompoundID",
+            "substratecid": "CompoundID", "metabolitecid": "CompoundID",
+            "Compound ID": "CompoundID", "CompoundID": "CompoundID", "CID": "CompoundID",
+            "Similar CIDs": "CompoundID", "Target Accession": "ProteinRefSeqAccession",
+            "geneid": "GeneID", "target_geneid": "GeneID", "cid": "CompoundID",
         }
         self.logger.info(f"Reading data from CSV file: {file_path}")
-        # Read only the column names
-        df = pd.read_csv(file_path, nrows=0)
-        column_names = df.columns.tolist()
-        # Step 1: Read the CSV file
-        df = pd.read_csv(file_path, usecols=column_names, low_memory=False)
-        # Step 2: Replace specific values with NaN
-        df.replace("__nan__", np.nan, inplace=True)
-        # Step 3: Drop columns that are completely empty (all NaN values)
+
+        # Read as strings to avoid dtype surprises; treat "__nan__" as NA
+        df = pd.read_csv(
+            file_path, dtype=str, keep_default_na=True, na_values=["__nan__"], low_memory=False
+        )
+        df.columns = self._normalize_headers(df.columns.tolist())
         df = df.dropna(axis=1, how="all")
-        df.to_csv("Data/test.csv", index=False)
+
+        if df.shape[1] < 2:
+            self.logger.error("CSV %s has <2 usable columns after cleaning.", file_path)
+            return
+
         if rel_type == "CO_OCCURS_IN_LITERATURE":
             df.rename(
-                columns={
-                    df.columns[0]: list(ast.literal_eval(df[df.columns[0]][0]).keys())[
-                        0
-                    ]
-                },
+                columns={df.columns[0]: list(ast.literal_eval(df.iloc[0, 0]).keys())[0]},
                 inplace=True,
             )
+
         source_column, destination_column = df.columns[:2]
         df = df.dropna(subset=[source_column, destination_column], how="any")
         if df.empty:
-            self.logger.error(
-                "The CSV file %s is empty or contains no valid data.", file_path
-            )
+            self.logger.error("CSV %s contains no valid rows after filtering.", file_path)
             return
-        if rel_type_column:
+
+        # Only drop NA on rel_type_column if present in this file
+        if rel_type_column and rel_type_column in df.columns:
+            before = len(df)
             df = df.dropna(subset=[rel_type_column])
+            if df.empty:
+                self.logger.warning(
+                    "No rows remain in %s after dropping NA on '%s' (started %d).",
+                    file_path, rel_type_column, before
+                )
+                return
+        else:
+            # If column was requested but not found, fall back to constant
+            if rel_type_column:
+                self.logger.warning(
+                    "Requested rel_type_column '%s' not found in %s. "
+                    "Falling back to constant rel_type '%s'.",
+                    rel_type_column, file_path, rel_type
+                )
+            rel_type_column = None
+
+        # (Optional) write a small preview for debugging
+        try:
+            df.head(50).to_csv("Data/test.csv", index=False)
+            self.logger.info("Wrote preview to Data/test.csv (first 50 rows).")
+        except Exception as e:
+            self.logger.debug("Could not write Data/test.csv: %s", e)
 
         for _, row in df.iterrows():
-            source = row[source_column]
-            destination = row[destination_column]
-            relationship_type = row[rel_type_column] if rel_type_column else rel_type
-            relationship_type = relationship_type.replace("/", "OR")
+            src_raw = row[source_column]
+            dst_raw = row[destination_column]
+            relationship_type = (row[rel_type_column] if rel_type_column else rel_type) or rel_type
+            relationship_type = str(relationship_type).replace("/", "OR")
+
             properties = self._process_properties(
                 row, source_column, destination_column, rel_type_column, standard_id
             )
 
             if rel_type == "IS_SIMILAR_TO":
-                targets = ast.literal_eval(row[destination_column])
+                targets = ast.literal_eval(dst_raw)
                 for target in targets:
-                    query = self._generate_query(
-                        source,
-                        target,
-                        relationship_type,
-                        properties,
-                        source_label,
-                        destination_label,
-                        standard_id,
-                        source_column,
-                        destination_column,
+                    yield self._generate_query(
+                        src_raw, target, relationship_type, properties,
+                        source_label, destination_label, standard_id,
+                        source_column, destination_column
                     )
-                    yield query
 
             elif rel_type == "CO_OCCURS_IN_LITERATURE":
-                source = ast.literal_eval(row[source_column])
-                destination = ast.literal_eval(row[destination_column])
-                if isinstance(source, dict):
-                    source = list(source.values())[0]
-                targets = ast.literal_eval(row[destination_column])
+                src = ast.literal_eval(src_raw)
+                if isinstance(src, dict):
+                    src = list(src.values())[0]
+                targets = ast.literal_eval(dst_raw)
                 if isinstance(targets, dict):
                     for target in targets.values():
-                        query = self._generate_query(
-                            source,
-                            target,
-                            relationship_type,
-                            properties,
-                            source_label,
-                            destination_label,
-                            standard_id,
-                            source_column,
-                            destination_column,
+                        yield self._generate_query(
+                            src, target, relationship_type, properties,
+                            source_label, destination_label, standard_id,
+                            source_column, destination_column
                         )
-                        yield query
 
             elif rel_type == "ENCODES":
-                source = int(row[source_column])
-                target = str(row[destination_column])
-                query = self._generate_query(
-                    source,
-                    target,
-                    relationship_type,
-                    properties,
-                    source_label,
-                    destination_label,
-                    standard_id,
-                    source_column,
-                    destination_column,
+                yield self._generate_query(
+                    str(src_raw), str(dst_raw), relationship_type, properties,
+                    source_label, destination_label, standard_id,
+                    source_column, destination_column
                 )
-                yield query
-
             else:
-                source = int(row[source_column])
-                target = int(row[destination_column])
-                query = self._generate_query(
-                    source,
-                    target,
-                    relationship_type,
-                    properties,
-                    source_label,
-                    destination_label,
-                    standard_id,
-                    source_column,
-                    destination_column,
+                # Keep as strings (safer key matching in Neo4j)
+                yield self._generate_query(
+                    str(src_raw), str(dst_raw), relationship_type, properties,
+                    source_label, destination_label, standard_id,
+                    source_column, destination_column
                 )
-                yield query
 
         self.logger.info("Cypher queries generated successfully.")
 
@@ -367,17 +374,18 @@ class AddGraphRelationships(Neo4jBase):
             A Cypher query string.
         """
         csv_files = glob.glob(directory)
-
         if not csv_files:
-            self.logger.error(
-                "The directory %s contains no valid CSV files.", directory
-            )
+            self.logger.error("The directory %s contains no valid CSV files.", directory)
             return []
 
         for csv_file in csv_files:
             self.logger.info("Processing file: %s", csv_file)
+
+            # Detect per-file relationship-type column (case-insensitive)
+            per_file_rel_col = self._detect_rel_type_col(csv_file, rel_type_column)
+
             for query in self.generate_cypher_queries_from_file(
-                csv_file, rel_type, source_label, destination_label, rel_type_column
+                csv_file, rel_type, source_label, destination_label, per_file_rel_col
             ):
                 yield query
 

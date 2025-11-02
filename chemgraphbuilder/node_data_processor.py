@@ -134,4 +134,4 @@ class NodeDataProcessor:
 
         df = pd.read_csv(output_file)
         df.rename(columns={"CID": "CompoundID", "Title": "CompoundName"}, inplace=True)
-        df.to_csv(f"{output_file.replace('.csv', '_Processed')}", index=False)
+        df.to_csv(f"{output_file.replace('.csv', '_Processed.csv')}", index=False)
