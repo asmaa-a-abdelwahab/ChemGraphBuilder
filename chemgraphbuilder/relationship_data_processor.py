@@ -218,11 +218,11 @@ class RelationshipDataProcessor:
         return row
 
     def process_files(self):
-        """
-        Processes the CSV files by filtering, cleaning, and augmenting data.
-
-        The processed data is saved to output files.
-        """
+        # REFRESH file list right before processing
+        self.csv_files = glob.glob(os.path.join(self.path, "AID_*.csv"))
+        if not self.csv_files:
+            logging.warning(f"No input files found in: {self.path}")
+            return
         self._filter_and_clean_data()
         logging.info("Data filtered, cleaned, and combined successfully.")
 

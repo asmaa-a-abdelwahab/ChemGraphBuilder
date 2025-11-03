@@ -359,7 +359,7 @@ class RelationshipPropertiesExtractor:
         df = df.drop_duplicates(keep="first", ignore_index=True)
         df = df.sort_values(["CID", "Target Accession"])
         df.dropna(axis=0, thresh=1, inplace=True)  ###
-        df.to_csv("Data/Relationships/Compound_Gene_Relationship.csv", index=False)
+        df.to_csv("Data/Relationships/Compound_Gene_Relationship/Compound_Gene_Relationship.csv", index=False)
         return df
 
     def fetch_similar_cids(self, cid):
