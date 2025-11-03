@@ -82,14 +82,17 @@ class AddGraphRelationships(Neo4jBase):
                 return lower_map[lc]
         return None
     @staticmethod
-    def _sanitize_rel_type(name: str, default: str = "RELATES_TO") -> str:
-        if not name:
-            return default
+    def _sanitize_rel_type(name: str) -> str:
+        """
+        Sanitizes a relationship type name by converting it to uppercase, replacing
+        non-alphanumeric characters with underscores, and stripping trailing underscores.
+        If the resulting string does not start with a letter or underscore, it
+        is prefixed with an underscore.
+        """
+        
         s = str(name).upper()
         s = re.sub(r"[^A-Z0-9_]", "_", s)
         s = re.sub(r"_+", "_", s).strip("_")
-        if not re.match(r"^[A-Z_]", s):
-            s = f"_{s}"
         return s
 
     @staticmethod
