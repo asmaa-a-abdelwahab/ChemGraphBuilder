@@ -53,6 +53,10 @@ class RelationshipDataProcessor:
             self.unique_column_names = self._load_columns_from_file(all_columns_file)
         else:
             self.unique_column_names = self._get_filtered_columns()
+            must_have = ["aid", "cid", "assay_name", "activity_outcome", "activity_name", "activity_direction"]
+            for col in must_have:
+                if col not in self.unique_column_names:
+                    self.unique_column_names.append(col)
             self._save_columns_to_file(all_columns_file, self.unique_column_names)
 
         # Ensure the 'activity' column is included
@@ -268,6 +272,14 @@ class RelationshipDataProcessor:
                     f"Processed batch {batch_index // batch_size + 1} of {total_files // batch_size + 1}"
                 )
 
+
+    def _ensure_required_cols(self, df: pd.DataFrame, cols: list[str]) -> pd.DataFrame:
+        for c in cols:
+            if c not in df.columns:
+                df[c] = pd.NA
+        return df
+
+
     def _process_file(self, file, unique_column_names, output_file, compound_gene_file):
         """
         Processes a single CSV file, applying filtering, cleaning, and adding data.
@@ -283,20 +295,30 @@ class RelationshipDataProcessor:
             df.columns = [col.replace(" ", "_").lower() for col in df.columns]
             df = df.dropna(subset=["cid"], how="any")
 
-            phenotype_cols = [col for col in df.columns if col.startswith("phenotype")]
-
             if isinstance(df, pd.Series):
                 df = df.to_frame().T  # Convert to DataFrame if a Series is encountered
             if df.columns.duplicated().any():
                 df = df.loc[:, ~df.columns.duplicated()]
                 logging.info("Duplicated columns removed from partition.")
             df = df.reindex(columns=unique_column_names, fill_value=pd.NA)
+            df = self._ensure_required_cols(
+                df,
+                ["aid", "cid", "assay_name", "activity_outcome", "activity_name", "activity_direction"]
+            )
             df = df.dropna(subset=["aid", "cid"], how="any")
+            
+            phenotype_cols = [c for c in df.columns if c.startswith("phenotype")]
 
-            if not df.empty:
+            if phenotype_cols:
                 df["measured_activity"] = df[phenotype_cols].apply(
                     lambda row: row.mode()[0] if not row.mode().empty else None, axis=1
                 )
+            else:
+                # No phenotype columns in this AID table → make this explicit
+                df["measured_activity"] = pd.NA
+
+
+            if not df.empty:
 
                 df = df.apply(self._add_all_data_connected_info, axis=1)
 
@@ -509,82 +531,51 @@ class RelationshipDataProcessor:
         }
 
         def determine_active_label(assay_name):
-            # Determine the appropriate label based on the first keyword found in the assay name
+            if not isinstance(assay_name, str):
+                return "Inhibitor/Inducer/Modulator"
             assay_name_lower = assay_name.lower()
-            first_keyword = None
-            first_position = len(assay_name_lower)
-
+            first_keyword, first_position = None, len(assay_name_lower)
             for keyword in all_keywords:
-                position = assay_name_lower.find(keyword)
-                if 0 <= position < first_position:
-                    first_keyword = keyword
-                    first_position = position
+                pos = assay_name_lower.find(keyword)
+                if 0 <= pos < first_position:
+                    first_keyword, first_position = keyword, pos
+            return keyword_to_label[first_keyword] if first_keyword else "Inhibitor/Inducer/Modulator"
 
-            if first_keyword:
-                return keyword_to_label[first_keyword]
-            return "Inhibitor/Inducer/Modulator"
+        # Ensure the column exists locally (extra safety)
+        for c in ["assay_name", "activity_outcome", "activity_name", "activity_direction"]:
+            if c not in merged_df.columns:
+                merged_df[c] = pd.NA
 
         merged_df["activity"] = None
 
-        # Assign the 'Inactive' label where the activity outcome is inactive
-        inactive_mask = merged_df["activity_outcome"] == "Inactive"
+        inactive_mask = merged_df["activity_outcome"].eq("Inactive")
         merged_df.loc[inactive_mask, "activity"] = "Inactive"
 
-        # Assign labels based on assay name keywords for active outcomes
-        active_mask = merged_df["activity_outcome"] == "Active"
+        active_mask = merged_df["activity_outcome"].eq("Active")
         if active_mask.any():
-            merged_df.loc[active_mask, "activity"] = merged_df.loc[
-                active_mask, "assay_name"
-            ].apply(determine_active_label)
+            merged_df.loc[active_mask, "activity"] = merged_df.loc[active_mask, "assay_name"].apply(determine_active_label)
+
             merged_df.loc[
-                active_mask
-                & merged_df["activity_name"].isin(["Km", "Drug metabolism"]),
+                active_mask & merged_df["activity_name"].isin(["Km", "Drug metabolism"]),
                 "activity",
             ] = "Substrate"
 
-            # Define the patterns with non-capturing groups
             substrate_pattern = r"(?:activity of.*oxidation)|(?:activity at cyp.*phenotyping)|(?:activity at human recombinant cyp.*formation)|(?:activity at recombinant cyp.*formation)"
-            ActIndMod_pattern = r"(?:effect on cyp)|(?:effect on human recombinant cyp)|(?:effect on recombinant cyp)|(?:effect on human cyp)"
+            act_ind_mod_pattern = r"(?:effect on cyp)|(?:effect on human recombinant cyp)|(?:effect on recombinant cyp)|(?:effect on human cyp)"
             inducer_pattern = r"(?:effect on cyp.*induction)|(?:induction of.*)"
 
-            merged_df.loc[
-                active_mask
-                & merged_df["assay_name"].str.contains(
-                    substrate_pattern, case=False, regex=True
-                ),
-                "activity",
-            ] = "Substrate"
-            merged_df.loc[
-                active_mask
-                & merged_df["assay_name"].str.contains(
-                    ActIndMod_pattern, case=False, regex=True
-                ),
-                "activity",
-            ] = "Inhibitor/Inducer/Modulator"
-            merged_df.loc[
-                active_mask
-                & merged_df["assay_name"].str.contains(
-                    inducer_pattern, case=False, regex=True
-                ),
-                "activity",
-            ] = "Inducer"
+            assay_name_series = merged_df["assay_name"].astype(str)
+            merged_df.loc[active_mask & assay_name_series.str.contains(substrate_pattern, case=False, regex=True), "activity"] = "Substrate"
+            merged_df.loc[active_mask & assay_name_series.str.contains(act_ind_mod_pattern, case=False, regex=True), "activity"] = "Inhibitor/Inducer/Modulator"
+            merged_df.loc[active_mask & assay_name_series.str.contains(inducer_pattern, case=False, regex=True), "activity"] = "Inducer"
 
-            merged_df.loc[
-                active_mask
-                & merged_df["activity_direction"].str.contains(
-                    "decreasing", case=False
-                ),
-                "activity",
-            ] = "Inhibitor"
-            merged_df.loc[
-                active_mask
-                & merged_df["activity_direction"].str.contains(
-                    "increasing", case=False
-                ),
-                "activity",
-            ] = "Activator"
-            merged_df.loc[active_mask & (merged_df["aid"] == 1215398), "activity"] = (
-                "Inactivator"
-            )
+            # Safe handling when 'activity_direction' is missing or NaN
+            dir_series = merged_df.get("activity_direction")
+            if dir_series is not None:
+                dir_str = dir_series.astype(str)
+                merged_df.loc[active_mask & dir_str.str.contains("decreasing", case=False, na=False), "activity"] = "Inhibitor"
+                merged_df.loc[active_mask & dir_str.str.contains("increasing", case=False, na=False), "activity"] = "Activator"
+
+            merged_df.loc[active_mask & (merged_df["aid"] == 1215398), "activity"] = "Inactivator"
 
         return merged_df

@@ -1,8 +1,0 @@
-beautifulsoup4
-matplotlib
-numpy
-pandas
-neo4j
-requests
-xmltodict
-dask
