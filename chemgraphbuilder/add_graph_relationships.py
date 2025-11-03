@@ -105,9 +105,9 @@ class AddGraphRelationships(Neo4jBase):
         label = (label or "").lower()
         if label in ("bioassay", "assay"):
             return ["AssayID", "AID", "aid"]
-        if label in ("compound",):
+        if label in ("compound","Compound"):
             return ["CompoundID", "CID", "cid"]
-        if label in ("gene",):
+        if label in ("gene","Gene"):
             return ["GeneID", "geneid", "Target GeneID", "target_geneid", "GeneSymbol", "genesymbol"]
         if label in ("protein",):
             return ["ProteinRefSeqAccession", "Target Accession", "target_accession"]
@@ -349,10 +349,6 @@ class AddGraphRelationships(Neo4jBase):
                 columns={df.columns[0]: list(ast.literal_eval(df.iloc[0, 0]).keys())[0]},
                 inplace=True,
             )
-        
-        # if rel_type == "Compound_Gene_CoOccurrence":
-        #     df = self._normalize_cpd_gene_cooccurrence(df)
-
 
         # after reading/cleaning df ...
         src_candidates = self._id_candidates_for_label(source_label)
