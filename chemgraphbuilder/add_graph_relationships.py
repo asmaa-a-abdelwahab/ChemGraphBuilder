@@ -7,6 +7,7 @@ and add them to a Neo4j database, including generating Cypher queries.
 
 import glob
 import ast
+import re
 import pandas as pd
 import numpy as np
 from chemgraphbuilder.neo4jdriver import Neo4jBase
@@ -80,6 +81,37 @@ class AddGraphRelationships(Neo4jBase):
             if lc in lower_map:
                 return lower_map[lc]
         return None
+    @staticmethod
+    def _sanitize_rel_type(name: str, default: str = "RELATES_TO") -> str:
+        if not name:
+            return default
+        s = str(name).upper()
+        s = re.sub(r"[^A-Z0-9_]", "_", s)
+        s = re.sub(r"_+", "_", s).strip("_")
+        if not re.match(r"^[A-Z_]", s):
+            s = f"_{s}"
+        return s
+
+    @staticmethod
+    def _pick_id_column(df: pd.DataFrame, candidates: list[str]) -> str | None:
+        cols_lower = {c.lower(): c for c in df.columns}
+        for cand in candidates:
+            if cand.lower() in cols_lower:
+                return cols_lower[cand.lower()]
+        return None
+
+    @staticmethod
+    def _id_candidates_for_label(label: str) -> list[str]:
+        label = (label or "").lower()
+        if label in ("bioassay", "assay"):
+            return ["AssayID", "AID", "aid"]
+        if label in ("compound",):
+            return ["CompoundID", "CID", "cid"]
+        if label in ("gene",):
+            return ["GeneID", "geneid", "Target GeneID", "target_geneid"]
+        if label in ("protein",):
+            return ["ProteinRefSeqAccession", "Target Accession", "target_accession"]
+        return ["AssayID", "AID", "CID", "GeneID", "geneid"]
 
 
     @staticmethod
@@ -268,7 +300,19 @@ class AddGraphRelationships(Neo4jBase):
                 inplace=True,
             )
 
-        source_column, destination_column = df.columns[:2]
+        # after reading/cleaning df ...
+        src_candidates = self._id_candidates_for_label(source_label)
+        dst_candidates = self._id_candidates_for_label(destination_label)
+
+        source_column = self._pick_id_column(df, src_candidates)
+        destination_column = self._pick_id_column(df, dst_candidates)
+
+        if not source_column or not destination_column:
+            self.logger.error("Could not detect ID columns ...")
+            return
+
+
+        # source_column, destination_column = df.columns[:2]
         df = df.dropna(subset=[source_column, destination_column], how="any")
         if df.empty:
             self.logger.error("CSV %s contains no valid rows after filtering.", file_path)
@@ -305,7 +349,8 @@ class AddGraphRelationships(Neo4jBase):
             src_raw = row[source_column]
             dst_raw = row[destination_column]
             relationship_type = (row[rel_type_column] if rel_type_column else rel_type) or rel_type
-            relationship_type = str(relationship_type).replace("/", "OR")
+            relationship_type = self._sanitize_rel_type(relationship_type)
+
 
             properties = self._process_properties(
                 row, source_column, destination_column, rel_type_column, standard_id
