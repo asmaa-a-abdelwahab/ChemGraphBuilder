@@ -331,7 +331,6 @@ class AddGraphRelationships(Neo4jBase):
             dtype=str,
             keep_default_na=True,
             na_values=["__nan__"],
-            low_memory=False,
             engine="python",           # tolerant to weird quoting/newlines
             on_bad_lines="skip",       # skip broken Evidence rows
             quotechar='"',
