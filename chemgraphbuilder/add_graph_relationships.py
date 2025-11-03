@@ -248,44 +248,67 @@ class AddGraphRelationships(Neo4jBase):
         self.logger.debug(f"Generated query: {query}")
         return query
 
-    def _normalize_cpd_gene_cooccurrence(self, df: pd.DataFrame) -> pd.DataFrame:
+    def _id_key_for_label(self, label: str) -> str:
         """
-        Expect columns: ID_1, ID_2, Evidence (all strings). Each ID_* is a dict-like string.
-        Returns a new DataFrame with columns: GeneSymbol, CID, evidence_json
+        Map a node label to the key we expect inside the ID_1/ID_2 dicts.
+        Only keys used by your co-occurrence files are handled here.
         """
+        l = (label or "").strip().lower()
+        if l in ("compound",):
+            return "CID"
+        if l in ("gene",):
+            return "GeneSymbol"
+        if l in ("bioassay", "assay"):
+            return "AID"
+        if l in ("protein",):
+            return "Target Accession"
+        # default fallback; unlikely used for co-occurrence
+        return "CID"
+
+
+    def _normalize_cooccurrence(self, df: pd.DataFrame, source_label: str, destination_label: str) -> tuple[pd.DataFrame, str, str]:
+        """
+        Normalize cpd–cpd and cpd–gene co-occurrence rows into a common, 2-column form:
+        <src_col>, <dst_col>, plus optional 'Evidence' if present.
+        - Assumes the raw file has columns ID_1, ID_2 (each a dict-like string).
+        - Picks values by the expected keys inferred from node labels.
+        Returns: (normalized_df, src_col_name, dst_col_name)
+        """
+        # Make sure we have the columns we need
+        if "ID_1" not in df.columns or "ID_2" not in df.columns:
+            # Return an empty normalized frame with inferred column names
+            src_key = self._id_key_for_label(source_label)
+            dst_key = self._id_key_for_label(destination_label)
+            return pd.DataFrame(columns=[src_key, dst_key, "Evidence"]), src_key, dst_key
+
         def to_dict(x):
             try:
                 return ast.literal_eval(x) if isinstance(x, str) else {}
             except Exception:
                 return {}
 
-        id1 = df.get("ID_1")
-        id2 = df.get("ID_2")
+        src_key = self._id_key_for_label(source_label)       # e.g., "CID" or "GeneSymbol"
+        dst_key = self._id_key_for_label(destination_label)  # e.g., "CID"
 
-        if id1 is None or id2 is None:
-            return pd.DataFrame(columns=["GeneSymbol", "CID", "evidence_json"])
+        d1 = df["ID_1"].apply(to_dict)
+        d2 = df["ID_2"].apply(to_dict)
 
-        d1 = id1.apply(to_dict)
-        d2 = id2.apply(to_dict)
-
-        # Some rows might have swapped order; prefer explicit keys
-        genesym = d1.apply(lambda d: d.get("GeneSymbol")) \
-            .fillna(d2.apply(lambda d: d.get("GeneSymbol")))
-        cid = d2.apply(lambda d: d.get("CID")) \
-            .fillna(d1.apply(lambda d: d.get("CID")))
+        # Extract, allowing the pair to be in either ID_1 or ID_2
+        src_vals = d1.apply(lambda d: d.get(src_key)).fillna(d2.apply(lambda d: d.get(src_key)))
+        dst_vals = d2.apply(lambda d: d.get(dst_key)).fillna(d1.apply(lambda d: d.get(dst_key)))
 
         out = pd.DataFrame({
-            "GeneSymbol": genesym,
-            "CID": cid,
-            "evidence_json": df.get("Evidence")
+            src_key: src_vals.astype(str),
+            dst_key: dst_vals.astype(str),
         })
 
-        # Drop rows missing either side
-        out = out.dropna(subset=["GeneSymbol", "CID"])
-        # Ensure CID is string (your MATCH uses string keys)
-        out["CID"] = out["CID"].astype(str)
-        out["GeneSymbol"] = out["GeneSymbol"].astype(str)
-        return out
+        if "Evidence" in df.columns:
+            out["Evidence"] = df["Evidence"]
+
+        # Drop incomplete rows
+        out = out.dropna(subset=[src_key, dst_key], how="any")
+
+        return out, src_key, dst_key
 
 
     def generate_cypher_queries_from_file(
@@ -344,29 +367,31 @@ class AddGraphRelationships(Neo4jBase):
             self.logger.error("CSV %s has <2 usable columns after cleaning.", file_path)
             return
 
+        # --- NEW unified branch for CO_OCCURS_IN_LITERATURE ---
         if rel_type == "CO_OCCURS_IN_LITERATURE":
-            df.rename(
-                columns={df.columns[0]: list(ast.literal_eval(df.iloc[0, 0]).keys())[0]},
-                inplace=True,
-            )
+            # Normalize (works for both CID↔CID and GeneSymbol↔CID)
+            df, source_column, destination_column = self._normalize_cooccurrence(df, source_label, destination_label)
 
-        # after reading/cleaning df ...
-        src_candidates = self._id_candidates_for_label(source_label)
-        dst_candidates = self._id_candidates_for_label(destination_label)
+            if df.empty:
+                self.logger.error("CSV %s contains no valid co-occurrence rows after normalization.", file_path)
+                return
 
-        source_column = self._pick_id_column(df, src_candidates)
-        destination_column = self._pick_id_column(df, dst_candidates)
+        else:
+            src_candidates = self._id_candidates_for_label(source_label)
+            dst_candidates = self._id_candidates_for_label(destination_label)
 
-        if not source_column or not destination_column:
-            self.logger.error("Could not detect ID columns ...")
-            return
+            source_column = self._pick_id_column(df, src_candidates)
+            destination_column = self._pick_id_column(df, dst_candidates)
 
+            if not source_column or not destination_column:
+                self.logger.error("Could not detect ID columns for %s → %s in %s", source_label, destination_label, file_path)
+                return
 
-        # source_column, destination_column = df.columns[:2]
-        df = df.dropna(subset=[source_column, destination_column], how="any")
-        if df.empty:
-            self.logger.error("CSV %s contains no valid rows after filtering.", file_path)
-            return
+            df = df.dropna(subset=[source_column, destination_column], how="any")
+            if df.empty:
+                self.logger.error("CSV %s contains no valid rows after filtering.", file_path)
+                return
+
 
         # Only drop NA on rel_type_column if present in this file
         if rel_type_column and rel_type_column in df.columns:
@@ -414,19 +439,6 @@ class AddGraphRelationships(Neo4jBase):
                         source_label, destination_label, standard_id,
                         source_column, destination_column
                     )
-
-            elif rel_type == "CO_OCCURS_IN_LITERATURE":
-                src = ast.literal_eval(src_raw)
-                if isinstance(src, dict):
-                    src = list(src.values())[0]
-                targets = ast.literal_eval(dst_raw)
-                if isinstance(targets, dict):
-                    for target in targets.values():
-                        yield self._generate_query(
-                            src, target, relationship_type, properties,
-                            source_label, destination_label, standard_id,
-                            source_column, destination_column
-                        )
 
             elif rel_type == "ENCODES":
                 yield self._generate_query(
