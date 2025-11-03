@@ -350,8 +350,8 @@ class AddGraphRelationships(Neo4jBase):
                 inplace=True,
             )
         
-        if rel_type == "Compound_Gene_CoOccurrence":
-            df = self._normalize_cpd_gene_cooccurrence(df)
+        # if rel_type == "Compound_Gene_CoOccurrence":
+        #     df = self._normalize_cpd_gene_cooccurrence(df)
 
 
         # after reading/cleaning df ...
