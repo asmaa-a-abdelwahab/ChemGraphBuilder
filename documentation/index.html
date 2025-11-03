@@ -1521,15 +1521,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#chemgraphbuilder.relationship_data_processor.RelationshipDataProcessor.process_files" class="md-nav__link">
-    <span class="md-ellipsis">
-      process_files
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#chemgraphbuilder.relationship_data_processor.RelationshipDataProcessor.propagate_phenotype" class="md-nav__link">
     <span class="md-ellipsis">
       propagate_phenotype
@@ -2465,15 +2456,6 @@
   <a href="#chemgraphbuilder.relationship_data_processor.RelationshipDataProcessor.most_frequent" class="md-nav__link">
     <span class="md-ellipsis">
       most_frequent
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#chemgraphbuilder.relationship_data_processor.RelationshipDataProcessor.process_files" class="md-nav__link">
-    <span class="md-ellipsis">
-      process_files
     </span>
   </a>
   
@@ -11354,7 +11336,7 @@ assays and saves the data to CSV files.</p>
         <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">(</span><span class="n">keep</span><span class="o">=</span><span class="s2">&quot;first&quot;</span><span class="p">,</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">sort_values</span><span class="p">([</span><span class="s2">&quot;CID&quot;</span><span class="p">,</span> <span class="s2">&quot;Target Accession&quot;</span><span class="p">])</span>
         <span class="n">df</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">thresh</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>  <span class="c1">###</span>
-        <span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="s2">&quot;Data/Relationships/Compound_Gene_Relationship.csv&quot;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="s2">&quot;Data/Relationships/Compound_Gene_Relationship/Compound_Gene_Relationship.csv&quot;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">df</span>
 
     <span class="k">def</span> <span class="nf">fetch_similar_cids</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cid</span><span class="p">):</span>
@@ -12833,7 +12815,7 @@ facilitating easy access and integration.</li>
     <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">(</span><span class="n">keep</span><span class="o">=</span><span class="s2">&quot;first&quot;</span><span class="p">,</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">sort_values</span><span class="p">([</span><span class="s2">&quot;CID&quot;</span><span class="p">,</span> <span class="s2">&quot;Target Accession&quot;</span><span class="p">])</span>
     <span class="n">df</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">thresh</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>  <span class="c1">###</span>
-    <span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="s2">&quot;Data/Relationships/Compound_Gene_Relationship.csv&quot;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="s2">&quot;Data/Relationships/Compound_Gene_Relationship/Compound_Gene_Relationship.csv&quot;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">df</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -15335,11 +15317,11 @@ for individual CIDs.</li>
         <span class="k">return</span> <span class="n">row</span>
 
     <span class="k">def</span> <span class="nf">process_files</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Processes the CSV files by filtering, cleaning, and augmenting data.</span>
-
-<span class="sd">        The processed data is saved to output files.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># REFRESH file list right before processing</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">csv_files</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;AID_*.csv&quot;</span><span class="p">))</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">csv_files</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No input files found in: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_filter_and_clean_data</span><span class="p">()</span>
         <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Data filtered, cleaned, and combined successfully.&quot;</span><span class="p">)</span>
 
@@ -15960,44 +15942,6 @@ for individual CIDs.</li>
     <span class="n">values</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
     <span class="n">string_values</span> <span class="o">=</span> <span class="n">values</span><span class="p">[</span><span class="n">values</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">str</span><span class="p">))]</span>
     <span class="k">return</span> <span class="n">string_values</span><span class="o">.</span><span class="n">mode</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">string_values</span><span class="o">.</span><span class="n">empty</span> <span class="k">else</span> <span class="kc">None</span>
-</code></pre></div></td></tr></table></div>
-            </details>
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h3 id="chemgraphbuilder.relationship_data_processor.RelationshipDataProcessor.process_files" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">process_files</span><span class="p">()</span></code>
-
-</h3>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Processes the CSV files by filtering, cleaning, and augmenting data.</p>
-<p>The processed data is saved to output files.</p>
-
-
-            <details class="quote">
-              <summary>Source code in <code>chemgraphbuilder\relationship_data_processor.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">220</span>
-<span class="normal">221</span>
-<span class="normal">222</span>
-<span class="normal">223</span>
-<span class="normal">224</span>
-<span class="normal">225</span>
-<span class="normal">226</span>
-<span class="normal">227</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">process_files</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Processes the CSV files by filtering, cleaning, and augmenting data.</span>
-
-<span class="sd">    The processed data is saved to output files.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">_filter_and_clean_data</span><span class="p">()</span>
-    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Data filtered, cleaned, and combined successfully.&quot;</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
