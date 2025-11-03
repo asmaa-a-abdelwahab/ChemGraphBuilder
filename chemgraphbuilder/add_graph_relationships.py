@@ -108,7 +108,7 @@ class AddGraphRelationships(Neo4jBase):
         if label in ("compound",):
             return ["CompoundID", "CID", "cid"]
         if label in ("gene",):
-            return ["GeneID", "geneid", "Target GeneID", "target_geneid"]
+            return ["GeneID", "geneid", "Target GeneID", "target_geneid", "GeneSymbol", "genesymbol"]
         if label in ("protein",):
             return ["ProteinRefSeqAccession", "Target Accession", "target_accession"]
         return ["AssayID", "AID", "CID", "GeneID", "geneid"]
@@ -248,6 +248,46 @@ class AddGraphRelationships(Neo4jBase):
         self.logger.debug(f"Generated query: {query}")
         return query
 
+    def _normalize_cpd_gene_cooccurrence(self, df: pd.DataFrame) -> pd.DataFrame:
+        """
+        Expect columns: ID_1, ID_2, Evidence (all strings). Each ID_* is a dict-like string.
+        Returns a new DataFrame with columns: GeneSymbol, CID, evidence_json
+        """
+        def to_dict(x):
+            try:
+                return ast.literal_eval(x) if isinstance(x, str) else {}
+            except Exception:
+                return {}
+
+        id1 = df.get("ID_1")
+        id2 = df.get("ID_2")
+
+        if id1 is None or id2 is None:
+            return pd.DataFrame(columns=["GeneSymbol", "CID", "evidence_json"])
+
+        d1 = id1.apply(to_dict)
+        d2 = id2.apply(to_dict)
+
+        # Some rows might have swapped order; prefer explicit keys
+        genesym = d1.apply(lambda d: d.get("GeneSymbol")) \
+            .fillna(d2.apply(lambda d: d.get("GeneSymbol")))
+        cid = d2.apply(lambda d: d.get("CID")) \
+            .fillna(d1.apply(lambda d: d.get("CID")))
+
+        out = pd.DataFrame({
+            "GeneSymbol": genesym,
+            "CID": cid,
+            "evidence_json": df.get("Evidence")
+        })
+
+        # Drop rows missing either side
+        out = out.dropna(subset=["GeneSymbol", "CID"])
+        # Ensure CID is string (your MATCH uses string keys)
+        out["CID"] = out["CID"].astype(str)
+        out["GeneSymbol"] = out["GeneSymbol"].astype(str)
+        return out
+
+
     def generate_cypher_queries_from_file(
         self, file_path, rel_type, source_label, destination_label, rel_type_column=None
     ):
@@ -279,14 +319,25 @@ class AddGraphRelationships(Neo4jBase):
             "substratecid": "CompoundID", "metabolitecid": "CompoundID",
             "Compound ID": "CompoundID", "CompoundID": "CompoundID", "CID": "CompoundID",
             "Similar CIDs": "CompoundID", "Target Accession": "ProteinRefSeqAccession",
-            "geneid": "GeneID", "target_geneid": "GeneID", "cid": "CompoundID",
+            "geneid": "GeneID", "target_geneid": "GeneID", "cid": "CompoundID",     "GeneSymbol": "GeneSymbol",
+            "genesymbol": "GeneSymbol", "CID": "CompoundID", "cid": "CompoundID",
+            "LinkID": "CompoundID", "linkid": "CompoundID", "ID": "CompoundID"
         }
         self.logger.info(f"Reading data from CSV file: {file_path}")
 
         # Read as strings to avoid dtype surprises; treat "__nan__" as NA
         df = pd.read_csv(
-            file_path, dtype=str, keep_default_na=True, na_values=["__nan__"], low_memory=False
+            file_path,
+            dtype=str,
+            keep_default_na=True,
+            na_values=["__nan__"],
+            low_memory=False,
+            engine="python",           # tolerant to weird quoting/newlines
+            on_bad_lines="skip",       # skip broken Evidence rows
+            quotechar='"',
+            escapechar='\\'
         )
+
         df.columns = self._normalize_headers(df.columns.tolist())
         df = df.dropna(axis=1, how="all")
 
@@ -299,6 +350,10 @@ class AddGraphRelationships(Neo4jBase):
                 columns={df.columns[0]: list(ast.literal_eval(df.iloc[0, 0]).keys())[0]},
                 inplace=True,
             )
+        
+        if rel_type == "Compound_Gene_CoOccurrence":
+            df = self._normalize_cpd_gene_cooccurrence(df)
+
 
         # after reading/cleaning df ...
         src_candidates = self._id_candidates_for_label(source_label)
