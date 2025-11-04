@@ -531,15 +531,20 @@ class RelationshipDataProcessor:
         }
 
         def determine_active_label(assay_name):
-            if not isinstance(assay_name, str):
-                return "Inhibitor/Inducer/Modulator"
+            # Determine the appropriate label based on the first keyword found in the assay name
             assay_name_lower = assay_name.lower()
-            first_keyword, first_position = None, len(assay_name_lower)
+            first_keyword = None
+            first_position = len(assay_name_lower)
+
             for keyword in all_keywords:
-                pos = assay_name_lower.find(keyword)
-                if 0 <= pos < first_position:
-                    first_keyword, first_position = keyword, pos
-            return keyword_to_label[first_keyword] if first_keyword else "Inhibitor/Inducer/Modulator"
+                position = assay_name_lower.find(keyword)
+                if 0 <= position < first_position:
+                    first_keyword = keyword
+                    first_position = position
+
+            if first_keyword:
+                return keyword_to_label[first_keyword]
+            return "Inhibitor/Inducer/Modulator"
 
         # Ensure the column exists locally (extra safety)
         for c in ["assay_name", "activity_outcome", "activity_name", "activity_direction"]:
@@ -564,11 +569,28 @@ class RelationshipDataProcessor:
             act_ind_mod_pattern = r"(?:effect on cyp)|(?:effect on human recombinant cyp)|(?:effect on recombinant cyp)|(?:effect on human cyp)"
             inducer_pattern = r"(?:effect on cyp.*induction)|(?:induction of.*)"
 
-            assay_name_series = merged_df["assay_name"].astype(str)
-            merged_df.loc[active_mask & assay_name_series.str.contains(substrate_pattern, case=False, regex=True), "activity"] = "Substrate"
-            merged_df.loc[active_mask & assay_name_series.str.contains(act_ind_mod_pattern, case=False, regex=True), "activity"] = "Inhibitor/Inducer/Modulator"
-            merged_df.loc[active_mask & assay_name_series.str.contains(inducer_pattern, case=False, regex=True), "activity"] = "Inducer"
-
+            merged_df.loc[
+                active_mask
+                & merged_df["assay_name"].str.contains(
+                    substrate_pattern, case=False, regex=True
+                ),
+                "activity",
+            ] = "Substrate"
+            merged_df.loc[
+                active_mask
+                & merged_df["assay_name"].str.contains(
+                    act_ind_mod_pattern, case=False, regex=True
+                ),
+                "activity",
+            ] = "Inhibitor/Inducer/Modulator"
+            merged_df.loc[
+                active_mask
+                & merged_df["assay_name"].str.contains(
+                    inducer_pattern, case=False, regex=True
+                ),
+                "activity",
+            ] = "Inducer"
+            
             # Safe handling when 'activity_direction' is missing or NaN
             dir_series = merged_df.get("activity_direction")
             if dir_series is not None:

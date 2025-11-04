@@ -81,19 +81,19 @@ class AddGraphRelationships(Neo4jBase):
             if lc in lower_map:
                 return lower_map[lc]
         return None
-    @staticmethod
-    def _sanitize_rel_type(name: str) -> str:
-        """
-        Sanitizes a relationship type name by converting it to uppercase, replacing
-        non-alphanumeric characters with underscores, and stripping trailing underscores.
-        If the resulting string does not start with a letter or underscore, it
-        is prefixed with an underscore.
-        """
+    # @staticmethod
+    # def _sanitize_rel_type(name: str) -> str:
+    #     """
+    #     Sanitizes a relationship type name by converting it to uppercase, replacing
+    #     non-alphanumeric characters with underscores, and stripping trailing underscores.
+    #     If the resulting string does not start with a letter or underscore, it
+    #     is prefixed with an underscore.
+    #     """
         
-        s = str(name).upper()
-        s = re.sub(r"[^A-Z0-9_]", "_", s)
-        s = re.sub(r"_+", "_", s).strip("_")
-        return s
+    #     s = str(name).upper()
+    #     s = re.sub(r"[^A-Z0-9_]", "_", s)
+    #     s = re.sub(r"_+", "_", s).strip("_")
+    #     return s
 
     @staticmethod
     def _pick_id_column(df: pd.DataFrame, candidates: list[str]) -> str | None:
@@ -427,7 +427,7 @@ class AddGraphRelationships(Neo4jBase):
             src_raw = row[source_column]
             dst_raw = row[destination_column]
             relationship_type = (row[rel_type_column] if rel_type_column else rel_type) or rel_type
-            relationship_type = self._sanitize_rel_type(relationship_type)
+            relationship_type = str(relationship_type).replace("/", "OR")
 
 
             properties = self._process_properties(
