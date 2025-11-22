@@ -179,6 +179,27 @@ class AddGraphRelationships(Neo4jBase):
         properties = {f"`{k}`": v for k, v in properties.items()}  ##last_edit
         return properties
 
+    def _generate_id_literal(self, value):
+        """
+        Generate a Cypher literal for an ID field.
+        - Always returns a quoted string: '12345'
+        - Normalizes values like '1607229.0' -> '1607229'
+        """
+        s = str(value).strip()
+
+        # If it looks like an integer with .0 (e.g., "1607229.0"), strip the .0 part
+        # "123.0" -> "123", "123.000" -> "123"
+        if re.fullmatch(r"\d+\.0+", s):
+            s = s.split(".", 1)[0]
+
+        escaped_value = (
+            s.replace("\\", "\\\\")
+             .replace("'", "\\'")
+             .replace('"', '\\"')
+             .replace("\n", "\\\n")
+        )
+        return f"'{escaped_value}'"
+
     def _generate_query(
         self,
         source,
@@ -220,8 +241,10 @@ class AddGraphRelationships(Neo4jBase):
         str
             A Cypher query string.
         """
-        source_value = self._generate_property_string(source)
-        target_value = self._generate_property_string(target)
+        # ✅ Use ID-specific literal generator
+        source_value = self._generate_id_literal(source)
+        target_value = self._generate_id_literal(target)
+
         source_key = (
             standard_id[source_column]
             if source_column in standard_id
@@ -233,16 +256,17 @@ class AddGraphRelationships(Neo4jBase):
             else destination_column
         )
 
+        # (you can also keep the two-MATCH version from before to avoid the cartesian warning)
         query = (
-            f"MATCH (a:{source_label} {{{source_key}: {source_value}}}), "
-            f"(b:{destination_label} {{{destination_key}: {target_value}}}) "
+            f"MATCH (a:{source_label} {{{source_key}: {source_value}}})\n"
+            f"MATCH (b:{destination_label} {{{destination_key}: {target_value}}})\n"
             f"MERGE (a)-[r:{relationship_type}]->(b)"
         )
 
         if properties:
             set_clauses = [
-                f"r.{prop.replace(' ', '').replace('[', '_').replace(']', '_')}"
-                f"= {self._generate_property_string(value)}"
+                f"r.{prop.replace(' ', '').replace('[', '_').replace(']', '_')}="
+                f"{self._generate_property_string(value)}"
                 for prop, value in properties.items()
             ]
             if set_clauses:
@@ -313,6 +337,43 @@ class AddGraphRelationships(Neo4jBase):
 
         return out, src_key, dst_key
 
+    def _parse_listish(self, value):
+        """
+        Return a list of string targets from a variety of formats:
+        - "[123, 456]" or "['123','456']"  -> ["123","456"]
+        - "123,456" or "123 ; 456"         -> ["123","456"]
+        - "12345" (scalar)                 -> ["12345"]
+        - NaN / empty                      -> []
+        """
+        if value is None or (isinstance(value, float) and np.isnan(value)):
+            return []
+
+        # Work with strings thereafter
+        s = str(value).strip()
+        if not s or s.lower() in {"nan", "none"}:
+            return []
+
+        # Looks like a Python/JSON list?
+        if (s.startswith("[") and s.endswith("]")) or (s.startswith("(") and s.endswith(")")):
+            try:
+                v = ast.literal_eval(s)
+                if isinstance(v, (list, tuple, set)):
+                    return [str(x).strip() for x in v if str(x).strip()]
+                # If it’s a scalar inside the brackets for some reason
+                return [str(v)]
+            except Exception:
+                pass  # fall through to split heuristics
+
+        # Comma/semicolon separated?
+        if ("," in s) or (";" in s) or ("|" in s):
+            # Normalize multiple separators
+            for sep in [";", "|"]:
+                s = s.replace(sep, ",")
+            return [t.strip() for t in s.split(",") if t.strip()]
+
+        # Otherwise treat as single value
+        return [s]
+
 
     def generate_cypher_queries_from_file(
         self, file_path, rel_type, source_label, destination_label, rel_type_column=None
@@ -380,20 +441,51 @@ class AddGraphRelationships(Neo4jBase):
                 return
 
         else:
-            src_candidates = self._id_candidates_for_label(source_label)
-            dst_candidates = self._id_candidates_for_label(destination_label)
+            # --- SPECIAL CASE for similarity relationship ---
+            if rel_type in {"IS_SIMILAR_TO", "Compound_Similarity", "COMPOUND_SIMILARITY"}:
+                # Source: a single CID; Destination: list of similar CIDs
+                # Prefer canonical list column names when present
+                list_col_candidates = ["Similar CIDs", "Similar_CIDs", "similar_cids", "similarCIDs", "similar_ids"]
+                src_candidates = ["CID", "cid", "CompoundID", "Compound ID", "LinkID", "ID"]
+                source_column = self._pick_id_column(df, src_candidates)
 
-            source_column = self._pick_id_column(df, src_candidates)
-            destination_column = self._pick_id_column(df, dst_candidates)
+                # Find the first existing list column
+                destination_column = None
+                for cand in list_col_candidates:
+                    if cand in df.columns:
+                        destination_column = cand
+                        break
 
-            if not source_column or not destination_column:
-                self.logger.error("Could not detect ID columns for %s → %s in %s", source_label, destination_label, file_path)
-                return
+                if not source_column or not destination_column:
+                    self.logger.error(
+                        "Similarity loader: could not find required columns in %s "
+                        "(source one of %s, destination one of %s).",
+                        file_path, src_candidates, list_col_candidates
+                    )
+                    return
 
-            df = df.dropna(subset=[source_column, destination_column], how="any")
-            if df.empty:
-                self.logger.error("CSV %s contains no valid rows after filtering.", file_path)
-                return
+                df = df.dropna(subset=[source_column], how="any")
+                if df.empty:
+                    self.logger.error("CSV %s contains no valid rows after filtering (source).", file_path)
+                    return
+
+            else:
+                # Generic path
+                src_candidates = self._id_candidates_for_label(source_label)
+                dst_candidates = self._id_candidates_for_label(destination_label)
+
+                source_column = self._pick_id_column(df, src_candidates)
+                destination_column = self._pick_id_column(df, dst_candidates)
+
+                if not source_column or not destination_column:
+                    self.logger.error("Could not detect ID columns for %s → %s in %s", source_label, destination_label, file_path)
+                    return
+
+                df = df.dropna(subset=[source_column, destination_column], how="any")
+                if df.empty:
+                    self.logger.error("CSV %s contains no valid rows after filtering.", file_path)
+                    return
+
 
 
         # Only drop NA on rel_type_column if present in this file
@@ -416,12 +508,12 @@ class AddGraphRelationships(Neo4jBase):
                 )
             rel_type_column = None
 
-        # (Optional) write a small preview for debugging
-        try:
-            df.head(50).to_csv("Data/test.csv", index=False)
-            self.logger.info("Wrote preview to Data/test.csv (first 50 rows).")
-        except Exception as e:
-            self.logger.debug("Could not write Data/test.csv: %s", e)
+        # # (Optional) write a small preview for debugging
+        # try:
+        #     df.head(50).to_csv("Data/test.csv", index=False)
+        #     self.logger.info("Wrote preview to Data/test.csv (first 50 rows).")
+        # except Exception as e:
+        #     self.logger.debug("Could not write Data/test.csv: %s", e)
 
         for _, row in df.iterrows():
             src_raw = row[source_column]
@@ -435,10 +527,15 @@ class AddGraphRelationships(Neo4jBase):
             )
 
             if rel_type == "IS_SIMILAR_TO":
-                targets = ast.literal_eval(dst_raw)
+                targets = self._parse_listish(row.get(destination_column))
+                if not targets:
+                    continue
                 for target in targets:
+                    # skip degenerate self-links early (we also have a cleanup method)
+                    if str(target) == str(src_raw):
+                        continue
                     yield self._generate_query(
-                        src_raw, target, relationship_type, properties,
+                        str(src_raw), str(target), relationship_type, properties,
                         source_label, destination_label, standard_id,
                         source_column, destination_column
                     )

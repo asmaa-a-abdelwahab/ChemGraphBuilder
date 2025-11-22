@@ -648,7 +648,7 @@ class RelationshipPropertiesExtractor:
         logging.info(f"Unique Compound IDs to process: {len(compound_ids)}")
 
         for compound_id in compound_ids:
-            logging.info(f"Processing Compound ID {int(compound_id)}")
+            # logging.info(f"Processing Compound ID {int(compound_id)}")
             try:
                 data = self._fetch_chemical_neighbor_data(int(compound_id))
                 filename = f"Data/Relationships/Cpd_Cpd_CoOccurrence/CID_{int(compound_id)}.csv"
@@ -690,7 +690,7 @@ class RelationshipPropertiesExtractor:
         logging.info(f"Unique Gene Symbols to process: {len(gene_symbols)}")
 
         for gene_symbol in gene_symbols:
-            logging.info(f"Processing Gene Symbol {gene_symbol}")
+            # logging.info(f"Processing Gene Symbol {gene_symbol}")
             try:
                 data = self._fetch_chemical_gene_data(gene_symbol)
                 filename = f"Data/Relationships/Cpd_Gene_CoOccurrence/Cpd_Gene_CoOccurrence_{gene_symbol}.csv"
@@ -732,7 +732,7 @@ class RelationshipPropertiesExtractor:
         logging.info(f"Unique Gene Symbols to process: {len(gene_symbols)}")
 
         for gene_symbol in gene_symbols:
-            logging.info(f"Processing Gene Symbol {gene_symbol}")
+            # logging.info(f"Processing Gene Symbol {gene_symbol}")
             try:
                 data = self._fetch_chemical_gene_interaction_data(int(gene_symbol))
                 filename = f"Data/Relationships/Compound_Gene_Relationship/Compound_Gene_Interaction_Outside_PubChem_{int(gene_symbol)}.csv"
