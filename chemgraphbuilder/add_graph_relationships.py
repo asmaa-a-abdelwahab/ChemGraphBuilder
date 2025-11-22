@@ -179,27 +179,6 @@ class AddGraphRelationships(Neo4jBase):
         properties = {f"`{k}`": v for k, v in properties.items()}  ##last_edit
         return properties
 
-    def _generate_id_literal(self, value):
-        """
-        Generate a Cypher literal for an ID field.
-        - Always returns a quoted string: '12345'
-        - Normalizes values like '1607229.0' -> '1607229'
-        """
-        s = str(value).strip()
-
-        # If it looks like an integer with .0 (e.g., "1607229.0"), strip the .0 part
-        # "123.0" -> "123", "123.000" -> "123"
-        if re.fullmatch(r"\d+\.0+", s):
-            s = s.split(".", 1)[0]
-
-        escaped_value = (
-            s.replace("\\", "\\\\")
-             .replace("'", "\\'")
-             .replace('"', '\\"')
-             .replace("\n", "\\\n")
-        )
-        return f"'{escaped_value}'"
-
     def _generate_query(
         self,
         source,
@@ -241,10 +220,8 @@ class AddGraphRelationships(Neo4jBase):
         str
             A Cypher query string.
         """
-        # ✅ Use ID-specific literal generator
-        source_value = self._generate_id_literal(source)
-        target_value = self._generate_id_literal(target)
-
+        source_value = self._generate_property_string(source)
+        target_value = self._generate_property_string(target)
         source_key = (
             standard_id[source_column]
             if source_column in standard_id
@@ -256,7 +233,7 @@ class AddGraphRelationships(Neo4jBase):
             else destination_column
         )
 
-        # (you can also keep the two-MATCH version from before to avoid the cartesian warning)
+        # ✅ Use two MATCH clauses → no Cartesian product warning
         query = (
             f"MATCH (a:{source_label} {{{source_key}: {source_value}}})\n"
             f"MATCH (b:{destination_label} {{{destination_key}: {target_value}}})\n"
@@ -272,7 +249,7 @@ class AddGraphRelationships(Neo4jBase):
             if set_clauses:
                 query += " SET " + ", ".join(set_clauses)
 
-        self.logger.debug(f"Generated query: {query}")
+        self.logger.debug("Generated query: %s", query)
         return query
 
     def _id_key_for_label(self, label: str) -> str:
