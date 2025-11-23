@@ -278,12 +278,10 @@ class AddGraphRelationships(Neo4jBase):
         - Picks values by the expected keys inferred from node labels.
         Returns: (normalized_df, src_col_name, dst_col_name)
         """
-        # Make sure we have the columns we need
         if "ID_1" not in df.columns or "ID_2" not in df.columns:
-            # Return an empty normalized frame with inferred column names
             src_key = self._id_key_for_label(source_label)
             dst_key = self._id_key_for_label(destination_label)
-            return pd.DataFrame(columns=[src_key, dst_key, "Evidence"]), src_key, dst_key
+            return pd.DataFrame(columns=[src_key + "_src", dst_key + "_dst", "Evidence"]), src_key + "_src", dst_key + "_dst"
 
         def to_dict(x):
             try:
@@ -291,28 +289,30 @@ class AddGraphRelationships(Neo4jBase):
             except Exception:
                 return {}
 
-        src_key = self._id_key_for_label(source_label)       # e.g., "CID" or "GeneSymbol"
-        dst_key = self._id_key_for_label(destination_label)  # e.g., "CID"
+        src_key = self._id_key_for_label(source_label)      # "CID" or "GeneSymbol"
+        dst_key = self._id_key_for_label(destination_label) # "CID" or "GeneSymbol"
 
         d1 = df["ID_1"].apply(to_dict)
         d2 = df["ID_2"].apply(to_dict)
 
-        # Extract, allowing the pair to be in either ID_1 or ID_2
         src_vals = d1.apply(lambda d: d.get(src_key)).fillna(d2.apply(lambda d: d.get(src_key)))
         dst_vals = d2.apply(lambda d: d.get(dst_key)).fillna(d1.apply(lambda d: d.get(dst_key)))
 
+        src_col = f"{src_key}_src"
+        dst_col = f"{dst_key}_dst"
+
         out = pd.DataFrame({
-            src_key: src_vals.astype(str),
-            dst_key: dst_vals.astype(str),
+            src_col: src_vals.astype(str),
+            dst_col: dst_vals.astype(str),
         })
 
         if "Evidence" in df.columns:
             out["Evidence"] = df["Evidence"]
 
-        # Drop incomplete rows
-        out = out.dropna(subset=[src_key, dst_key], how="any")
+        out = out.dropna(subset=[src_col, dst_col], how="any")
 
-        return out, src_key, dst_key
+        return out, src_col, dst_col
+
 
     def _parse_listish(self, value):
         """
@@ -385,9 +385,15 @@ class AddGraphRelationships(Neo4jBase):
             "Similar CIDs": "CompoundID", "Target Accession": "ProteinRefSeqAccession",
             "geneid": "GeneID", "target_geneid": "GeneID", "cid": "CompoundID",     "GeneSymbol": "GeneSymbol",
             "genesymbol": "GeneSymbol", "CID": "CompoundID", "cid": "CompoundID",
-            "LinkID": "CompoundID", "linkid": "CompoundID", "ID": "CompoundID"
+            "LinkID": "CompoundID", "linkid": "CompoundID", "ID": "CompoundID",
+            "CID_src": "CompoundID",
+            "CID_dst": "CompoundID",
+            "GeneSymbol_src": "GeneSymbol",
+            "GeneSymbol_dst": "GeneSymbol",
+            "AID_src": "AssayID",
+            "AID_dst": "AssayID",
         }
-        self.logger.info(f"Reading data from CSV file: {file_path}")
+        # self.logger.info(f"Reading data from CSV file: {file_path}")
 
         # Read as strings to avoid dtype surprises; treat "__nan__" as NA
         df = pd.read_csv(
