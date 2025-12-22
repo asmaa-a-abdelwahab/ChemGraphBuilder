@@ -12,11 +12,14 @@ Functions:
     main: Main function to parse command-line arguments and collect data for the specified node type and enzyme list.
 """
 
+import json
 import os
 import logging
 import argparse
+
 from chemgraphbuilder.node_properties_extractor import NodePropertiesExtractor
 from chemgraphbuilder.node_data_processor import NodeDataProcessor
+from chemgraphbuilder.node_ontology_enricher import NodesOntologyEnricher
 
 # Set up logging configuration
 logging.basicConfig(
@@ -24,65 +27,214 @@ logging.basicConfig(
 )
 
 
+
 class NodesCollectorProcessor:
     """
-    A class to collect and process data for different types of nodes using NodePropertiesExtractor and NodeDataProcessor.
+    A class to collect and process data for different types of nodes using
+    NodePropertiesExtractor, NodeDataProcessor, and (optionally) NodesOntologyEnricher.
     """
 
-    def __init__(self, node_type, enzyme_list, start_chunk=None):
+    def __init__(
+        self,
+        node_type,
+        enzyme_list,
+        start_chunk=None,
+        with_ontologies: bool = False,
+        species: str = "human",
+        mygene_email: str | None = None,
+    ):
         """
-        Initializes the NodesCollectorProcessor with the node type to collect data for, and the list of enzymes.
+        Initializes the NodesCollectorProcessor.
 
         Args:
-            node_type (str): The type of node to collect data for (e.g., 'Compound', 'BioAssay', 'Gene', 'Protein').
-            enzyme_list (list of str): List of enzyme names for which assay data will be fetched from PubChem.
-            start_chunk (int, optional): The starting chunk index for processing. Default is None.
+            node_type (str): 'Compound', 'BioAssay', 'Gene', or 'Protein'.
+            enzyme_list (list[str]): Enzyme names to fetch data for.
+            start_chunk (int, optional): Starting chunk index for compounds.
+            with_ontologies (bool): If True, run ontology enrichment after processing.
+            species (str): Species passed to ontology services (e.g. MyGene.info).
+            mygene_email (str, optional): Contact email for MyGene.info client.
         """
         self.node_type = node_type
         self.extractor = NodePropertiesExtractor(enzyme_list=enzyme_list)
         self.processor = NodeDataProcessor(data_dir="Data")
         self.start_chunk = start_chunk
+        self.with_ontologies = with_ontologies
 
-    def collect_and_process_data(self):
+        # Enriched tables are written under Data/Nodes by NodeDataProcessor
+        self.ontology_enricher = None
+        if self.with_ontologies:
+            self.ontology_enricher = NodesOntologyEnricher(
+                data_dir="Data/Nodes",
+                species=species,
+                mygene_email=mygene_email,
+            )
+
+    def collect_and_process_data(self) -> None:
         """
-        Collects and processes data based on the node type and saves it to the appropriate file.
+        Collect and process data for the configured node type, and optionally enrich it
+        with ontology annotations.
+
+        Steps:
+            1. Ensure the main joined file (Data/AllDataConnected.csv) exists.
+            2. For the selected node_type, run:
+               - extraction (NodePropertiesExtractor)
+               - preprocessing (NodeDataProcessor)
+               - optional ontology enrichment (NodesOntologyEnricher)
+            3. Log a lightweight summary (row counts and file paths).
         """
         data_file = "Data/AllDataConnected.csv"
 
-        # Check if the data file exists before running the extractor
-        if not os.path.exists(data_file):
-            logging.info(f"{data_file} does not exist. Running data extraction...")
-            df = self.extractor.run()
-        else:
-            logging.info(f"{data_file} already exists. Skipping main data extraction.")
+        # Helper: safe CSV row counter
+        def _safe_count_csv(path: str) -> int:
+            if not os.path.exists(path):
+                return 0
+            try:
+                import pandas as pd  # local import to avoid hard dependency if unused
+                return len(pd.read_csv(path))
+            except Exception as exc:  # pragma: no cover - defensive
+                logging.warning("Could not count rows in %s: %s", path, exc)
+                return 0
 
-        if self.node_type == "Compound":
-            self.extractor.extract_compound_properties(
-                main_data="Data/AllDataConnected.csv", start_chunk=self.start_chunk
-            )
-            self.processor.preprocess_compounds()
-        elif self.node_type == "BioAssay":
-            self.extractor.extract_assay_properties(
-                main_data="Data/AllDataConnected.csv"
-            )
-            self.processor.preprocess_assays()
-        elif self.node_type == "Gene":
-            self.extractor.extract_gene_properties(
-                main_data="Data/AllDataConnected.csv"
-            )
-            self.processor.preprocess_genes()
-        elif self.node_type == "Protein":
-            self.extractor.extract_protein_properties(
-                main_data="Data/AllDataConnected.csv"
-            )
-            self.processor.preprocess_proteins()
+        # 1. Ensure the main joined file exists
+        if not os.path.exists(data_file):
+            logging.info("%s does not exist. Running main data extraction...", data_file)
+            # This will fetch assays + linked genes/proteins/compounds for the enzyme_list
+            self.extractor.run()
         else:
-            logging.error(f"Unsupported node type: {self.node_type}")
+            logging.info("%s already exists. Skipping main data extraction.", data_file)
+
+        summary: dict[str, object] = {
+            "node_type": self.node_type,
+            "main_data_file": data_file,
+        }
+
+        # ------------------------------------------------------------------
+        # 2. Branch per node type
+        # ------------------------------------------------------------------
+
+        # ---------------------- COMPOUNDS ----------------------
+        if self.node_type == "Compound":
+            logging.info("Starting COMPOUND extraction & preprocessing...")
+            self.extractor.extract_compound_properties(
+                main_data=data_file,
+                start_chunk=self.start_chunk,
+            )
+
+            # Preprocess compound node table(s)
+            self.processor.preprocess_compounds()
+            processed_path = "Data/Nodes/Compound_Properties_Processed.csv"
+            summary["processed_file"] = processed_path
+            summary["n_processed_rows"] = _safe_count_csv(processed_path)
+
+            # Ontology enrichment for compound nodes
+            if self.ontology_enricher is not None:
+                logging.info("Running compound ontology enrichment (ChEBI/MeSH/ChEMBL)...")
+                # IMPORTANT: use the processed column name 'CompoundID'
+                df_enriched = self.ontology_enricher.enrich_compounds(
+                    input_name=os.path.basename(processed_path),
+                    output_name="Compound_Properties_WithOntologies.csv",
+                )
+                if df_enriched is not None:
+                    enriched_path = "Data/Nodes/Compound_Properties_WithOntologies.csv"
+                    summary["enriched_file"] = enriched_path
+                    summary["n_enriched_rows"] = len(df_enriched)
+
+        # ---------------------- BIOASSAYS ----------------------
+        elif self.node_type == "BioAssay":
+            logging.info("Starting BIOASSAY extraction & preprocessing...")
+            self.extractor.extract_assay_properties(main_data=data_file)
+
+            self.processor.preprocess_assays()
+            processed_path = "Data/Nodes/Assay_Properties_Processed.csv"
+            summary["processed_file"] = processed_path
+            summary["n_processed_rows"] = _safe_count_csv(processed_path)
+
+            # Ontology enrichment for assay nodes (BAO)
+            if self.ontology_enricher is not None:
+                logging.info("Running assay ontology enrichment (BAO via OLS)...")
+                # IMPORTANT: use the *processed* column names from NodeDataProcessor
+                df_enriched = self.ontology_enricher.enrich_assays(
+                    input_name=os.path.basename(processed_path),
+                    output_name="Assay_Properties_WithOntologies.csv",
+                    name_cols=[
+                        "AssayName",
+                        "AssayActivityName",
+                        "AssayType",
+                        "AssayDescription",
+                    ],
+                )
+                if df_enriched is not None:
+                    enriched_path = "Data/Nodes/Assay_Properties_WithOntologies.csv"
+                    summary["enriched_file"] = enriched_path
+                    summary["n_enriched_rows"] = len(df_enriched)
+
+        # ---------------------- GENES ----------------------
+        elif self.node_type == "Gene":
+            logging.info("Starting GENE extraction & preprocessing...")
+            self.extractor.extract_gene_properties(main_data=data_file)
+
+            self.processor.preprocess_genes()
+            processed_path = "Data/Nodes/Gene_Properties_Processed.csv"
+            summary["processed_file"] = processed_path
+            summary["n_processed_rows"] = _safe_count_csv(processed_path)
+
+            # Ontology enrichment for gene nodes (HGNC, Ensembl, GO, UniProt)
+            if self.ontology_enricher is not None:
+                logging.info("Running gene ontology enrichment (MyGene.info)...")
+                df_enriched = self.ontology_enricher.enrich_genes(
+                    input_name=os.path.basename(processed_path),
+                    output_name="Gene_Properties_WithOntologies.csv",
+                    gene_id_col="GeneID",
+                )
+                if df_enriched is not None:
+                    enriched_path = "Data/Nodes/Gene_Properties_WithOntologies.csv"
+                    summary["enriched_file"] = enriched_path
+                    summary["n_enriched_rows"] = len(df_enriched)
+
+        # ---------------------- PROTEINS ----------------------
+        elif self.node_type == "Protein":
+            logging.info("Starting PROTEIN extraction & preprocessing...")
+            self.extractor.extract_protein_properties(main_data=data_file)
+
+            self.processor.preprocess_proteins()
+            processed_path = "Data/Nodes/Protein_Properties_Processed.csv"
+            summary["processed_file"] = processed_path
+            summary["n_processed_rows"] = _safe_count_csv(processed_path)
+
+            # Ontology enrichment for protein nodes (UniProt, GO, InterPro)
+            if self.ontology_enricher is not None:
+                logging.info("Running protein ontology enrichment (UniProt/GO/InterPro)...")
+                # IMPORTANT: use the processed column name 'ProteinRefSeqAccession'
+                df_enriched = self.ontology_enricher.enrich_proteins(
+                    input_name=os.path.basename(processed_path),
+                    output_name="Protein_Properties_WithOntologies.csv",
+                    accession_col="ProteinRefSeqAccession",
+                )
+                if df_enriched is not None:
+                    enriched_path = "Data/Nodes/Protein_Properties_WithOntologies.csv"
+                    summary["enriched_file"] = enriched_path
+                    summary["n_enriched_rows"] = len(df_enriched)
+
+        else:
+            raise ValueError(
+                f"Unsupported node_type '{self.node_type}'. "
+                "Expected one of: 'Compound', 'BioAssay', 'Gene', 'Protein'."
+            )
+
+        # # after logging summary
+        # report_path = f"Data/Nodes/{self.node_type}_run_summary.json"
+        # try:
+        #     with open(report_path, "w", encoding="utf-8") as f:
+        #         json.dump(summary, f, indent=2)
+        #     logging.info("Saved node run summary to %s", report_path)
+        # except Exception as exc:
+        #     logging.warning("Could not write run summary to %s: %s", report_path, exc)
 
 
 def main():
     """
-    Main function to parse command-line arguments and collect data for the specified node type and enzyme list.
+    Main function to parse command-line arguments and collect data for the
+    specified node type and enzyme list.
     """
     parser = argparse.ArgumentParser(
         description="Collect data for different types of nodes."
@@ -106,15 +258,37 @@ def main():
         default=None,
         help="The starting chunk index for processing Compound Data",
     )
+    parser.add_argument(
+        "--with_ontologies",
+        action="store_true",
+        help="If set, enrich processed node tables with ontology IDs "
+             "(ChEBI / HGNC / Ensembl / UniProt / GO / BAO, etc.)",
+    )
+    parser.add_argument(
+        "--species",
+        type=str,
+        default="human",
+        help="Species passed to ontology services (e.g. 'human', 'mouse').",
+    )
+    parser.add_argument(
+        "--mygene_email",
+        type=str,
+        default=None,
+        help="Optional email used for MyGene.info client (polite, not required).",
+    )
 
     args = parser.parse_args()
     enzyme_list = args.enzyme_list.split(",")
 
     collector = NodesCollectorProcessor(
-        node_type=args.node_type, enzyme_list=enzyme_list, start_chunk=args.start_chunk
+        node_type=args.node_type,
+        enzyme_list=enzyme_list,
+        start_chunk=args.start_chunk,
+        with_ontologies=args.with_ontologies,
+        species=args.species,
+        mygene_email=args.mygene_email,
     )
     collector.collect_and_process_data()
-
 
 if __name__ == "__main__":
     main()

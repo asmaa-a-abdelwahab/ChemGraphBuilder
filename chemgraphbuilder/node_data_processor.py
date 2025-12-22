@@ -19,9 +19,13 @@ Example Usage:
     >>> processor.preprocess_compounds()
 """
 
+import datetime
 import glob
+import os
 import pandas as pd
 import logging
+
+import yaml
 
 # Set up logging configuration
 logging.basicConfig(
@@ -47,14 +51,44 @@ class NodeDataProcessor:
         preprocess_compounds(): Consolidates and renames columns in compound data.
     """
 
-    def __init__(self, data_dir: str):
+    def __init__(self, data_dir: str, schema_path: str = "config/node_schema.yml"):
         """
         Initializes the NodeDataProcessor with a directory path to manage the data files.
 
         Args:
             data_dir (str): The directory where the node data files are stored.
         """
-        self.data_dir = data_dir
+        self.data_dir = data_dir        
+        self.schema_version = None
+        self.schema = None
+        if os.path.exists(schema_path):
+            with open(schema_path, "r") as f:
+                self.schema = yaml.safe_load(f)
+                self.schema_version = self.schema.get("schema_version")
+
+    def _stamp_provenance(self, df: pd.DataFrame) -> pd.DataFrame:
+        df["ProcessedAt"] = datetime.datetime.utcnow().isoformat() + "Z"
+        df["ProcessedBy"] = "ChemGraphBuilder.NodeDataProcessor/1.0"
+        if self.schema_version:
+            df["NodeSchemaVersion"] = self.schema_version
+        return df
+
+
+    def _validate_required_columns(self, df: pd.DataFrame, node_type: str, required_cols: list[str] | None = None) -> None:
+        if required_cols is None and self.schema:
+            # find node config by label or type
+            for _, node_cfg in self.schema["nodes"].items():
+                if node_cfg.get("label") == node_type or node_type in node_cfg.get("aliases", []):
+                    required_cols = node_cfg.get("required_columns", [])
+                    break
+        required_cols = required_cols or []
+        missing = [c for c in required_cols if c not in df.columns]
+        if missing:
+            logging.warning(
+                "NodeDataProcessor: %s is missing required columns: %s",
+                node_type,
+                ", ".join(missing),
+            )
 
     def preprocess_assays(self):
         """
@@ -74,6 +108,8 @@ class NodeDataProcessor:
             },
             inplace=True,
         )
+        df = self._stamp_provenance(df)
+        self._validate_required_columns(df, "Assay")
         df.to_csv(f"{self.data_dir}/Nodes/Assay_Properties_Processed.csv", index=False)
 
     def preprocess_proteins(self):
@@ -89,6 +125,9 @@ class NodeDataProcessor:
             },
             inplace=True,
         )
+        df = self._stamp_provenance(df)
+        self._validate_required_columns(
+            df, "Protein")
         df.to_csv(
             f"{self.data_dir}/Nodes/Protein_Properties_Processed.csv", index=False
         )
@@ -109,6 +148,8 @@ class NodeDataProcessor:
         )
         df["GeneID"] = df["GeneID"].astype("Int64")
         df["TaxonomyID"] = df["TaxonomyID"].astype("Int64")
+        df = self._stamp_provenance(df)
+        self._validate_required_columns(df, "Gene")
         df.to_csv(f"{self.data_dir}/Nodes/Gene_Properties_Processed.csv", index=False)
 
     def preprocess_compounds(self):
@@ -134,4 +175,6 @@ class NodeDataProcessor:
 
         df = pd.read_csv(output_file)
         df.rename(columns={"CID": "CompoundID", "Title": "CompoundName"}, inplace=True)
+        df = self._stamp_provenance(df)
+        self._validate_required_columns(df, "Compound")
         df.to_csv(f"{output_file.replace('.csv', '_Processed.csv')}", index=False)

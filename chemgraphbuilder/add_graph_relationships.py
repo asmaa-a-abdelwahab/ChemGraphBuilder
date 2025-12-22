@@ -386,12 +386,8 @@ class AddGraphRelationships(Neo4jBase):
             "geneid": "GeneID", "target_geneid": "GeneID", "cid": "CompoundID",     "GeneSymbol": "GeneSymbol",
             "genesymbol": "GeneSymbol", "CID": "CompoundID", "cid": "CompoundID",
             "LinkID": "CompoundID", "linkid": "CompoundID", "ID": "CompoundID",
-            "CID_src": "CompoundID",
-            "CID_dst": "CompoundID",
-            "GeneSymbol_src": "GeneSymbol",
-            "GeneSymbol_dst": "GeneSymbol",
-            "AID_src": "AssayID",
-            "AID_dst": "AssayID",
+            "CID_src": "CompoundID", "CID_dst": "CompoundID", "GeneSymbol_src": "GeneSymbol",
+            "GeneSymbol_dst": "GeneSymbol", "AID_src": "AssayID", "AID_dst": "AssayID",
         }
         # self.logger.info(f"Reading data from CSV file: {file_path}")
 
@@ -404,7 +400,8 @@ class AddGraphRelationships(Neo4jBase):
             engine="python",           # tolerant to weird quoting/newlines
             on_bad_lines="skip",       # skip broken Evidence rows
             quotechar='"',
-            escapechar='\\'
+            escapechar='\\',
+            index_col=False
         )
 
         df.columns = self._normalize_headers(df.columns.tolist())
@@ -414,62 +411,101 @@ class AddGraphRelationships(Neo4jBase):
             self.logger.error("CSV %s has <2 usable columns after cleaning.", file_path)
             return
 
-        # --- NEW unified branch for CO_OCCURS_IN_LITERATURE ---
-        if rel_type == "CO_OCCURS_IN_LITERATURE":
+        # --- 1) Co-occurrence (Cpd–Cpd, Cpd–Gene) ---
+        if rel_type in {
+            "CO_OCCURS_IN_LITERATURE",
+            "Compound_Gene_CoOccurrence",
+            "Compound_Compound_CoOccurrence",
+        }:
             # Normalize (works for both CID↔CID and GeneSymbol↔CID)
-            df, source_column, destination_column = self._normalize_cooccurrence(df, source_label, destination_label)
-
+            df, source_column, destination_column = self._normalize_cooccurrence(
+                df, source_label, destination_label
+            )
             if df.empty:
-                self.logger.error("CSV %s contains no valid co-occurrence rows after normalization.", file_path)
+                self.logger.error(
+                    "CSV %s contains no valid co-occurrence rows after normalization.",
+                    file_path,
+                )
                 return
 
-        else:
-            # --- SPECIAL CASE for similarity relationship ---
-            if rel_type in {"IS_SIMILAR_TO", "Compound_Similarity", "COMPOUND_SIMILARITY"}:
-                # Source: a single CID; Destination: list of similar CIDs
-                # Prefer canonical list column names when present
-                list_col_candidates = ["Similar CIDs", "Similar_CIDs", "similar_cids", "similarCIDs", "similar_ids"]
-                src_candidates = ["CID", "cid", "CompoundID", "Compound ID", "LinkID", "ID"]
-                source_column = self._pick_id_column(df, src_candidates)
-
-                # Find the first existing list column
-                destination_column = None
-                for cand in list_col_candidates:
-                    if cand in df.columns:
-                        destination_column = cand
-                        break
-
-                if not source_column or not destination_column:
-                    self.logger.error(
-                        "Similarity loader: could not find required columns in %s "
-                        "(source one of %s, destination one of %s).",
-                        file_path, src_candidates, list_col_candidates
-                    )
-                    return
-
-                df = df.dropna(subset=[source_column], how="any")
-                if df.empty:
-                    self.logger.error("CSV %s contains no valid rows after filtering (source).", file_path)
-                    return
-
+        # --- 2) Compound transformation (substrate → metabolite) ---
+        elif (
+            # Normal case: explicit relationship type
+            rel_type in {"Compound_Transformation", "METABOLIZED_TO", "TRANSFORMS_TO"}
+            # Fallback: detect by columns, in case rel_type was sanitized
+            or (
+                source_label.lower() == "compound"
+                and destination_label.lower() == "compound"
+                and {"substratecid", "metabolitecid"}.issubset(df.columns)
+            )
+        ):
+            if {"substratecid", "metabolitecid"}.issubset(df.columns):
+                source_column = "substratecid"
+                destination_column = "metabolitecid"
             else:
-                # Generic path
-                src_candidates = self._id_candidates_for_label(source_label)
-                dst_candidates = self._id_candidates_for_label(destination_label)
+                self.logger.error(
+                    "Compound_Transformation loader: expected 'substratecid' "
+                    "and 'metabolitecid' in %s",
+                    file_path,
+                )
+                return
 
-                source_column = self._pick_id_column(df, src_candidates)
-                destination_column = self._pick_id_column(df, dst_candidates)
+        # --- 3) Compound similarity (CID → [similar CIDs]) ---
+        elif rel_type in {"IS_SIMILAR_TO", "Compound_Similarity", "COMPOUND_SIMILARITY"}:
+            list_col_candidates = [
+                "Similar CIDs",
+                "Similar_CIDs",
+                "similar_cids",
+                "similarCIDs",
+                "similar_ids",
+            ]
+            src_candidates = ["CID", "cid", "CompoundID", "Compound ID", "LinkID", "ID"]
+            source_column = self._pick_id_column(df, src_candidates)
+            destination_column = next(
+                (c for c in list_col_candidates if c in df.columns), None
+            )
 
-                if not source_column or not destination_column:
-                    self.logger.error("Could not detect ID columns for %s → %s in %s", source_label, destination_label, file_path)
-                    return
+            if not source_column or not destination_column:
+                self.logger.error(
+                    "Similarity loader: could not find required columns in %s "
+                    "(source one of %s, destination one of %s).",
+                    file_path,
+                    src_candidates,
+                    list_col_candidates,
+                )
+                return
 
-                df = df.dropna(subset=[source_column, destination_column], how="any")
-                if df.empty:
-                    self.logger.error("CSV %s contains no valid rows after filtering.", file_path)
-                    return
+            df = df.dropna(subset=[source_column], how="any")
+            if df.empty:
+                self.logger.error(
+                    "CSV %s contains no valid rows after filtering (source).",
+                    file_path,
+                )
+                return
 
+        # --- 4) Generic relationships (everything else) ---
+        else:
+            src_candidates = self._id_candidates_for_label(source_label)
+            dst_candidates = self._id_candidates_for_label(destination_label)
 
+            source_column = self._pick_id_column(df, src_candidates)
+            destination_column = self._pick_id_column(df, dst_candidates)
+
+            if not source_column or not destination_column:
+                self.logger.error(
+                    "Could not detect ID columns for %s → %s in %s",
+                    source_label,
+                    destination_label,
+                    file_path,
+                )
+                return
+
+            df = df.dropna(subset=[source_column, destination_column], how="any")
+            if df.empty:
+                self.logger.error(
+                    "CSV %s contains no valid rows after filtering.", file_path
+                )
+                return
 
         # Only drop NA on rel_type_column if present in this file
         if rel_type_column and rel_type_column in df.columns:
@@ -571,8 +607,11 @@ class AddGraphRelationships(Neo4jBase):
         for csv_file in csv_files:
             self.logger.info("Processing file: %s", csv_file)
 
-            # Detect per-file relationship-type column (case-insensitive)
-            per_file_rel_col = self._detect_rel_type_col(csv_file, rel_type_column)
+            # Only auto-detect when rel_type is None (dynamic relationship types)
+            if rel_type is None:
+                per_file_rel_col = self._detect_rel_type_col(csv_file, rel_type_column)
+            else:
+                per_file_rel_col = rel_type_column   # keep whatever was passed (None)
 
             for query in self.generate_cypher_queries_from_file(
                 csv_file, rel_type, source_label, destination_label, per_file_rel_col

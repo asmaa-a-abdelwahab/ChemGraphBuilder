@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "chemgraphbuilder"
-version = "0.1.23"
+version = "0.1.28"
 description = "A package to build chemical knowledge graphs using data from PubChem and Neo4j"
 readme = { file = "README.md", content-type = "text/markdown" }
 requires-python = ">=3.8"
@@ -24,6 +24,11 @@ dependencies = [
   "requests",
   "xmltodict",
   "dask",
+  "pyyaml",
+  "biothings_client",
+  "mygene",
+  "bioservices",
+  "pubchempy",
 ]
 
 [project.scripts]

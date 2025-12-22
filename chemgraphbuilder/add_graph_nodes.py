@@ -173,7 +173,17 @@ class AddGraphNodes(Neo4jBase):
             A dictionary with unique identifiers as keys and extracted data as values.
         """
         self.logger.info("Reading data from CSV file: %s", file_path)
-        df = pd.read_csv(file_path).dropna(subset=[unique_property], how="any")
+        df = pd.read_csv(file_path)
+        total = len(df)
+        df = df.dropna(subset=[unique_property], how="any")
+        dropped = total - len(df)
+        if dropped > 0:
+            self.logger.warning(
+                "Dropped %d rows from %s with missing %s",
+                dropped,
+                file_path,
+                unique_property,
+            )
         node_dict = {
             row[unique_property]: row.drop(labels=[unique_property]).to_dict()
             for _, row in df.iterrows()

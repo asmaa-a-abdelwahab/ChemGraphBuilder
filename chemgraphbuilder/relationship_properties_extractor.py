@@ -1,3 +1,4 @@
+# relationship_properties_extractor.py
 """
 This module defines the `RelationshipPropertiesExtractor` class, which is responsible for extracting and analyzing
 relationship properties among compounds, genes, and assays from the PubChem database.
@@ -397,7 +398,7 @@ class RelationshipPropertiesExtractor:
             f"fastsimilarity_2d/cid/{int(cid)}/cids/XML?Threshold=95&MaxRecords=100"
         )
         try:
-            response = requests.get(url)
+            response = requests.get(url, timeout=60)
             response.raise_for_status()
             xml_data = response.text
 

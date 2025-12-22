@@ -1,3 +1,4 @@
+# relationship_collector_processor.py
 """
 Module to collect and process relationship data for different types of relationships using RelationshipPropertiesExtractor and RelationshipDataProcessor.
 

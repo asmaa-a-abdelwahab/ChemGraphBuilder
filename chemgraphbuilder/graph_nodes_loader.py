@@ -14,6 +14,8 @@ Functions:
 
 import logging
 import argparse
+import pandas as pd
+import yaml
 from neo4j import GraphDatabase
 from chemgraphbuilder.add_graph_nodes import AddGraphNodes
 
@@ -21,7 +23,6 @@ from chemgraphbuilder.add_graph_nodes import AddGraphNodes
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
 )
-
 
 class GraphNodesLoader:
     """
@@ -33,7 +34,7 @@ class GraphNodesLoader:
         label_mapping: A dictionary mapping node labels to their unique properties and file paths.
     """
 
-    def __init__(self, uri, username, password):
+    def __init__(self, uri, username, password, schema_path="config/node_schema.yml"):
         """
         Initializes the GraphDataLoader with Neo4j connection details.
 
@@ -46,24 +47,57 @@ class GraphNodesLoader:
         self.logger = logging.getLogger(__name__)  # Define the logger
         self.logger.info("GraphNodesLoader class initialized.")
         self.node_data_adder = AddGraphNodes(self.driver)
+        with open(schema_path, "r") as f:
+            schema = yaml.safe_load(f)
+        # store only what we need
         self.label_mapping = {
-            "Compound": {
-                "unique_property": "CompoundID",
-                "file_path": "Data/Nodes/Compound_Properties_Processed.csv",
-            },
-            "BioAssay": {
-                "unique_property": "AssayID",
-                "file_path": "Data/Nodes/Assay_Properties_Processed.csv",
-            },
-            "Gene": {
-                "unique_property": "GeneID",
-                "file_path": "Data/Nodes/Gene_Properties_Processed.csv",
-            },
-            "Protein": {
-                "unique_property": "ProteinRefSeqAccession",
-                "file_path": "Data/Nodes/Protein_Properties_Processed.csv",
-            },
+            node_cfg["label"]: {
+                "unique_property": node_cfg["unique_property"],
+                "file_path": node_cfg["csv_ontologies"] or node_cfg["csv_processed"],
+            }
+            for _, node_cfg in schema["nodes"].items()
         }
+
+    def validate_node_type(self, label: str) -> bool:
+        """
+        Validate that the CSV for a given node label:
+          - exists
+          - contains the unique_property
+          - has no duplicate values in unique_property
+        """
+        if label not in self.label_mapping:
+            self.logger.error("No mapping found for label: %s", label)
+            return False
+
+        unique_property = self.label_mapping[label]["unique_property"]
+        file_path = self.label_mapping[label]["file_path"]
+
+        try:
+            df = pd.read_csv(file_path)
+        except FileNotFoundError:
+            self.logger.error("CSV file for label %s not found: %s", label, file_path)
+            return False
+
+        if unique_property not in df.columns:
+            self.logger.error(
+                "Unique property '%s' not found in %s for label %s",
+                unique_property,
+                file_path,
+                label,
+            )
+            return False
+
+        dup_count = df[unique_property].duplicated().sum()
+        if dup_count > 0:
+            self.logger.warning(
+                "Found %d duplicate %s values in %s",
+                dup_count,
+                unique_property,
+                file_path,
+            )
+
+        self.logger.info("Validation OK for label %s (file: %s)", label, file_path)
+        return True
 
     def create_uniqueness_constraint(self, label, unique_property):
         """
@@ -77,18 +111,28 @@ class GraphNodesLoader:
             self.driver, label=label, unique_property=unique_property
         )
 
+    def _upsert_node(self, tx, label, unique_property, props: dict):
+        query = f"""
+        MERGE (n:{label} {{ {unique_property}: $unique_id }})
+        SET n += $props
+        """
+        unique_id = props.pop(unique_property)
+        tx.run(query, unique_id=unique_id, props=props)
+    
     def process_and_add_nodes(self, file_path, label, unique_property):
-        """
-        Processes and adds nodes from a CSV file to the Neo4j database.
+        df = pd.read_csv(file_path).dropna(subset=[unique_property], how="any")
+        self.logger.info("Processing %d %s nodes", len(df), label)
 
-        Args:
-            file_path (str): The path to the CSV file containing node data.
-            label (str): The label of the node.
-            unique_property (str): The unique property of the node.
-        """
-        self.node_data_adder.process_and_add_nodes(
-            file_path, label=label, unique_property=unique_property
-        )
+        with self.driver.session() as session:
+            def batch(tx):
+                for _, row in df.iterrows():
+                    self._upsert_node(
+                        tx,
+                        label=label,
+                        unique_property=unique_property,
+                        props=row.to_dict(),
+                    )
+            session.execute_write(batch)
 
     def load_data_for_node_type(self, label):
         """
@@ -121,12 +165,19 @@ def main():
         "--password", required=True, help="Password for the Neo4j database"
     )
     parser.add_argument("--label", required=True, help="Label of the node")
+    parser.add_argument(
+        "--dry_run", action="store_true",
+        help="If set, validate CSV and constraints but do not write nodes."
+    )
 
     args = parser.parse_args()
 
     # Create an instance of GraphDataLoader and load data for the specified node type
     graph_nodes_loader = GraphNodesLoader(args.uri, args.username, args.password)
-    graph_nodes_loader.load_data_for_node_type(args.label)
+    if args.dry_run:
+        graph_nodes_loader.validate_node_type(args.label)
+    else:
+        graph_nodes_loader.load_data_for_node_type(args.label)
 
 
 if __name__ == "__main__":

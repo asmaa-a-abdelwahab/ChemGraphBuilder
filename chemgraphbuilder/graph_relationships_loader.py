@@ -47,7 +47,7 @@ class GraphRelationshipsLoader:
         # Predefined settings for different relationship types
         self.relationship_settings = {
             "Compound_Gene": {
-                "file_path": "Data/Relationships/Compound_Gene_Relationship/Compound_Gene_Relationship*.csv",
+                "file_path": "Data/Relationships/Compound_Gene_Relationship/Compound_Gene_Relationship_batch*.csv",
                 "source_label": "Compound",
                 "destination_label": "Gene",
                 "rel_type_column": "activity",

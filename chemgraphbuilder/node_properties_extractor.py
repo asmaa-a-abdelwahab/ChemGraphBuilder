@@ -31,12 +31,15 @@ Note:
     scope of this class.
 """
 
+import datetime
+import random
 import time
 import math
 import logging
 from io import StringIO
 import concurrent.futures
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from typing import List, Union
 from bs4 import BeautifulSoup
 import requests
 import pandas as pd
@@ -93,7 +96,7 @@ class NodePropertiesExtractor:
         steps outside the scope of this class.
     """
 
-    _REQUEST_TIMEOUT = 30  # in seconds
+    _REQUEST_TIMEOUT = 300  # in seconds
     _CONCURRENT_REQUEST_LIMIT = 2
     _RETRY_ATTEMPTS = 3  # number of times to retry a failed request
 
@@ -129,44 +132,36 @@ class NodePropertiesExtractor:
         self._enzyme_count = len(enzyme_list)
 
     def _make_request(self, url):
-        """
-        Sends an HTTP GET request to a specified URL with built-in retry logic.
-        If the request fails, it retries the request up to a predefined number
-        of attempts with exponential backoff to handle potential temporary network
-        or server issues.
-
-        The method attempts to gracefully handle server-side errors
-        (HTTP 4XX/5XX responses) by raising an exception if the response status
-        code indicates an error. For client-side errors (e.g., connectivity issues),
-        it logs a warning and retries the request.
-
-        Parameters:
-            url (str): The complete URL to which the HTTP GET request is sent.
-
-        Returns:
-            requests.Response: The response object from the server if the request
-            is successfully completed.
-
-        Raises:
-            requests.RequestException: If the request fails to complete
-            successfully after the maximum number of retry attempts.
-        """
         for attempt in range(self._RETRY_ATTEMPTS):
             try:
                 response = requests.get(url, timeout=self._REQUEST_TIMEOUT)
-                response.raise_for_status()  # Checks for HTTP errors
+                response.raise_for_status()
                 return response
+            except requests.HTTPError as e:
+                status = getattr(e.response, "status_code", None)
+                # For PubChem 503/504, treat as transient
+                if status in (503, 504):
+                    logging.warning(
+                        "Attempt %s of %s failed for URL: %s (HTTP %s). Error: %s",
+                        attempt + 1, self._RETRY_ATTEMPTS, url, status, e
+                    )
+                else:
+                    # Non-transient errors: re-raise immediately
+                    raise
+
             except requests.RequestException as e:
                 logging.warning(
                     "Attempt %s of %s failed for URL: %s. Error: %s",
-                    attempt + 1,
-                    self._RETRY_ATTEMPTS,
-                    url,
-                    e,
+                    attempt + 1, self._RETRY_ATTEMPTS, url, e
                 )
-                if attempt + 1 == self._RETRY_ATTEMPTS:
-                    raise  # All attempts failed; re-raise the last exception
-                time.sleep(2**attempt)  # Exponential backoff
+
+            # If we got here, there was some error
+            if attempt + 1 == self._RETRY_ATTEMPTS:
+                raise
+
+            # Jittered backoff to be nicer to the API
+            # sleep_seconds = (2 ** attempt) + random.uniform(0, 0.5)
+            time.sleep(0.2)
 
     def get_enzyme_assays(self, enzyme):
         """
@@ -319,16 +314,11 @@ class NodePropertiesExtractor:
         original_enzyme_list = self.enzyme_list.copy()
 
         for enzyme in self.enzyme_list:
-            # Formulate the URL
             url = f"{self._base_url}/{enzyme}/concise/CSV"
-
             try:
-                response = requests.get(url)
-                # Check for a successful response (status code 200)
+                response = self._make_request(url)
                 if response.status_code == 200:
-                    enzymes_with_response.append(
-                        enzyme
-                    )  # Keep the enzyme in the new list
+                    enzymes_with_response.append(enzyme)
             except requests.RequestException:
                 # If there's an exception, skip adding the enzyme to the new list
                 pass
@@ -353,6 +343,10 @@ class NodePropertiesExtractor:
         substrings_to_filter = ["CYP", "Cytochrome"]
         pattern = "|".join(substrings_to_filter)
         df = df[df["Assay Name"].str.contains(pattern, case=False, na=False)]
+        retrieval_time = datetime.datetime.utcnow().isoformat() + "Z"
+        df["SourceDatabase"] = "PubChem"
+        df["SourceEndpoint"] = self._base_url
+        df["RetrievedAt"] = retrieval_time
         df.to_csv("Data/AllDataConnected.csv", index=False)
         return df
 
@@ -473,7 +467,14 @@ class NodePropertiesExtractor:
         n = self._enzyme_count
         gene_ids = df["Target GeneID"].value_counts().head(n).index.tolist()
         df_gene = df_gene[df_gene["GeneID"].isin([int(item) for item in gene_ids])]
+        # after df_gene is created and filtered
+        retrieval_time = datetime.datetime.utcnow().isoformat() + "Z"
+        df_gene["SourceDatabase"] = "PubChem"
+        df_gene["SourceEndpoint"] = "https://pubchem.ncbi.nlm.nih.gov/rest/pug/gene/geneid/summary/JSON"
+        df_gene["RetrievedAt"] = retrieval_time
+
         df_gene.to_csv("Data/Nodes/Gene_Properties.csv", sep=",", index=False)
+
         return df_gene
 
     def _fetch_assay_details(self, aid):
@@ -574,7 +575,7 @@ class NodePropertiesExtractor:
             Ensure the input file path is correct and accessible to avoid errors during processing.
         """
 
-        df = pd.read_csv(main_data)
+        df = pd.read_csv(main_data,  low_memory=False)
 
         # Check if the DataFrame is valid
         if df.empty or "AID" not in df.columns:
@@ -639,7 +640,10 @@ class NodePropertiesExtractor:
                 except Exception as exc:
                     # Logging any errors encountered during the fetch
                     logging.error(f"Error occurred while processing AID {aid}: {exc}")
-
+        retrieval_time = datetime.datetime.utcnow().isoformat() + "Z"
+        assay_df["SourceDatabase"] = "PubChem"
+        assay_df["SourceEndpoint"] = "https://pubchem.ncbi.nlm.nih.gov/rest/pug/assay/aid/summary/XML"
+        assay_df["RetrievedAt"] = retrieval_time
         # Saving the updated DataFrame to a CSV file
         assay_df.to_csv("Data/Nodes/Assay_Properties.csv", sep=",", index=False)
         return assay_df
@@ -701,31 +705,21 @@ class NodePropertiesExtractor:
         data = []
 
         n = self._enzyme_count
-        df = pd.read_csv(main_data)
+        df = pd.read_csv(main_data, low_memory=False)
         gene_ids = df["Target GeneID"].value_counts().head(n).index.tolist()
         df = df[df["Target GeneID"].isin([int(item) for item in gene_ids])]
-        Accessions = df["Target Accession"].unique().tolist()
-        # Iterate over each protein accession number in the DataFrame
-        for accession in Accessions:
-            # Construct the URL to query the NCBI protein database
+        accessions = df["Target Accession"].unique().tolist()
+
+        for accession in accessions:
             url = f"https://www.ncbi.nlm.nih.gov/protein/{accession}"
-
             try:
-                # Send an HTTP request to the URL
-                response = requests.get(url)
-
-                # Parse the HTML content of the response
+                response = self._make_request(url)
                 soup = BeautifulSoup(response.text, "html.parser")
-
-                # Extract the title from the parsed HTML
                 title = soup.title.string if soup.title else "Title Not Found"
-
-                # Append the extracted data to the list
                 data.append(
                     {"RefSeq Accession": accession, "URL": url, "Description": title}
                 )
             except Exception as e:
-                # In case of an error, log the error message
                 logging.error(f"Error fetching data for accession {accession}: {e}")
                 data.append(
                     {
@@ -735,68 +729,32 @@ class NodePropertiesExtractor:
                     }
                 )
 
-        # Convert the list of data into a DataFrame
         protein_df = pd.DataFrame(data)
 
-        # Save the DataFrame to a CSV file
-        protein_df.to_csv("Data/Nodes/Protein_Properties.csv", sep=",", index=False)
+        retrieval_time = datetime.datetime.utcnow().isoformat() + "Z"
+        protein_df["SourceDatabase"] = "NCBI_Protein"
+        protein_df["SourceEndpoint"] = "https://www.ncbi.nlm.nih.gov/protein/{accession}"
+        protein_df["RetrievedAt"] = retrieval_time
 
-        # Return the DataFrame
+        protein_df.to_csv("Data/Nodes/Protein_Properties.csv", sep=",", index=False)
         return protein_df
 
-    def fetch_data(self, cid):
+    def fetch_data_batch(self, cids: List[Union[int, float]]) -> pd.DataFrame:
         """
-        Retrieves detailed chemical compound properties for a specified
-        Compound ID (CID) from the PubChem database.
+        Retrieve detailed compound properties for a list of CIDs from PubChem
+        in a single batch request (or a few chunked requests).
 
-        This method constructs a query URL to fetch a wide range of properties
-        for the given CID from PubChem, including molecular formula,
-        molecular weight, canonical and isomeric SMILES, InChI codes,
-        physicochemical properties, and more. If the CID is valid and data is
-        available, it returns a pandas DataFrame containing these properties. This
-        method also generates a URL to retrieve the structure image of the
-        compound as a 2D PNG image, adding it as a column in the DataFrame.
-        In cases where the CID is NaN or an error occurs during data retrieval,
-        an empty DataFrame is returned.
-
-        Parameters:
-            cid (int or float): The Compound ID for which to fetch data.
-            Can be an integer or NaN.
-
-        Returns:
-            pd.DataFrame: A DataFrame containing the fetched properties for the
-            given CID. The DataFrame includes columns for each property fetched
-            from PubChem, along with a 'StructureImage2DURL' column containing
-            the URL to the compound's structure image. Returns an empty DataFrame
-            if the CID is NaN or if any error occurs during the fetch operation.
-
-        Raises:
-            Exception: Logs an error message if the request to PubChem fails or
-            if the response cannot be processed into a DataFrame.
-
-        Example:
-            >>> extractor = NodePropertiesExtractor(['CYP2D6', 'CYP3A4'])
-            >>> extractor.create_data_directories()
-            >>> compound_data_df = extractor.fetch_data(2244)
-            >>> print(compound_data_df.head())
-
-            This example fetches the properties for the compound with CID 2244
-            from PubChem and prints the first few rows
-            of the resulting DataFrame.
-
-        Note:
-            This method requires an active internet connection to access the
-            PubChem database. Ensure that the CID provided is valid and not NaN
-            to avoid fetching errors. The structure and availability of data
-            fields are subject to the current state of the PubChem database
-            and may vary.
+        Returns a DataFrame with one row per CID. Adds a StructureImage2DURL
+        column per compound.
         """
-        if pd.isna(cid):
-            return pd.DataFrame()  # Return an empty DataFrame for NaN CIDs
+        # Clean CIDs
+        clean_cids = [int(c) for c in cids if pd.notna(c)]
+        clean_cids = sorted(set(clean_cids))
+        if not clean_cids:
+            return pd.DataFrame()
 
-        cid = int(cid)  # Convert CID to integer
-        url = (
-            f"https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/{cid}/property/"
+        # Build the property list once
+        props = (
             "MolecularFormula,MolecularWeight,CanonicalSMILES,IsomericSMILES,InChI,"
             "InChIKey,IUPACName,Title,XLogP,ExactMass,MonoisotopicMass,TPSA,Complexity,"
             "Charge,HBondDonorCount,HBondAcceptorCount,RotatableBondCount,HeavyAtomCount,"
@@ -806,21 +764,49 @@ class NodePropertiesExtractor:
             "YStericQuadrupole3D,ZStericQuadrupole3D,FeatureCount3D,FeatureAcceptorCount3D,"
             "FeatureDonorCount3D,FeatureAnionCount3D,FeatureCationCount3D,FeatureRingCount3D,"
             "FeatureHydrophobeCount3D,ConformerModelRMSD3D,EffectiveRotorCount3D,ConformerCount3D,"
-            "Fingerprint2D/CSV"
+            "Fingerprint2D"
         )
-        try:
-            response = requests.get(url)
-            response.raise_for_status()
-            compound_data = pd.read_csv(
-                StringIO(response.text), sep=",", low_memory=False
+
+        # You can also chunk if you have thousands of CIDs
+        batch_size = 150
+        all_frames = []
+
+        for i in range(0, len(clean_cids), batch_size):
+            batch = clean_cids[i : i + batch_size]
+            cid_str = ",".join(str(c) for c in batch)
+
+            url = (
+                f"https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/"
+                f"{cid_str}/property/{props}/CSV"
             )
-            compound_data["StructureImage2DURL"] = (
-                f"https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/{cid}/PNG"
-            )
-            return compound_data
-        except Exception as e:
-            logging.error(f"Error processing CID {cid}: {e}")
-            return pd.DataFrame()  # Return an empty DataFrame in case of error
+
+            try:
+                response = self._make_request(url)
+                df_batch = pd.read_csv(StringIO(response.text), sep=",", low_memory=False)
+
+                # Add 2D structure URL per row (per CID)
+                df_batch["StructureImage2DURL"] = (
+                    "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/"
+                    + df_batch["CID"].astype(str)
+                    + "/PNG"
+                )
+
+                all_frames.append(df_batch)
+
+            except Exception as e:
+                logging.error(f"Error processing PubChem batch {batch[0]}–{batch[-1]}: {e}")
+                continue
+
+        if not all_frames:
+            return pd.DataFrame()
+
+        return pd.concat(all_frames, ignore_index=True)
+
+    def fetch_data(self, cid):
+        if pd.isna(cid):
+            return pd.DataFrame()
+        df = self.fetch_data_batch([cid])
+        return df
 
     def extract_compound_properties(self, main_data, start_chunk=0):
         """
@@ -879,7 +865,7 @@ class NodePropertiesExtractor:
         """
 
         n = self._enzyme_count
-        df = pd.read_csv(main_data)
+        df = pd.read_csv(main_data, low_memory=False)
         gene_ids = df["Target GeneID"].value_counts().head(n).index.tolist()
         df = df[df["Target GeneID"].isin([int(item) for item in gene_ids])]
         df = df.dropna(subset=["CID"])
@@ -916,6 +902,12 @@ class NodePropertiesExtractor:
 
                 # Concatenate results for the current chunk
                 chunk_df = pd.concat(results, ignore_index=True)
+                retrieval_time = datetime.datetime.utcnow().isoformat() + "Z"
+                chunk_df["SourceDatabase"] = "PubChem"
+                chunk_df["SourceEndpoint"] = (
+                    "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/property/..."
+                )
+                chunk_df["RetrievedAt"] = retrieval_time
 
                 # Save the concatenated DataFrame to a CSV file for the chunk
                 chunk_df.to_csv(

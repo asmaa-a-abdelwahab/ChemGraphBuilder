@@ -1,0 +1,48 @@
+schema_version: "0.2.0"
+
+nodes:
+  compound:
+    label: Compound
+    aliases: ["Compound"]
+    unique_property: CompoundID
+    csv_processed: Data/Nodes/Compound_Properties_Processed.csv
+    csv_ontologies: Data/Nodes/Compound_Properties_WithOntologies.csv
+    required_columns:
+      - CompoundID
+      - CompoundName
+      - InChIKey
+
+  gene:
+    label: Gene
+    aliases: ["Gene"]
+    unique_property: GeneID
+    csv_processed: Data/Nodes/Gene_Properties_Processed.csv
+    csv_ontologies: Data/Nodes/Gene_Properties_WithOntologies.csv
+    required_columns:
+      - GeneID
+      - GeneSymbol
+      - TaxonomyID
+
+  protein:
+    label: Protein
+    aliases: ["Protein"]
+    # Use ProteinRefSeqAccession here; it's guaranteed to exist in both processed and enriched tables
+    unique_property: ProteinRefSeqAccession
+    csv_processed: Data/Nodes/Protein_Properties_Processed.csv
+    csv_ontologies: Data/Nodes/Protein_Properties_WithOntologies.csv
+    required_columns:
+      - ProteinRefSeqAccession
+      - ProteinDescription
+
+  bioassay:
+    label: BioAssay
+    # NodeDataProcessor uses node_type="Assay", so we add it as an alias
+    aliases: ["Assay"]
+    unique_property: AssayID
+    csv_processed: Data/Nodes/Assay_Properties_Processed.csv
+    csv_ontologies: Data/Nodes/Assay_Properties_WithOntologies.csv
+    required_columns:
+      - AssayID
+      - AssayName
+      - AssayType
+      - AssayActivityName

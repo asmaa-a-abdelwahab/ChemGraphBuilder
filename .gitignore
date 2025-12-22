@@ -1,1 +1,7 @@
 site/
+.venv/
+test*.py
+__pycache__/
+chemgraphbuilder/__pycache__/
+Data/
+.cache/
