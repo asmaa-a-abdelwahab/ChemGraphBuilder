@@ -30,16 +30,18 @@ External services used:
 
 from __future__ import annotations
 
-from collections import Counter
+from collections import Counter, deque
 import datetime
 import logging
 import re
 import time
-from typing import Dict, Iterable, List, Optional, Set, Tuple, Union
+from typing import Any, Dict, Iterable, List, Optional, Set, Tuple, Union
 from biothings_client import get_client
 import pandas as pd
 import requests
 from difflib import SequenceMatcher
+import json
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 try:
     import mygene
@@ -110,6 +112,15 @@ class NodesOntologyEnricher:
     UNIPROT_BATCH_SIZE = 500
     OLS_SLEEP_SECONDS = 0.2  # be polite to EBI OLS
 
+    # External ontology endpoints used for compound enrichment
+    PUBCHEM_BASE_URL = "https://pubchem.ncbi.nlm.nih.gov"
+    MESH_BASE_URL = "https://id.nlm.nih.gov/mesh"
+    CHEBI_BASE_URL = "https://www.ebi.ac.uk/chebi/backend/api/public"
+
+    # Token extractors for IDs embedded in PubChem PUG-View records
+    _MESH_ID_TOKEN_RE = re.compile(r"\b([DCM]\d{6,9})\b")
+    _CHEBI_TOKEN_RE = re.compile(r"\bCHEBI:\d+\b")
+
     def __init__(
         self,
         data_dir: str = "Data/Nodes",
@@ -117,6 +128,12 @@ class NodesOntologyEnricher:
         mygene_email: Optional[str] = None,
         ols_base_url: str = "https://www.ebi.ac.uk/ols4/api",
         http_timeout: int = 30,
+        # PubChem tuning (avoid 504s + control run time)
+        pubchem_xrefs_batch_size: int = 50,
+        pubchem_xrefs_min_batch_size: int = 10,
+        pubchem_xrefs_max_retries: int = 3,
+        pubchem_xrefs_retry_sleep: float = 5.0,
+        pubchem_polite_sleep: float = 0.2,
     ):
         self._nlp = None   # lazy-initialised spaCy model
         self.data_dir = data_dir.rstrip("/")
@@ -124,8 +141,19 @@ class NodesOntologyEnricher:
         self.ols_base_url = ols_base_url
         self.http_timeout = http_timeout
 
+        # PubChem runtime controls (used by batch xrefs + polite sleeps)
+        self.pubchem_xrefs_batch_size = int(pubchem_xrefs_batch_size)
+        self.pubchem_xrefs_min_batch_size = int(pubchem_xrefs_min_batch_size)
+        self.pubchem_xrefs_max_retries = int(pubchem_xrefs_max_retries)
+        self.pubchem_xrefs_retry_sleep = float(pubchem_xrefs_retry_sleep)
+        self.pubchem_polite_sleep = float(pubchem_polite_sleep)
+
         self.session = requests.Session()
         self.session.headers.update({"User-Agent": "ChemGraphBuilder-NodesOntologyEnricher/1.0"})
+
+        # Internal caches (in-memory) to minimize repeated HTTP calls
+        self._pug_view_cache: Dict[int, Optional[Dict[str, Any]]] = {}
+        self._chebi_parents_cache: Dict[str, List[Dict[str, str]]] = {}
 
         # MyGene.info client
         if mygene is None:
@@ -198,6 +226,220 @@ class NodesOntologyEnricher:
         with open(output_json_path, "w", encoding="utf-8") as f:
             json.dump(summary, f, indent=2)
         logger.info("Saved ontology run summary to %s", output_json_path)
+
+
+    # ------------------------------------------------------------------
+    # Compound enrichment helpers: PubChem PUG-View, MeSH lookup, ChEBI parents
+    # ------------------------------------------------------------------
+    def _safe_get_json(self, url: str, params: Optional[dict] = None, timeout: Optional[int] = None) -> Optional[Any]:
+        """Best-effort JSON GET that returns None on HTTP errors/timeouts."""
+        try:
+            r = self.session.get(
+                url,
+                params=params,
+                timeout=timeout or self.http_timeout,
+                headers={"Accept": "application/json"},
+            )
+            # PubChem may return 404 for missing sections; treat as empty.
+            if r.status_code == 404:
+                return None
+            r.raise_for_status()
+            return r.json()
+        except Exception:
+            return None
+
+    def _pubchem_pug_view_record(self, cid: int) -> Optional[Dict[str, Any]]:
+        """Fetch full PubChem PUG-View record for a CID (cached)."""
+        try:
+            cid = int(cid)
+        except Exception:
+            return None
+
+        if cid in self._pug_view_cache:
+            return self._pug_view_cache[cid]
+
+        url = f"{self.PUBCHEM_BASE_URL}/rest/pug_view/data/compound/{cid}/JSON"
+        data = self._safe_get_json(url, params={"response_type": "display"})
+        rec = None
+        if isinstance(data, dict):
+            rec_obj = data.get("Record")
+            if isinstance(rec_obj, dict):
+                rec = rec_obj
+
+        self._pug_view_cache[cid] = rec
+        return rec
+
+    @staticmethod
+    def _walk_sections(section_list: Iterable[Dict[str, Any]]) -> Iterable[Dict[str, Any]]:
+        """Depth-first walk over PubChem PUG-View Record.Section nodes."""
+        stack = list(section_list)[::-1]
+        while stack:
+            sec = stack.pop()
+            yield sec
+            for child in (sec.get("Section") or [])[::-1]:
+                if isinstance(child, dict):
+                    stack.append(child)
+
+    @staticmethod
+    def _extract_strings_from_value(value_obj: Any) -> List[str]:
+        """Extract plain strings from PubChem PUG-View Value objects."""
+        out: List[str] = []
+        if isinstance(value_obj, dict):
+            swm = value_obj.get("StringWithMarkup")
+            if isinstance(swm, list):
+                for item in swm:
+                    if isinstance(item, dict):
+                        s = item.get("String")
+                        if isinstance(s, str) and s.strip():
+                            out.append(s.strip())
+            # Sometimes nested structures exist; be permissive
+            for v in value_obj.values():
+                if isinstance(v, (dict, list)) and v is not swm:
+                    out.extend(NodesOntologyEnricher._extract_strings_from_value(v))
+        elif isinstance(value_obj, list):
+            for v in value_obj:
+                out.extend(NodesOntologyEnricher._extract_strings_from_value(v))
+        return out
+
+    @classmethod
+    def _extract_terms_by_toc_heading(cls, record: Dict[str, Any], toc_heading: str) -> List[str]:
+        terms: Set[str] = set()
+        for sec in cls._walk_sections(record.get("Section", []) or []):
+            if sec.get("TOCHeading") == toc_heading:
+                for info in sec.get("Information", []) or []:
+                    if isinstance(info, dict):
+                        terms.update(cls._extract_strings_from_value(info.get("Value")))
+        return sorted(terms)
+
+    @classmethod
+    def _find_sections_heading_contains(cls, record: Dict[str, Any], substrings: Tuple[str, ...]) -> List[Dict[str, Any]]:
+        hits: List[Dict[str, Any]] = []
+        for sec in cls._walk_sections(record.get("Section", []) or []):
+            h = sec.get("TOCHeading")
+            if isinstance(h, str):
+                hl = h.lower()
+                if any(sub.lower() in hl for sub in substrings):
+                    hits.append(sec)
+        return hits
+
+    @classmethod
+    def _extract_kv_from_sections(cls, sections: List[Dict[str, Any]]) -> Dict[str, List[str]]:
+        out: Dict[str, List[str]] = {}
+        for sec in sections:
+            for info in sec.get("Information", []) or []:
+                if not isinstance(info, dict):
+                    continue
+                key = info.get("Name")
+                if not isinstance(key, str) or not key.strip():
+                    continue
+                vals = cls._extract_strings_from_value(info.get("Value"))
+                if not vals:
+                    continue
+                out.setdefault(key.strip(), [])
+                for v in vals:
+                    if v not in out[key.strip()]:
+                        out[key.strip()].append(v)
+        return out
+
+    @staticmethod
+    def _iter_all_strings(obj: Any) -> Iterable[str]:
+        if isinstance(obj, dict):
+            for v in obj.values():
+                yield from NodesOntologyEnricher._iter_all_strings(v)
+        elif isinstance(obj, list):
+            for v in obj:
+                yield from NodesOntologyEnricher._iter_all_strings(v)
+        elif isinstance(obj, str):
+            yield obj
+
+    def _extract_ids_from_record_text(self, record: Dict[str, Any]) -> Dict[str, List[str]]:
+        """Extract MeSH and ChEBI tokens embedded anywhere in a PUG-View record."""
+        mesh_ids: Set[str] = set()
+        chebi_ids: Set[str] = set()
+
+        for s in self._iter_all_strings(record):
+            for m in self._MESH_ID_TOKEN_RE.findall(s):
+                mesh_ids.add(m)
+            for c in self._CHEBI_TOKEN_RE.findall(s):
+                chebi_ids.add(c)
+
+        return {
+            "mesh_unique_ids": sorted(mesh_ids),   # D*, C*, M* (best-effort)
+            "chebi_ids": sorted(chebi_ids),
+        }
+
+    @staticmethod
+    def _extract_pubchem_mesh_references(record: Dict[str, Any]) -> List[Dict[str, str]]:
+        """Extract MeSH-related references from PubChem PUG-View record.Reference."""
+        refs = record.get("Reference", []) or []
+        out: List[Dict[str, str]] = []
+        for ref in refs:
+            if not isinstance(ref, dict):
+                continue
+            src = ref.get("SourceName")
+            url = ref.get("URL") or ""
+            if src == "Medical Subject Headings (MeSH)" or (isinstance(url, str) and "id.nlm.nih.gov/mesh/" in url):
+                out.append(
+                    {
+                        "mesh_source_id": str(ref.get("SourceID") or ""),
+                        "label": str(ref.get("Name") or ""),
+                        "url": str(url or ""),
+                    }
+                )
+
+        # de-dup
+        seen = set()
+        uniq: List[Dict[str, str]] = []
+        for x in out:
+            k = (x["mesh_source_id"], x["label"], x["url"])
+            if k not in seen:
+                seen.add(k)
+                uniq.append(x)
+        return uniq
+
+    def _chebi_get_parent_nodes(self, chebi_id: str) -> List[Dict[str, str]]:
+        """Fetch ChEBI ontology parents for a CHEBI ID (cached, best-effort)."""
+        chebi_id = (chebi_id or "").strip()
+        if not chebi_id:
+            return []
+        if chebi_id in self._chebi_parents_cache:
+            return self._chebi_parents_cache[chebi_id]
+
+        chebi_num = chebi_id.split(":")[-1]
+
+        def _fetch(token: str) -> Optional[Any]:
+            return self._safe_get_json(f"{self.CHEBI_BASE_URL}/ontology/parents/{token}/")
+
+        payload = _fetch(chebi_id) or _fetch(chebi_num)
+        out: List[Dict[str, str]] = []
+
+        def rec(x: Any) -> None:
+            if isinstance(x, dict):
+                if ("chebiId" in x or "id" in x) and ("chebiName" in x or "name" in x):
+                    cid = x.get("chebiId", x.get("id"))
+                    name = x.get("chebiName", x.get("name"))
+                    rel = x.get("relationship", x.get("relation", x.get("type", "")))
+                    if isinstance(cid, str) and isinstance(name, str):
+                        out.append({"chebiId": cid, "chebiName": name, "relationship": str(rel or "")})
+                for v in x.values():
+                    rec(v)
+            elif isinstance(x, list):
+                for v in x:
+                    rec(v)
+
+        if payload is not None:
+            rec(payload)
+
+        seen = set()
+        uniq: List[Dict[str, str]] = []
+        for r in out:
+            k = (r.get("chebiId"), r.get("chebiName"), r.get("relationship"))
+            if k not in seen:
+                seen.add(k)
+                uniq.append(r)
+
+        self._chebi_parents_cache[chebi_id] = uniq
+        return uniq
 
     def fetch_compound_xrefs_mychem_biothings(self, inchikeys: List[str], batch_size: int = 200
     ) -> Dict[str, Dict[str, List[str]]]:
@@ -313,18 +555,23 @@ class NodesOntologyEnricher:
     def _fetch_compound_xrefs_pubchem_batch(
         self,
         cids: List[int],
-        batch_size: int = 100,
+        batch_size: int = 50,
         max_retries: int = 3,
         retry_sleep: float = 5.0,
+        min_batch_size: int = 10,
     ) -> Dict[int, Dict[str, List[str]]]:
         """
         Fetch PubChem xrefs in batch mode by CID using PUG REST.
 
-        Processes up to `batch_size` CIDs per HTTP call and retries on failures.
+        Why this version:
+          - Large batches can trigger PubChem 504s.
+          - We *adaptively split* a failing batch into smaller chunks until it succeeds
+            (down to `min_batch_size`) to keep overall retrieval time low and avoid
+            losing xrefs entirely.
 
         Returns:
             {
-            cid: {
+              cid: {
                 "RegistryID": [...],
                 "PubMedID": [...],
                 "MIMID": [...],
@@ -332,8 +579,8 @@ class NodesOntologyEnricher:
                 "PatentID": [...],
                 "DBURL": [...],
                 "TaxonomyID": [...],
-            },
-            ...
+              },
+              ...
             }
         """
         results: Dict[int, Dict[str, List[str]]] = {}
@@ -342,29 +589,39 @@ class NodesOntologyEnricher:
         if not uniq_cids:
             return results
 
+        # NOTE: PubChem xrefs endpoint does NOT reliably expose MeSH IDs.
+        #       MeSH enrichment is handled via PUG-View (and optional MeSH RDF resolution).
         xref_types = "RegistryID,PubMedID,MIMID,GeneID,PatentID,DBURL,TaxonomyID"
         base_url = "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid"
 
+        batch_size = max(int(batch_size), 1)
+        min_batch_size = max(int(min_batch_size), 1)
+
         logger.info(
-            "Fetching PubChem xrefs for %d unique CIDs (batch_size=%d)",
+            "Fetching PubChem xrefs for %d unique CIDs (batch_size=%d, min_batch_size=%d)",
             len(uniq_cids),
             batch_size,
+            min_batch_size,
         )
 
-        for i in range(0, len(uniq_cids), batch_size):
-            batch = uniq_cids[i : i + batch_size]
+        # Work queue of CID chunks; failing chunks will be split and re-queued.
+        queue = deque([uniq_cids[i : i + batch_size] for i in range(0, len(uniq_cids), batch_size)])
+        processed = 0
+
+        while queue:
+            batch = queue.popleft()
+            processed += len(batch)
+
             payload = {"cid": ",".join(str(c) for c in batch)}
-
-            attempt = 0
             success = False
+            data: Dict[str, Any] = {}
 
-            while attempt < max_retries and not success:
-                attempt += 1
+            for attempt in range(1, int(max_retries) + 1):
                 logger.info(
-                    "PubChem xrefs batch %d-%d (size=%d), attempt %d/%d",
-                    i + 1,
-                    i + len(batch),
+                    "PubChem xrefs batch (size=%d), processed ~%d/%d, attempt %d/%d",
                     len(batch),
+                    min(processed, len(uniq_cids)),
+                    len(uniq_cids),
                     attempt,
                     max_retries,
                 )
@@ -376,57 +633,63 @@ class NodesOntologyEnricher:
                         timeout=self.http_timeout,
                     )
 
-                    # 404: no xrefs – treat as empty batch and stop retrying
+                    # 404: no xrefs – treat as empty and stop retrying this chunk.
                     if resp.status_code == 404:
-                        logger.warning(
-                            "PubChem xrefs batch %d-%d returned 404 (no data).",
-                            i + 1,
-                            i + len(batch),
-                        )
+                        logger.warning("PubChem xrefs chunk (size=%d) returned 404 (no data).", len(batch))
                         success = True
                         data = {}
                         break
 
-                    # 504 or other server error – retry
+                    # 504: typically too-large batch; retry then split (below) if it keeps failing.
                     if resp.status_code == 504:
-                        logger.warning(
-                            "PubChem xrefs batch %d-%d got 504 (timeout).",
-                            i + 1,
-                            i + len(batch),
-                        )
+                        logger.warning("PubChem xrefs chunk (size=%d) got 504 (timeout).", len(batch))
                         if attempt < max_retries:
-                            time.sleep(retry_sleep)
+                            time.sleep(float(retry_sleep))
                         continue
 
                     resp.raise_for_status()
-                    data = resp.json()
+                    data = resp.json() if resp.content else {}
                     success = True
+                    break
 
                 except Exception as e:
-                    logger.error(
-                        "PubChem xrefs batch %d-%d failed on attempt %d/%d: %s",
-                        i + 1,
-                        i + len(batch),
+                    logger.warning(
+                        "PubChem xrefs chunk (size=%d) failed on attempt %d/%d: %s",
+                        len(batch),
                         attempt,
                         max_retries,
                         e,
                     )
                     if attempt < max_retries:
-                        time.sleep(retry_sleep)
+                        time.sleep(float(retry_sleep))
 
             if not success:
-                logger.error(
-                    "PubChem xrefs batch %d-%d permanently failed after %d attempts; "
-                    "these CIDs will have no PubChem xrefs.",
-                    i + 1,
-                    i + len(batch),
-                    max_retries,
-                )
+                # Split & retry if chunk is still sizeable.
+                if len(batch) > min_batch_size:
+                    mid = len(batch) // 2
+                    left = batch[:mid]
+                    right = batch[mid:]
+                    logger.warning(
+                        "Splitting failing PubChem xrefs chunk of %d CIDs into %d + %d",
+                        len(batch),
+                        len(left),
+                        len(right),
+                    )
+                    # Re-queue (left first so results appear earlier)
+                    if right:
+                        queue.appendleft(right)
+                    if left:
+                        queue.appendleft(left)
+                else:
+                    logger.error(
+                        "PubChem xrefs chunk permanently failed (size=%d) after %d attempts; skipping these CIDs.",
+                        len(batch),
+                        max_retries,
+                    )
                 continue
 
             info_list = (
-                data.get("InformationList", {})
-                .get("Information", [])
+                data.get("InformationList", {}).get("Information", [])
                 if isinstance(data, dict)
                 else []
             )
@@ -455,8 +718,11 @@ class NodesOntologyEnricher:
 
                 if out:
                     results[cid_val] = out
-            time.sleep(0.5)  # be polite to PubChem
+
+            time.sleep(getattr(self, "pubchem_polite_sleep", 0.2))  # be polite to PubChem
+
         return results
+
 
     def enrich_compounds(
         self,
@@ -464,6 +730,10 @@ class NodesOntologyEnricher:
         output_name: str = "Compound_Properties_WithOntologies.csv",
         inchikey_col: str = "InChIKey",
         cid_col: str = "CompoundID",
+        include_mesh_terms: bool = True,
+        include_chemical_classes: bool = True,
+        pugview_max_workers: int = 6,
+        chebi_max_workers: int = 6,
     ) -> Optional[pd.DataFrame]:
 
         input_path = f"{self.data_dir}/{input_name}"
@@ -516,7 +786,10 @@ class NodesOntologyEnricher:
             cid_values = cid_series.dropna().astype(int).tolist()
             pubchem_xrefs = self._fetch_compound_xrefs_pubchem_batch(
                 cid_values,
-                batch_size=100,
+                batch_size=getattr(self, "pubchem_xrefs_batch_size", 50),
+                max_retries=getattr(self, "pubchem_xrefs_max_retries", 3),
+                retry_sleep=getattr(self, "pubchem_xrefs_retry_sleep", 5.0),
+                min_batch_size=getattr(self, "pubchem_xrefs_min_batch_size", 10),
             )
 
         # ------------------------------------------------------
@@ -556,7 +829,7 @@ class NodesOntologyEnricher:
 
         # Track per-ontology, per-source counts for the run summary
         ontology_source_counts: Dict[str, Dict[str, int]] = {
-            out_col: {"MyChem": 0, "PubChem": 0}
+            out_col: {"MyChem": 0, "PubChem": 0, "PUGView": 0}
             for out_col in output_fields.keys()
         }
 
@@ -644,7 +917,269 @@ class NodesOntologyEnricher:
         for src_col, values in source_columns_data.items():
             df[src_col] = values
 
+        
         # ------------------------------------------------------
+        # 3b) Optional: MeSH terms + chemical classes (PubChem PUG-View + NLM MeSH + ChEBI parents)
+        # ------------------------------------------------------
+        cid_to_record: Dict[int, Dict[str, Any]] = {}
+        cid_mesh_entry_terms: Dict[int, List[str]] = {}
+        cid_mesh_pharm_class: Dict[int, List[str]] = {}
+        cid_mesh_ref_ids: Dict[int, List[str]] = {}
+        cid_mesh_embedded_ids: Dict[int, List[str]] = {}
+        cid_chebi_embedded_ids: Dict[int, List[str]] = {}
+        cid_pubchem_chem_class: Dict[int, Dict[str, List[str]]] = {}
+        cid_pubchem_ontology_summary: Dict[int, str] = {}
+        chebi_to_parents: Dict[str, Dict[str, List[str]]] = {}
+
+        if (include_mesh_terms or include_chemical_classes) and cid_series is not None:
+            uniq_cids = sorted({int(c) for c in cid_series.dropna().astype(int).tolist()})
+            if uniq_cids:
+                logger.info(
+                    "Fetching PubChem PUG-View records for %d unique CIDs (max_workers=%d)…",
+                    len(uniq_cids),
+                    pugview_max_workers,
+                )
+
+                def _fetch_pug(cid: int):
+                    return cid, self._pubchem_pug_view_record(cid)
+
+                with ThreadPoolExecutor(max_workers=max(1, int(pugview_max_workers))) as ex:
+                    futures = {ex.submit(_fetch_pug, cid): cid for cid in uniq_cids}
+                    for fut in as_completed(futures):
+                        cid, rec = fut.result()
+                        if isinstance(rec, dict):
+                            cid_to_record[cid] = rec
+
+                # Parse PUG-View records (local CPU work)
+                for cid, rec in cid_to_record.items():
+                    try:
+                        embedded = self._extract_ids_from_record_text(rec)
+                        cid_mesh_embedded_ids[cid] = embedded.get("mesh_unique_ids", []) or []
+                        cid_chebi_embedded_ids[cid] = embedded.get("chebi_ids", []) or []
+                    except Exception:
+                        cid_mesh_embedded_ids[cid] = []
+                        cid_chebi_embedded_ids[cid] = []
+
+                    if include_mesh_terms:
+                        cid_mesh_entry_terms[cid] = self._extract_terms_by_toc_heading(rec, "MeSH Entry Terms")
+                        cid_mesh_pharm_class[cid] = self._extract_terms_by_toc_heading(rec, "MeSH Pharmacological Classification")
+                        refs = self._extract_pubchem_mesh_references(rec)
+                        cid_mesh_ref_ids[cid] = [r.get("mesh_source_id", "") for r in refs if r.get("mesh_source_id")]
+
+                    if include_chemical_classes:
+                        class_secs = self._find_sections_heading_contains(rec, ("chemical classification", "chemical taxonomy"))
+                        cid_pubchem_chem_class[cid] = self._extract_kv_from_sections(class_secs) if class_secs else {}
+                        ont = self._extract_terms_by_toc_heading(rec, "Ontology Summary")
+                        cid_pubchem_ontology_summary[cid] = (ont[0] if ont else "")
+
+                # ChEBI parents (cached + parallel). We use both MyChem ChEBI IDs and any ChEBI tokens embedded in PubChem.
+                if include_chemical_classes:
+                    chebi_ids: Set[str] = set()
+
+                    if "ChEBI_IDs" in df.columns:
+                        for s in df["ChEBI_IDs"].fillna("").astype(str).tolist():
+                            for tok in s.split("|"):
+                                tok = tok.strip()
+                                if tok:
+                                    chebi_ids.add(tok)
+
+                    for lst in cid_chebi_embedded_ids.values():
+                        for tok in lst or []:
+                            tok = str(tok).strip()
+                            if tok:
+                                chebi_ids.add(tok)
+
+                    chebi_ids_list = sorted(chebi_ids)
+                    if chebi_ids_list:
+                        logger.info(
+                            "Fetching ChEBI parent classes for %d unique ChEBI IDs (max_workers=%d)…",
+                            len(chebi_ids_list),
+                            chebi_max_workers,
+                        )
+
+                        def _fetch_chebi(cid: str):
+                            parents = self._chebi_get_parent_nodes(cid)
+                            p_ids = sorted({p.get("chebiId") for p in parents if p.get("chebiId")})
+                            p_names = sorted({p.get("chebiName") for p in parents if p.get("chebiName")})
+                            return cid, [str(x) for x in p_ids if x], [str(x) for x in p_names if x]
+
+                        with ThreadPoolExecutor(max_workers=max(1, int(chebi_max_workers))) as ex:
+                            futures = {ex.submit(_fetch_chebi, c): c for c in chebi_ids_list}
+                            for fut in as_completed(futures):
+                                c, p_ids, p_names = fut.result()
+                                chebi_to_parents[c] = {"ids": p_ids, "names": p_names}
+
+        # Create new columns (row-wise) without extra HTTP calls
+        if include_mesh_terms or include_chemical_classes:
+            mesh_entry_out: List[str] = []
+            mesh_pharm_out: List[str] = []
+            mesh_embedded_ids_out: List[str] = []
+            mesh_all_ids_out: List[str] = []
+            mesh_terms_sources_out: List[str] = []
+
+            pubchem_ontology_summary_out: List[str] = []
+            pubchem_chemclass_json_out: List[str] = []
+            pubchem_kingdom_out: List[str] = []
+            pubchem_superclass_out: List[str] = []
+            pubchem_class_out: List[str] = []
+            pubchem_subclass_out: List[str] = []
+            pubchem_direct_parent_out: List[str] = []
+            pubchem_alt_parent_out: List[str] = []
+            pubchem_framework_out: List[str] = []
+
+            chebi_parent_ids_out: List[str] = []
+            chebi_parent_names_out: List[str] = []
+            chemical_classes_sources_out: List[str] = []
+
+            for _, row in df.iterrows():
+                cid_val: Optional[int] = None
+                if cid_series is not None:
+                    cid_raw = row.get(cid_col)
+                    if pd.notna(cid_raw):
+                        try:
+                            cid_val = int(cid_raw)
+                        except Exception:
+                            cid_val = None
+
+                # Existing MeSH IDs (from MyChem/PubChem xrefs) – keep as part of completeness union
+                existing_mesh_ids: Set[str] = set()
+                existing_mesh_raw = row.get("MeSH_IDs", "")
+                if pd.notna(existing_mesh_raw):
+                    for tok in str(existing_mesh_raw).split("|"):
+                        tok = tok.strip()
+                        if tok:
+                            existing_mesh_ids.add(tok)
+
+                entry_terms = cid_mesh_entry_terms.get(cid_val, []) if cid_val is not None else []
+                pharm_terms = cid_mesh_pharm_class.get(cid_val, []) if cid_val is not None else []
+                embedded_mesh_ids = cid_mesh_embedded_ids.get(cid_val, []) if cid_val is not None else []
+                pubchem_ref_ids = cid_mesh_ref_ids.get(cid_val, []) if cid_val is not None else []
+                # Union all MeSH IDs we know about (completeness)
+                all_mesh_ids = set(existing_mesh_ids)
+                all_mesh_ids.update([x for x in embedded_mesh_ids if x])
+                all_mesh_ids.update([x for x in pubchem_ref_ids if x])
+
+                # Sources
+                mesh_sources: Set[str] = set()
+                if existing_mesh_ids:
+                    mesh_sources.add("MyChem/PubChemXrefs")
+                if (entry_terms or pharm_terms or embedded_mesh_ids or pubchem_ref_ids) and cid_val is not None:
+                    mesh_sources.add("PubChemPUGView")
+
+                mesh_entry_out.append("|".join(entry_terms) if include_mesh_terms and entry_terms else "")
+                mesh_pharm_out.append("|".join(pharm_terms) if include_mesh_terms and pharm_terms else "")
+                mesh_embedded_ids_out.append("|".join(sorted(set(embedded_mesh_ids))) if include_mesh_terms and embedded_mesh_ids else "")
+                mesh_all_ids_out.append("|".join(sorted(all_mesh_ids)) if include_mesh_terms and all_mesh_ids else "")
+                mesh_terms_sources_out.append(";".join(sorted(mesh_sources)) if include_mesh_terms and mesh_sources else "")
+
+                # Chemical classes
+                chem_sources: Set[str] = set()
+                chem_dict: Dict[str, List[str]] = {}
+                ont_sum = ""
+                if cid_val is not None and include_chemical_classes:
+                    chem_dict = cid_pubchem_chem_class.get(cid_val, {}) or {}
+                    ont_sum = cid_pubchem_ontology_summary.get(cid_val, "") or ""
+                    if chem_dict or ont_sum:
+                        chem_sources.add("PubChemPUGView")
+
+                # Extract commonly used ClassyFire-like keys if present
+                def _pick(keys: Tuple[str, ...]) -> str:
+                    for k in keys:
+                        if k in chem_dict and chem_dict.get(k):
+                            return "|".join([str(x) for x in chem_dict.get(k) if x])
+                    return ""
+
+                pubchem_ontology_summary_out.append(ont_sum if include_chemical_classes else "")
+                pubchem_chemclass_json_out.append(json.dumps(chem_dict, ensure_ascii=False) if include_chemical_classes and chem_dict else "")
+                pubchem_kingdom_out.append(_pick(("Kingdom", "kingdom")))
+                pubchem_superclass_out.append(_pick(("Superclass", "superclass")))
+                pubchem_class_out.append(_pick(("Class", "class")))
+                pubchem_subclass_out.append(_pick(("Subclass", "subclass")))
+                pubchem_direct_parent_out.append(_pick(("Direct Parent", "Direct parent", "DirectParent")))
+                pubchem_alt_parent_out.append(_pick(("Alternative Parent", "Alternative parent", "AlternativeParent")))
+                pubchem_framework_out.append(_pick(("Molecular Framework", "Molecular framework", "MolecularFramework")))
+
+                # ChEBI parents aggregated
+                parent_ids: Set[str] = set()
+                parent_names: Set[str] = set()
+
+                chebi_ids_for_row: Set[str] = set()
+                chebi_raw = row.get("ChEBI_IDs", "")
+                if pd.notna(chebi_raw):
+                    for tok in str(chebi_raw).split("|"):
+                        tok = tok.strip()
+                        if tok:
+                            chebi_ids_for_row.add(tok)
+
+                if cid_val is not None:
+                    for tok in cid_chebi_embedded_ids.get(cid_val, []) or []:
+                        tok = str(tok).strip()
+                        if tok:
+                            chebi_ids_for_row.add(tok)
+
+                for chebi_id in chebi_ids_for_row:
+                    p = chebi_to_parents.get(chebi_id)
+                    if p:
+                        parent_ids.update(p.get("ids", []) or [])
+                        parent_names.update(p.get("names", []) or [])
+
+                if chebi_ids_for_row:
+                    chem_sources.add("ChEBI")
+
+                chebi_parent_ids_out.append("|".join(sorted(parent_ids)) if include_chemical_classes and parent_ids else "")
+                chebi_parent_names_out.append("|".join(sorted(parent_names)) if include_chemical_classes and parent_names else "")
+                chemical_classes_sources_out.append(";".join(sorted(chem_sources)) if include_chemical_classes and chem_sources else "")
+
+            # Attach new columns
+            if include_mesh_terms:
+                df["MeSH_Entry_Terms"] = mesh_entry_out
+                df["MeSH_Pharmacological_Classification"] = mesh_pharm_out
+                df["MeSH_Embedded_IDs"] = mesh_embedded_ids_out
+                df["MeSH_All_IDs"] = mesh_all_ids_out
+                df["MeSH_Terms_Sources"] = mesh_terms_sources_out
+
+            # Backfill legacy MeSH_IDs + MeSH_Sources to include PUG-View / MeSH RDF resolution.
+            # This makes downstream graph linking easier while keeping provenance explicit.
+            if "MeSH_IDs" in df.columns and "MeSH_All_IDs" in df.columns and "MeSH_Sources" in df.columns:
+                merged_ids: List[str] = []
+                merged_sources: List[str] = []
+                pugview_rows = 0
+
+                for existing_ids, all_ids, srcs in zip(
+                    df["MeSH_IDs"].fillna(""),
+                    df["MeSH_All_IDs"].fillna(""),
+                    df["MeSH_Sources"].fillna(""),
+                ):
+                    ids_set = set([x for x in str(existing_ids).split("|") if x]) | set([x for x in str(all_ids).split("|") if x])
+                    merged_ids.append("|".join(sorted(ids_set)) if ids_set else "")
+
+                    src_set = set([x for x in str(srcs).split(";") if x])
+                    if str(all_ids).strip():
+                        src_set.add("PUGView")
+                        pugview_rows += 1
+                    merged_sources.append(";".join(sorted(src_set)) if src_set else "")
+
+                df["MeSH_IDs"] = merged_ids
+                df["MeSH_Sources"] = merged_sources
+
+                # Update per-source counters for MeSH only (other ontologies remain MyChem/PubChem only)
+                ontology_source_counts["MeSH_IDs"]["PUGView"] = int(pugview_rows)
+
+            if include_chemical_classes:
+                df["PubChem_Ontology_Summary"] = pubchem_ontology_summary_out
+                df["PubChem_Chemical_Classification_JSON"] = pubchem_chemclass_json_out
+                df["PubChem_ChemicalClass_Kingdom"] = pubchem_kingdom_out
+                df["PubChem_ChemicalClass_Superclass"] = pubchem_superclass_out
+                df["PubChem_ChemicalClass_Class"] = pubchem_class_out
+                df["PubChem_ChemicalClass_Subclass"] = pubchem_subclass_out
+                df["PubChem_ChemicalClass_DirectParent"] = pubchem_direct_parent_out
+                df["PubChem_ChemicalClass_AlternativeParent"] = pubchem_alt_parent_out
+                df["PubChem_ChemicalClass_MolecularFramework"] = pubchem_framework_out
+                df["ChEBI_Parent_IDs"] = chebi_parent_ids_out
+                df["ChEBI_Parent_Names"] = chebi_parent_names_out
+                df["Chemical_Classes_Sources"] = chemical_classes_sources_out
+
+# ------------------------------------------------------
         # 4) Ontology counts summary + transparency metadata
         # ------------------------------------------------------
         ontology_counts: Dict[str, int] = {}
@@ -664,10 +1199,21 @@ class NodesOntologyEnricher:
         missing_all: List[str] = []
         for _, row in df.iterrows():
             ik_val = str(row[inchikey_col]).strip() if pd.notna(row[inchikey_col]) else ""
-            has_any = any(
-                bool(str(row[col]).strip())
-                for col in output_fields.keys()
-            )
+            fields_to_check = list(output_fields.keys())
+            if include_mesh_terms:
+                fields_to_check += [
+                    "MeSH_Entry_Terms",
+                    "MeSH_Pharmacological_Classification",
+                    "MeSH_All_IDs",
+                ]
+            if include_chemical_classes:
+                fields_to_check += [
+                    "PubChem_Chemical_Classification_JSON",
+                    "PubChem_Ontology_Summary",
+                    "ChEBI_Parent_IDs",
+                ]
+
+            has_any = any(bool(str(row.get(col, "")).strip()) for col in fields_to_check)
             if not has_any and ik_val:
                 missing_all.append(ik_val)
 
@@ -680,25 +1226,53 @@ class NodesOntologyEnricher:
         logger.info("Ontology counts / coverage (all sources):")
         for k, v in ontology_counts.items():
             logger.info(
-                "  %s: %d  (%.2f%%) [MyChem=%d, PubChem=%d]",
+                "  %s: %d  (%.2f%%) [MyChem=%d, PubChem=%d, PUGView=%d]",
                 k,
                 v,
                 ontology_percent[k],
                 ontology_source_counts[k]["MyChem"],
                 ontology_source_counts[k]["PubChem"],
+                ontology_source_counts[k].get("PUGView", 0)
             )
 
         # Build final summary dict
+        retrieved_fields = list(output_fields.keys())
+        if include_mesh_terms:
+            retrieved_fields += [
+                "MeSH_Entry_Terms",
+                "MeSH_Pharmacological_Classification",
+                "MeSH_Embedded_IDs",
+                "MeSH_All_IDs",
+                "MeSH_Terms_Sources",
+            ]
+        if include_chemical_classes:
+            retrieved_fields += [
+                "PubChem_Ontology_Summary",
+                "PubChem_Chemical_Classification_JSON",
+                "PubChem_ChemicalClass_Kingdom",
+                "PubChem_ChemicalClass_Superclass",
+                "PubChem_ChemicalClass_Class",
+                "PubChem_ChemicalClass_Subclass",
+                "PubChem_ChemicalClass_DirectParent",
+                "PubChem_ChemicalClass_AlternativeParent",
+                "PubChem_ChemicalClass_MolecularFramework",
+                "ChEBI_Parent_IDs",
+                "ChEBI_Parent_Names",
+                "Chemical_Classes_Sources",
+            ]
+
         run_summary = {
             "total_compounds_processed": int(num_total),
+            "total_nodes_processed": int(num_total),  # generic key for tooling/tests
             "total_unique_inchikeys": int(num_total),
             "total_successful_hits": int(num_total - num_missing),
+            "total_successful_hits_any": int(num_total - num_missing),  # generic key for tooling/tests
             "total_missing_entries": int(num_missing),
             "missing_inchikeys": missing_all,
             "ontology_counts": ontology_counts,
             "ontology_coverage_percent": ontology_percent,
             "ontology_source_counts": ontology_source_counts,  # <-- NEW
-            "retrieved_fields": list(output_fields.keys()),
+            "retrieved_fields": retrieved_fields,
             "input_file": input_path,
             "output_file": f"{self.data_dir}/{output_name}",
             "inchikey_column": inchikey_col,
@@ -714,7 +1288,7 @@ class NodesOntologyEnricher:
             ],
             "created_at": datetime.datetime.utcnow().isoformat() + "Z",
             "batch_size_mychem": 200,
-            "batch_size_pubchem": 100,
+            "batch_size_pubchem": int(getattr(self, "pubchem_xrefs_batch_size", 50)),
             "source": "MyChem.info(BioThings);PubChem PUG REST",
         }
 
@@ -725,8 +1299,8 @@ class NodesOntologyEnricher:
         # 5) Save enriched version
         # ------------------------------------------------------
         df["OntologyEnrichedAt"] = datetime.datetime.utcnow().isoformat() + "Z"
-        df["OntologyEnricherVersion"] = "ChemGraphBuilder.MyChem+PubChem/1.1"
-        df["OntologySources"] = "MyChem.info;PubChem"
+        df["OntologyEnricherVersion"] = "ChemGraphBuilder.MyChem+PubChem+PUGView+MeSH+ChEBI/1.2"
+        df["OntologySources"] = "MyChem.info;PubChem;PubChemPUGView;NLMMeSH;ChEBI"
 
         out_path = f"{self.data_dir}/{output_name}"
         df.to_csv(out_path, index=False)
@@ -1055,6 +1629,8 @@ class NodesOntologyEnricher:
             # "HPO_Terms": "HPO",    # not populated
         }
 
+        retrieved_fields = list(output_fields.keys())
+
         # Fill columns
         for out_col, logical_key in output_fields.items():
             values: List[str] = []
@@ -1138,13 +1714,15 @@ class NodesOntologyEnricher:
         # Build and save JSON summary
         run_summary = {
             "total_genes_processed": int(num_total),
+            "total_nodes_processed": int(num_total),  # generic key for tooling/tests
             "total_unique_gene_ids": int(num_total),
             "total_successful_hits": int(num_total - num_missing),
+            "total_successful_hits_any": int(num_total - num_missing),  # generic key for tooling/tests
             "total_missing_entries": int(num_missing),
             "missing_gene_ids": missing_all,
             "ontology_counts": ontology_counts,
             "ontology_coverage_percent": ontology_percent,
-            "retrieved_fields": list(output_fields.keys()),
+            "retrieved_fields": retrieved_fields,
             "ontology_sources": ontology_sources,
             "input_file": input_path,
             "output_file": f"{self.data_dir}/{output_name}",
@@ -1773,8 +2351,10 @@ class NodesOntologyEnricher:
 
         run_summary = {
             "total_proteins_processed": int(num_rows),
+            "total_nodes_processed": int(num_rows),  # generic key for tooling/tests
             "total_unique_input_accessions": int(len(raw_ids)),
             "total_successful_hits": int(num_success),
+            "total_successful_hits_any": int(num_success),  # generic key for tooling/tests
             "total_missing_entries": int(num_missing),
             "missing_input_accessions": missing_all,
             "ontology_counts": ontology_counts,
@@ -2410,6 +2990,7 @@ class NodesOntologyEnricher:
         # Build and save JSON summary
         run_summary = {
             "total_assays_processed": int(num_rows),
+            "total_nodes_processed": int(num_rows),  # generic key for tooling/tests
             "total_successful_hits_any": int(num_success),
             "total_missing_entries": int(num_missing),
             "missing_assay_ids": missing_all,
