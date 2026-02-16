@@ -1,0 +1,133 @@
+digraph FigG_MLView_pub {
+  graph [
+    rankdir=LR,
+    bgcolor="white",
+    splines=polyline,   // more stable + cleaner than ortho for slides
+    overlap=false,
+    pad=0.25,
+    nodesep=0.9,
+    ranksep=1.15,
+    fontname="Helvetica",
+    fontsize=18,
+    labelloc="t",
+    labeljust="l",
+    label="Figure G — ML-ready view (materialized edge + feature aggregation)"
+  ];
+
+  node [
+    style="filled",
+    fontname="Helvetica",
+    fontsize=13,
+    penwidth=1.2,
+    color="#2f2f2f"
+  ];
+
+  edge [
+    fontname="Helvetica",
+    fontsize=11,
+    penwidth=1.1,
+    arrowsize=0.75,
+    color="#607d8b",
+    fontcolor="#37474f"
+  ];
+
+  // -------------------------
+  // Core nodes used by the GNN
+  // -------------------------
+  Compound [shape=circle, fixedsize=true, width=1.6, height=1.6,
+            fillcolor="#d81b60", fontcolor="white",
+            label=<<B>Compound</B><BR/><FONT POINT-SIZE="10">PubChem CID</FONT>>];
+
+  Protein  [shape=circle, fixedsize=true, width=1.6, height=1.6,
+            fillcolor="#2e7d32", fontcolor="white",
+            label=<<B>Protein / Enzyme</B><BR/><FONT POINT-SIZE="10">UniProt / EC</FONT>>];
+
+  // The ML target edge (materialized)
+  edge [style=bold, color="#37474f", penwidth=1.6, arrowsize=0.9, fontcolor="#111827"];
+  Compound -> Protein [label="INTERACTS_WITH  (prediction target)"];
+
+  // -------------------------
+  // Feature aggregation (inputs)
+  // -------------------------
+  subgraph cluster_feat {
+    label="Feature aggregation (from layered evidence)";
+    fontsize=12;
+    fontcolor="#0f172a";
+    color="#cbd5e1";
+    style="rounded,dashed,filled";
+    fillcolor="#f8fafc";
+    penwidth=1.0;
+
+    node [shape=box, style="rounded,filled", fillcolor="#eef2f7",
+          fontcolor="#111827", fontsize=11, penwidth=1.0];
+
+    Feat_Assay [label=<
+      <B>Assay evidence</B><BR/><FONT POINT-SIZE="9">
+      activity_call / potency bins,<BR/>
+      endpoint type, organism/context,<BR/>
+      assay category (BAO/OBI)
+      </FONT>
+    >];
+
+    Feat_Annot [label=<
+      <B>Node annotations</B><BR/><FONT POINT-SIZE="9">
+      chemical classes (ChEBI/MeSH),<BR/>
+      GO terms, domains (Pfam/InterPro),<BR/>
+      pathways (Reactome/KEGG)
+      </FONT>
+    >];
+
+    Feat_Prov [label=<
+      <B>Provenance controls</B><BR/><FONT POINT-SIZE="9">
+      source/release filters,<BR/>
+      evidence counts, confidence weights<BR/>
+      (avoid leakage into labels)
+      </FONT>
+    >];
+
+    // Order top→bottom within the cluster
+    edge [style=invis];
+    Feat_Assay -> Feat_Annot -> Feat_Prov;
+  }
+
+  // Connect features to the target edge via a small “EdgeFeature” box (keeps it tidy)
+  EdgeFeat [shape=box, style="rounded,filled", fillcolor="#ffffff",
+            fontcolor="#111827", fontsize=11, penwidth=1.0,
+            label=<
+              <B>Edge feature vector</B><BR/><FONT POINT-SIZE="9">
+              aggregated per (Compound, Protein)
+              </FONT>
+            >];
+
+  edge [style=dashed, color="#90a4ae", fontcolor="#546e7a", penwidth=1.1, arrowsize=0.7];
+  Feat_Assay -> EdgeFeat;
+  Feat_Annot -> EdgeFeat;
+  Feat_Prov  -> EdgeFeat;
+
+  // Show that EdgeFeat feeds the ML target (without cluttering)
+  edge [style=dotted, color="#616161", fontcolor="#424242", penwidth=1.2, arrowsize=0.7];
+  EdgeFeat -> Compound [label="GNN input", constraint=false];
+  EdgeFeat -> Protein  [constraint=false];
+
+  // -------------------------
+  // Labels / supervision (training)
+  // -------------------------
+  Label [shape=box, style="rounded,filled", fillcolor="#ffe7e7", fontcolor="#111827",
+         color="#ef9a9a", fontsize=11, penwidth=1.0,
+         label=<
+           <B>Training label</B><BR/><FONT POINT-SIZE="9">
+           InteractionAssertion / curated activity label<BR/>
+           (positive/negative or graded)
+           </FONT>
+         >];
+
+  edge [style=dashed, color="#ef5350", fontcolor="#b71c1c", penwidth=1.2, arrowsize=0.8];
+  Label -> Compound [label="supervises", constraint=false];
+  Label -> Protein  [constraint=false];
+
+  // -------------------------
+  // Layout nudges
+  // -------------------------
+  { rank=same; Compound; Protein; }
+  { rank=max; Label; }
+}

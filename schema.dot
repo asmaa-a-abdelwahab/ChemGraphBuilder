@@ -1,0 +1,400 @@
+digraph ChemGraphBuilderSchema {
+  graph [
+    rankdir=LR,
+    splines=ortho,
+    overlap=false,
+    concentrate=false,
+
+    // spacing / clarity
+    nodesep=1.05,
+    ranksep="1.55 equally",
+    pad=0.55,
+    sep="+28,22",
+    esep="+18,12",
+
+    // cluster behavior
+    compound=true,
+    newrank=true,
+    clusterrank=local,
+
+    bgcolor="white",
+    fontname="Helvetica",
+    fontsize=18,
+    labelloc="t",
+    labeljust="l",
+    // label="ChemGraphBuilder Knowledge Graph Schema (evidence-aware; thesis figure)"
+  ];
+
+  node [
+    fontname="Helvetica",
+    fontsize=12,
+    shape=ellipse,
+    style="filled",
+    color="#2f2f2f",
+    penwidth=1.6
+  ];
+
+  edge [
+    fontname="Helvetica",
+    fontsize=12,
+    color="#4b4b4b",
+    fontcolor="#263238",
+    penwidth=1.6,
+    arrowsize=0.85,
+  ];
+
+  // ============================================================
+  // Legend (anchored top-left)
+  // ============================================================
+  subgraph cluster_legend {
+    label="Legend";
+    labelloc="t";
+    labeljust="l";
+    fontsize=13;
+    fontname="Helvetica";
+    style="rounded,dashed";
+    color="#ffffff";
+    penwidth=1.2;
+    bgcolor="#e5dfdf";
+    margin="10";
+
+    LegendTable [shape=plaintext, label=<
+      <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="7" COLOR="#ffffff">
+        <TR><TD COLSPAN="2"><B>Edge styles</B></TD></TR>
+        <TR><TD ALIGN="LEFT">Solid</TD><TD ALIGN="LEFT">Primary asserted relation (e.g. assay result)</TD></TR>
+        <TR><TD ALIGN="LEFT">Dashed gray</TD><TD ALIGN="LEFT">Provenance / evidence links (e.g. SUPPORTED_BY, FROM_SOURCE)</TD></TR>
+        <TR><TD ALIGN="LEFT">Solid</TD><TD ALIGN="LEFT">Primary asserted relation</TD></TR>
+        <TR><TD ALIGN="LEFT">Dashed gray</TD><TD ALIGN="LEFT">Provenance / evidence links (SUPPORTED_BY / FROM_SOURCE)</TD></TR>
+        <TR><TD ALIGN="LEFT">Dotted</TD><TD ALIGN="LEFT">Derived / materialized view (optional)</TD></TR>
+
+        <TR><TD COLSPAN="2"><B>Node roles</B></TD></TR>
+        <TR><TD ALIGN="LEFT">Core entities</TD><TD ALIGN="LEFT">Compound, BioAssay, Gene, Protein, Publication</TD></TR>
+        <TR><TD ALIGN="LEFT">Reified assertions</TD><TD ALIGN="LEFT">AssayResult, InteractionAssertion, CooccurrenceAssertion</TD></TR>
+        <TR><TD ALIGN="LEFT">Metabolism</TD><TD ALIGN="LEFT">MetabolicTransformation (normalized reaction)</TD></TR>
+      </TABLE>
+    >];
+  }
+
+  LegendAnchor [shape=point, width=0.01, label="", style=invis];
+  LegendAnchor [shape=point width=0.01 label="" style=invis];
+  LegendAnchor -> LegendTable [style=invis];
+
+  // ============================================================
+  // Layer clusters (no ontology section)
+  // ============================================================
+
+  // --- Layer 1: Core entities ---
+  subgraph cluster_core {
+    label="Layer 1 — Core entities";
+    style="rounded,dashed";
+    color="#9aa7b2";
+    penwidth=1.2;
+
+    Compound [
+      label="Compound\n(PubChem CID)\nInChIKey / SMILES",
+      fillcolor="#e91e63",
+      fontcolor="white",
+      shape=circle,
+      fixedsize=true,
+      width=1.85
+    ];
+
+    BioAssay [
+      label="BioAssay\n(PubChem AID)",
+      fillcolor="#ffb74d",
+      fontcolor="#1f1f1f",
+      shape=circle,
+      fixedsize=true,
+      width=1.45
+    ];
+
+    Gene [
+      label="Gene\n(NCBI / HGNC / Ensembl)",
+      fillcolor="#03a9f4",
+      fontcolor="white",
+      shape=circle,
+      fixedsize=true,
+      width=1.95
+    ];
+
+    Protein [
+      label="Protein / Enzyme\n(UniProt / EC)",
+      fillcolor="#4caf50",
+      fontcolor="white",
+      shape=circle,
+      fixedsize=true,
+      width=1.55
+    ];
+
+    Publication [
+      label="Publication\n(PMID / DOI)",
+      fillcolor="#ffffff",
+      fontcolor="#263238",
+      shape=box,
+      style="rounded,filled",
+      color="#90a4ae"
+    ];
+
+    DataSource [
+      label="DataSource\n(PubChem / SDQ / Literature pipeline / ...)",
+      fillcolor="#ffffff",
+      fontcolor="#263238",
+      shape=box,
+      style="rounded,filled",
+      color="#c0c0c0"
+    ];
+  }
+
+  // --- Layer 4: Metabolism / transformation ---
+  subgraph cluster_metabolism {
+    label="Layer 4 — Metabolism / transformation";
+    style="rounded,dashed";
+    color="#9aa7b2";
+    penwidth=1.2;
+
+    MetabolicTransformation [
+      label="MetabolicTransformation\n(reaction_type, context,\norganism, confidence)",
+      shape=diamond,
+      fillcolor="#c8e6c9",
+      fontcolor="#1f1f1f",
+      color="#2e7d32"
+    ];
+  }
+
+  // --- Layer 5: Literature co-occurrence ---
+  subgraph cluster_lit {
+    label="Layer 5 — Literature co-occurrence";
+    style="rounded,dashed";
+    color="#9aa7b2";
+    penwidth=1.2;
+
+    CooccurrenceAssertion [
+      label="CooccurrenceAssertion\n(article_count, score,\nsource, section)",
+      shape=box,
+      style="rounded,filled",
+      fillcolor="#e1bee7",
+      fontcolor="#311b92",
+      color="#6a1b9a"
+    ];
+  }
+
+  // --- Layer 6: Mechanistic assertions (training targets) ---
+  subgraph cluster_mech {
+    label="Layer 6 — Mechanistic assertions (training targets)";
+    style="rounded,dashed";
+    color="#9aa7b2";
+    penwidth=1.2;
+
+    AssayResult [
+      label="AssayResult\n(endpoint, value, unit,\nqualifier, activity_call,\nscore, confidence,\ncontext, organism)",
+      shape=box,
+      style="rounded,filled",
+      fillcolor="#ffe0b2",
+      fontcolor="#3e2723",
+      color="#ef6c00"
+    ];
+
+    InteractionAssertion [
+      label="InteractionAssertion\n(predicate, direction,\nconfidence, source,\ncontext, organism)",
+      shape=hexagon,
+      style="rounded,filled",
+      fillcolor="#ffcdd2",
+      fontcolor="#b71c1c",
+      color="#c62828"
+    ];
+  }
+
+  // ============================================================
+  // Column/rank control to avoid overlap & keep a clean layout
+  // (LR: ranks = columns)
+  // ============================================================
+  { rank=min; LegendAnchor; }
+
+  // Column 1 (left): compound + bioassay + assay results
+  { rank=same; AssayResult; Compound; BioAssay; }
+  AssayResult -> Compound -> BioAssay [style=invis, weight=30];
+
+  // Column 2 (middle): interaction assertion + gene + protein
+  { rank=same; InteractionAssertion; Gene; Protein; }
+  InteractionAssertion -> Gene -> Protein [style=invis, weight=30];
+
+  // Column 3 (right): metabolism + cooccurrence + publication + source
+  { rank=same; CooccurrenceAssertion; MetabolicTransformation; Publication; DataSource; }
+  CooccurrenceAssertion -> MetabolicTransformation -> Publication -> DataSource [style=invis, weight=30];
+
+  // anchor legend to top-left of graph
+  LegendAnchor -> AssayResult [style=invis, weight=100];
+
+  // ============================================================
+  // Core biology relations (solid)
+  // ============================================================
+
+  // Assay context
+  Compound -> BioAssay [
+    xlabel="TESTED_IN",
+    color="#9e9e9e",
+    fontcolor="#37474f",
+    penwidth=1.5,
+    minlen=2
+  ];
+
+  // Prefer Protein as canonical target (thesis-friendly)
+  BioAssay -> Protein [
+    xlabel="TARGETS_PROTEIN",
+    color="#ef6c00",
+    fontcolor="#4e342e",
+    penwidth=1.8,
+    minlen=2
+  ];
+
+  Gene -> Protein [
+    xlabel="ENCODES",
+    color="#0097a7",
+    fontcolor="#004d40",
+    penwidth=1.7,
+    minlen=2
+  ];
+
+  // ============================================================
+  // Metabolism (normalized) — solid
+  // ============================================================
+  Compound -> MetabolicTransformation [
+    xlabel="SUBSTRATE_OF",
+    color="#2e7d32",
+    fontcolor="#1b5e20",
+    penwidth=1.8,
+    minlen=2
+  ];
+
+  MetabolicTransformation -> Compound [
+    xlabel="PRODUCT",
+    color="#2e7d32",
+    fontcolor="#1b5e20",
+    penwidth=1.8,
+    minlen=2
+  ];
+
+  MetabolicTransformation -> Protein [
+    xlabel="CATALYZED_BY",
+    color="#2e7d32",
+    fontcolor="#1b5e20",
+    penwidth=1.8,
+    minlen=2
+  ];
+
+  // ============================================================
+  // Reified assertions
+  // Use HAS_SUBJECT / HAS_OBJECT (clearer than SUBJECT/OBJECT)
+  // ============================================================
+
+  // AssayResult captures measured evidence for a (compound, assay, target) tuple
+  AssayResult -> Compound [xlabel="HAS_SUBJECT", color="#ef6c00", fontcolor="#5d4037", penwidth=1.6];
+  AssayResult -> BioAssay  [xlabel="HAS_ASSAY",   color="#ef6c00", fontcolor="#5d4037", penwidth=1.6];
+  AssayResult -> Protein  [xlabel="HAS_TARGET",  color="#ef6c00", fontcolor="#5d4037", penwidth=1.6];
+
+  // InteractionAssertion captures mechanistic claim (e.g., inhibits/activates/binds)
+  InteractionAssertion -> Compound [xlabel="HAS_SUBJECT", color="#c62828", fontcolor="#b71c1c", penwidth=1.7];
+  InteractionAssertion -> Protein  [xlabel="HAS_OBJECT",  color="#c62828", fontcolor="#b71c1c", penwidth=1.7];
+
+  // CooccurrenceAssertion captures literature co-mentions (typically Gene–Compound; can also represent Compound–Compound)
+  CooccurrenceAssertion -> Gene     [xlabel="HAS_SUBJECT", color="#6a1b9a", fontcolor="#4a148c", penwidth=1.6];
+  CooccurrenceAssertion -> Compound [xlabel="HAS_OBJECT",  color="#6a1b9a", fontcolor="#4a148c", penwidth=1.6];
+
+  // ============================================================
+  // Provenance (dashed; keep out of rank constraints to avoid distortion)
+  // ============================================================
+  AssayResult -> Publication [
+    xlabel="SUPPORTED_BY",
+    style="dashed",
+    color="#90a4ae",
+    fontcolor="#546e7a",
+    penwidth=1.4,
+    constraint=false
+  ];
+
+  InteractionAssertion -> Publication [
+    xlabel="SUPPORTED_BY",
+    style="dashed",
+    color="#90a4ae",
+    fontcolor="#546e7a",
+    penwidth=1.4,
+    constraint=false
+  ];
+
+  CooccurrenceAssertion -> Publication [
+    xlabel="SUPPORTED_BY",
+    style="dashed",
+    color="#90a4ae",
+    fontcolor="#546e7a",
+    penwidth=1.4,
+    constraint=false
+  ];
+
+  MetabolicTransformation -> Publication [
+    xlabel="SUPPORTED_BY",
+    style="dashed",
+    color="#90a4ae",
+    fontcolor="#546e7a",
+    penwidth=1.4,
+    constraint=false
+  ];
+
+  // optional: record pipeline/source provenance for each assertion
+  AssayResult -> DataSource [
+    xlabel="FROM_SOURCE",
+    style="dashed",
+    color="#b0bec5",
+    fontcolor="#546e7a",
+    penwidth=1.2,
+    constraint=false
+  ];
+
+  InteractionAssertion -> DataSource [
+    xlabel="FROM_SOURCE",
+    style="dashed",
+    color="#b0bec5",
+    fontcolor="#546e7a",
+    penwidth=1.2,
+    constraint=false
+  ];
+
+  CooccurrenceAssertion -> DataSource [
+    xlabel="FROM_SOURCE",
+    style="dashed",
+    color="#b0bec5",
+    fontcolor="#546e7a",
+    penwidth=1.2,
+    constraint=false
+  ];
+
+  MetabolicTransformation -> DataSource [
+    xlabel="FROM_SOURCE",
+    style="dashed",
+    color="#b0bec5",
+    fontcolor="#546e7a",
+    penwidth=1.2,
+    constraint=false
+  ];
+
+  // ============================================================
+  // OPTIONAL: Derived/materialized shortcuts (dotted)
+  // Keep them light and clearly marked as derived.
+  // ============================================================
+  Compound -> Protein [
+    xlabel="INHIBITS (derived)",
+    style="dotted",
+    color="#c62828",
+    fontcolor="#b71c1c",
+    penwidth=1.2,
+    constraint=false
+  ];
+
+  Compound -> Protein [
+    xlabel="SUBSTRATE_OF (derived)",
+    style="dotted",
+    color="#2e7d32",
+    fontcolor="#1b5e20",
+    penwidth=1.2,
+    constraint=false
+  ];
+}

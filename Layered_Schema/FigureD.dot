@@ -1,0 +1,159 @@
+digraph FigD_ProvenanceIdentity_pub {
+  graph [
+    rankdir=LR,
+    bgcolor="white",
+    splines=ortho,
+    overlap=false,
+    pad=0.35,
+    nodesep=0.95,
+    ranksep=1.25,
+    fontname="Helvetica",
+    fontsize=18,
+    labelloc="t",
+    labeljust="l",
+    label="Figure D — Provenance, identity normalization, and reproducibility"
+  ];
+
+  node [
+    style="filled",
+    fontname="Helvetica",
+    fontsize=13,
+    penwidth=1.1,
+    color="#64748b"
+  ];
+
+  edge [
+    fontname="Helvetica",
+    fontsize=11,
+    penwidth=1.1,
+    arrowsize=0.75,
+    color="#90a4ae",
+    fontcolor="#546e7a",
+    style=dashed
+  ];
+
+  // =========================
+  // Left: Entities in the KG
+  // =========================
+  Entity [
+    shape=ellipse,
+    fillcolor="#ffffff",
+    fontcolor="#111827",
+    color="#94a3b8",
+    label=<
+      <B>Entity</B><BR/><FONT POINT-SIZE="10">
+      Compound / Gene / Protein / BioAssay<BR/>
+      AssayResult / Assertion
+      </FONT>
+    >
+  ];
+
+  // =========================
+  // Cluster A: Identity normalization
+  // =========================
+  subgraph cluster_id {
+    label="Identity normalization";
+    fontsize=12;
+    fontcolor="#0f172a";
+    color="#cbd5e1";
+    style="rounded,dashed,filled";
+    fillcolor="#f8fafc";
+
+    ExternalIdentifier [
+      shape=box,
+      style="rounded,filled",
+      fillcolor="#f3f4f6",
+      fontcolor="#111827",
+      color="#cbd5e1",
+      label=<
+        <B>ExternalIdentifier</B><BR/><FONT POINT-SIZE="10">
+        db, accession, url
+        </FONT>
+      >
+    ];
+
+    DataSource [
+      shape=ellipse,
+      fillcolor="#e5e7eb",
+      fontcolor="#111827",
+      color="#cbd5e1",
+      label=<
+        <B>DataSource</B><BR/><FONT POINT-SIZE="10">
+        PubChem / UniProt / MyGene / OLS / …
+        </FONT>
+      >
+    ];
+  }
+
+  // =========================
+  // Cluster B: Evidence provenance
+  // =========================
+  subgraph cluster_prov {
+    label="Evidence provenance";
+    fontsize=12;
+    fontcolor="#0f172a";
+    color="#cbd5e1";
+    style="rounded,dashed,filled";
+    fillcolor="#f8fafc";
+
+    Publication [
+      shape=ellipse,
+      fillcolor="#e5e7eb",
+      fontcolor="#111827",
+      color="#cbd5e1",
+      label=<
+        <B>Publication</B><BR/><FONT POINT-SIZE="10">
+        PMID / DOI
+        </FONT>
+      >
+    ];
+  }
+
+  // =========================
+  // Cluster C: Reproducibility snapshot
+  // =========================
+  subgraph cluster_rel {
+    label="Reproducible snapshot";
+    fontsize=12;
+    fontcolor="#0f172a";
+    color="#cbd5e1";
+    style="rounded,dashed,filled";
+    fillcolor="#f8fafc";
+
+    DatasetRelease [
+      shape=box,
+      style="rounded,filled",
+      fillcolor="#f3f4f6",
+      fontcolor="#111827",
+      color="#cbd5e1",
+      label=<
+        <B>DatasetRelease</B><BR/><FONT POINT-SIZE="10">
+        version/date, pipeline commit,<BR/>
+        checksum, license
+        </FONT>
+      >
+    ];
+  }
+
+  // =========================
+  // Edges (dashed by default)
+  // =========================
+  Entity -> ExternalIdentifier [xlabel="HAS_DBXREF"];
+  ExternalIdentifier -> DataSource [xlabel="MAPPED_BY"];
+
+  Entity -> Publication [xlabel="SUPPORTED_BY"];
+
+  // Reproducibility links
+  DataSource -> DatasetRelease [xlabel="HAS_RELEASE"];
+  Publication -> DatasetRelease [xlabel="INGESTED_IN_RELEASE"];
+
+  // =========================
+  // Layout nudges (keeps a clean left→right story)
+  // =========================
+  { rank=same; ExternalIdentifier; Publication; }
+  { rank=max; DatasetRelease; }
+
+  // light invisible spine to keep columns stable
+  edge [style=invis, weight=30];
+  Entity -> ExternalIdentifier -> DataSource -> DatasetRelease;
+}

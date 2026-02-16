@@ -1,0 +1,305 @@
+digraph ChemGraphBuilderSchema {
+  graph [
+    rankdir=LR,
+    splines=ortho,
+    overlap=false,
+    newrank=true,
+    compound=true,
+    clusterrank=local,
+    bgcolor="white",
+    fontname="Helvetica",
+    fontsize=18,
+    labelloc="t",
+    labeljust="l",
+    pad=0.55,
+    nodesep=1.05,
+    ranksep="1.35 equally",
+    sep="+28,20",
+    esep="+18,12"
+  ];
+
+  node [
+    shape=ellipse,
+    style="filled",
+    fontname="Helvetica",
+    fontsize=14,
+    color="#2f2f2f",
+    penwidth=1.4
+  ];
+
+  edge [
+    fontname="Helvetica",
+    fontsize=14,
+    fontcolor="#263238",
+    color="#4b4b4b",
+    penwidth=1.6,
+    arrowsize=0.85,
+    labelfloat=true,
+    labeldistance=1.7,
+    labelangle=22
+  ];
+
+  // =========================
+  // Layer 0 — Ontology anchors (minimal + reusable)
+  // =========================
+  subgraph cluster_layer0 {
+    label=< <B>Layer 0 — Ontology anchors (minimal, reusable)</B> >;
+    fontsize=13;
+    fontcolor="#0f172a";
+    color="#94a3b8";
+    style="rounded,dashed,filled";
+    fillcolor="#e3f2fd";
+    penwidth=1.2;
+
+    Taxon   [label=< <B>Taxon<br/>(NCBITaxon)<br/>{taxid}</B> >, fillcolor="#bbdefb", fontcolor="#0b1f3a"];
+    Unit    [label=< <B>Unit<br/>(UO / UCUM)<br/>{unit_id}</B> >, fillcolor="#bbdefb", fontcolor="#0b1f3a"];
+    BAOTerm [label=< <B>BAO Term<br/>(BioAssay Ontology)<br/>{bao_id}</B> >, fillcolor="#bbdefb", fontcolor="#0b1f3a"];
+
+    // Optional context anchors
+    CellLine [label=< <B>Cell line<br/>(Cellosaurus)<br/>{cv_id}</B> >, fillcolor="#e3f2fd", fontcolor="#0b1f3a"];
+    Tissue   [label=< <B>Tissue / Organ<br/>(UBERON)<br/>{uberon_id}</B> >, fillcolor="#e3f2fd", fontcolor="#0b1f3a"];
+    Context  [label=< <B>Experimental context<br/>(controlled term)<br/>{context_id}</B> >, fillcolor="#e3f2fd", fontcolor="#0b1f3a"];
+
+    // Controlled predicate vocabulary (optional)
+    RelationType [label=< <B>RelationType<br/>(controlled predicate)<br/>{type_id}</B> >, fillcolor="#e3f2fd", fontcolor="#0b1f3a"];
+  }
+  { rank=min; Taxon; Unit; BAOTerm; RelationType; }
+
+  // =========================
+  // Layer 1 — Core entities
+  // =========================
+  subgraph cluster_layer1 {
+    label=< <B>Layer 1 — Core entities</B> >;
+    fontsize=13;
+    fontcolor="#0f172a";
+    color="#cbd5e1";
+    style="rounded,dashed,filled";
+    fillcolor="#fcf7cb";
+    penwidth=1.2;
+
+    Compound [label=<<B>Compound</B><BR/>(PubChem CID)<BR/><FONT POINT-SIZE="11">InChIKey, SMILES</FONT>>, fixedsize=true, width=2, height=2,
+              shape=circle, fillcolor="#d81b60", fontcolor="white"];
+
+    BioAssay  [label=<<B>BioAssay</B><BR/>(PubChem AID)>, fixedsize=true, width=2, height=2,
+              shape=circle, fillcolor="#ffb300", fontcolor="#111827"];
+
+    Protein  [label=<<B>Protein / Enzyme</B><BR/>(UniProt / EC)>, fixedsize=true, width=2, height=2,
+              shape=circle, fillcolor="#2e7d32", fontcolor="white"];
+
+    Gene     [label=<<B>Gene</B><BR/><FONT POINT-SIZE="10">(NCBI / Ensembl / HGNC)</FONT>>, fixedsize=true, width=2, height=2,
+              shape=circle, fillcolor="#039be5", fontcolor="white"];
+  }
+
+  // =========================
+  // Layer 2 — Assay evidence (measurements)
+  // =========================
+  subgraph cluster_layer2 {
+    label=< <B>Layer 2 — Assay evidence (measurements)</B> >;
+    fontsize=13;
+    fontcolor="#0f172a";
+    color="#cbd5e1";
+    style="rounded,dashed,filled";
+    fillcolor="#fff3e0";
+    penwidth=1.2;
+
+    AssayResult [
+      label=< <B>AssayResult<br/>(endpoint, value, unit,<br/>qualifier, activity_call,<br/>score/confidence,<br/>organism, context)</B> >,
+      fillcolor="#fb8c00",
+      fontcolor="#111827",
+      shape=box,
+      style="rounded,filled"
+    ];
+  }
+
+  // =========================
+  // Layer 3 — Provenance & identity normalization
+  // =========================
+  subgraph cluster_layer3 {
+    label=< <B>Layer 3 — Provenance &amp; identity (sources, publications, releases, xrefs)</B> >;
+    fontsize=13;
+    fontcolor="#0f172a";
+    color="#cbd5e1";
+    style="rounded,dashed,filled";
+    fillcolor="#f5f5f5";
+    penwidth=1.2;
+
+    Publication [
+      label=< <B>Publication<br/>(PMID / DOI)</B> >,
+      fillcolor="#e5e7eb",
+      fontcolor="#111827",
+      color="#6b7280"
+    ];
+
+    DataSource [
+      label=< <B>DataSource<br/>(PubChem / SDQ / UniProt / MyGene / OLS / ...)</B> >,
+      fillcolor="#e5e7eb",
+      fontcolor="#111827",
+      color="#6b7280"
+    ];
+
+    DatasetRelease [
+      label=< <B>DatasetRelease<br/>(version/date, pipeline_commit,<br/>checksum, license)</B> >,
+      fillcolor="#f3f4f6",
+      fontcolor="#111827",
+      color="#6b7280",
+      shape=box,
+      style="rounded,filled"
+    ];
+
+    ExternalIdentifier [
+      label=< <B>ExternalIdentifier<br/>(db, accession, url)<br/>(e.g., ChEMBL, DrugBank,<br/>HGNC, Ensembl, UniProt)</B> >,
+      fillcolor="#f3f4f6",
+      fontcolor="#111827",
+      color="#6b7280",
+      shape=box,
+      style="rounded,filled"
+    ];
+  }
+
+  // =========================
+  // Layer 4 — Metabolism / transformation
+  // =========================
+  subgraph cluster_layer4 {
+    label=< <B>Layer 4 — Metabolism / transformation</B> >;
+    fontsize=13;
+    fontcolor="#0f172a";
+    color="#cbd5e1";
+    style="rounded,dashed,filled";
+    fillcolor="#e8f5e8";
+    penwidth=1.2;
+
+    MetabolicTransformation [
+      label=< <B>MetabolicTransformation<br/>(reaction_type, confidence,<br/>organism, context)</B> >,
+      fillcolor="#a5d6a7",
+      fontcolor="#0b1f3a",
+      shape=diamond
+    ];
+  }
+
+  // =========================
+  // Layer 5 — Literature co-occurrence (weak evidence)
+  // =========================
+  subgraph cluster_layer5 {
+    label=< <B>Layer 5 — Literature co-occurrence (weak evidence)</B> >;
+    fontsize=13;
+    fontcolor="#0f172a";
+    color="#cbd5e1";
+    style="rounded,dashed,filled";
+    fillcolor="#f3e5f5";
+    penwidth=1.2;
+
+    CooccurrenceAssertion [
+      label=< <B>CooccurrenceAssertion<br/>(article_count, score,<br/>PMIDs/DOIs, section, source)</B> >,
+      fillcolor="#ce93d8",
+      fontcolor="#111827",
+      shape=box,
+      style="rounded,filled"
+    ];
+  }
+
+  // =========================
+  // Layer 6 — Mechanistic assertions (training targets / labels)
+  // =========================
+  subgraph cluster_layer6 {
+    label=< <B>Layer 6 — Mechanistic assertions (training targets)</B> >;
+    fontsize=13;
+    fontcolor="#0f172a";
+    color="#cbd5e1";
+    style="rounded,dashed,filled";
+    fillcolor="#fce4ec";
+    penwidth=1.2;
+
+    InteractionAssertion [
+      label=< <B>InteractionAssertion<br/>(predicate, direction,<br/>confidence, source,<br/>context, organism)</B> >,
+      fillcolor="#ef5350",
+      fontcolor="#111827",
+      shape=octagon,
+      style="rounded,filled"
+    ];
+  }
+
+  // =========================
+  // Core asserted relations (SOLID)
+  // =========================
+
+  // Compound assayed in a BioAssay; BioAssay yields AssayResult
+  Compound -> BioAssay     [xlabel=< <B>TESTED_IN</B> >];
+  BioAssay -> AssayResult  [xlabel=< <B>HAS_RESULT</B> >];
+
+  // The measured result points to a target Protein (preferred) and Gene->Protein encoding
+  AssayResult -> Protein   [xlabel=< <B>HAS_TARGET</B> >];
+  Gene -> Protein          [xlabel=< <B>ENCODES</B> >];
+
+  // Mechanistic assertion is reified; subject/object connect through it
+  Compound -> InteractionAssertion [xlabel=< <B>HAS_SUBJECT</B> >, color="#d32f2f", fontcolor="#b71c1c"];
+  InteractionAssertion -> Protein  [xlabel=< <B>HAS_OBJECT</B> >,  color="#d32f2f", fontcolor="#b71c1c"];
+
+  // Normalize metabolism through transformation node
+  Compound -> MetabolicTransformation [xlabel=< <B>SUBSTRATE_OF</B> >, color="#1b5e20", fontcolor="#1b5e20"];
+  MetabolicTransformation -> Compound [xlabel=< <B>PRODUCT</B> >,      color="#1b5e20", fontcolor="#1b5e20"];
+  MetabolicTransformation -> Gene     [xlabel=< <B>CATALYZED_BY</B> >, color="#1b5e20", fontcolor="#1b5e20"];
+
+  // Literature co-occurrence (compound-compound)
+  Compound -> CooccurrenceAssertion [xlabel=< <B>HAS_SUBJECT</B> >, color="#6a1b9a", fontcolor="#4a148c"];
+  CooccurrenceAssertion -> Compound [xlabel=< <B>HAS_OBJECT</B> >,  color="#6a1b9a", fontcolor="#4a148c"];
+  // =========================
+  // Provenance / identity / evidence relations (DASHED GRAY)
+  // =========================
+  edge [style=dashed, color="#90a4ae", fontcolor="#546e7a", penwidth=1.2];
+
+  // Evidence support
+  AssayResult -> Publication            [xlabel=< <B>SUPPORTED_BY</B> >];
+  InteractionAssertion -> Publication   [xlabel=< <B>SUPPORTED_BY</B> >];
+  CooccurrenceAssertion -> Publication  [xlabel=< <B>SUPPORTED_BY</B> >];
+  MetabolicTransformation -> Publication [xlabel=< <B>SUPPORTED_BY</B> >];
+
+  // Source attribution
+  AssayResult -> DataSource             [xlabel=< <B>FROM_SOURCE</B> >];
+  InteractionAssertion -> DataSource    [xlabel=< <B>FROM_SOURCE</B> >];
+  CooccurrenceAssertion -> DataSource   [xlabel=< <B>FROM_SOURCE</B> >];
+  MetabolicTransformation -> DataSource [xlabel=< <B>FROM_SOURCE</B> >];
+
+  // Dataset / snapshot versioning (reproducibility)
+  DataSource -> DatasetRelease          [xlabel=< <B>HAS_RELEASE</B> >];
+  Publication -> DatasetRelease         [xlabel=< <B>INGESTED_IN_RELEASE</B> >];
+
+  // Critical: link training label back to measurement evidence (auditability + avoids ambiguity)
+  InteractionAssertion -> AssayResult   [xlabel=< <B>DERIVED_FROM</B> >];
+  // Identity normalization via cross-references (treat as dbxrefs, not ontology terms)
+  Compound -> ExternalIdentifier        [xlabel=< <B>HAS_DBXREF</B> >];
+  Gene -> ExternalIdentifier            [xlabel=< <B>HAS_DBXREF</B> >];
+  Protein -> ExternalIdentifier         [xlabel=< <B>HAS_DBXREF</B> >];
+  BioAssay -> ExternalIdentifier        [xlabel=< <B>HAS_DBXREF</B> >];
+
+  ExternalIdentifier -> DataSource      [xlabel=< <B>MAPPED_BY</B> >];
+
+  // Ontology links
+  AssayResult -> Taxon                  [xlabel=< <B>IN_TAXON</B> >];
+  InteractionAssertion -> Taxon         [xlabel=< <B>IN_TAXON</B> >];
+  MetabolicTransformation -> Taxon      [xlabel=< <B>IN_TAXON</B> >];
+
+  AssayResult -> Unit                   [xlabel=< <B>HAS_UNIT</B> >];
+  BioAssay -> BAOTerm                   [xlabel=< <B>HAS_BAO_TERM</B> >];
+  AssayResult -> BAOTerm                [xlabel=< <B>HAS_ENDPOINT_TERM</B> >];
+  // Optional context anchors
+  AssayResult -> CellLine               [xlabel=< <B>MEASURED_IN_CELL_LINE</B> >];
+  AssayResult -> Tissue                 [xlabel=< <B>MEASURED_IN_TISSUE</B> >];
+  AssayResult -> Context                [xlabel=< <B>HAS_CONTEXT</B> >];
+  InteractionAssertion -> RelationType  [xlabel=< <B>HAS_PREDICATE_TYPE</B> >];
+
+  // =========================
+  // Derived / materialized training view (DOTTED)
+  // =========================
+  edge [style=dotted, color="#616161", fontcolor="#424242", penwidth=1.2];
+
+  Compound -> Protein [xlabel=< <B>INTERACTS_WITH (derived)</B> >, constraint=false];
+
+  // =========================
+  // Layout nudges
+  // =========================
+  { rank=same; Compound; BioAssay; }
+  { rank=same; Gene; Protein; }
+
+  // Keep provenance close to the midline for readability
+  { rank=same; Publication; DataSource; DatasetRelease; }
+}

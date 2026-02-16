@@ -299,7 +299,7 @@ class NodesOntologyEnricher:
                 out["MIMID"]      = self._uniq(gx("mim"))
                 out["GeneID"]     = self._uniq(gx("gene"))
                 out["TaxonomyID"] = self._uniq(gx("taxonomy"))
-                # out["MeSH"]       = self._uniq(gx("mesh"))
+                out["MeSH_IDs"]       = self._uniq(gx("mesh"))
                 # out["KEGG"]       = self._uniq(gx("kegg"))
                 # out["HMDB"]       = self._uniq(gx("hmdb"))
                 # out["DTXSID"]     = self._uniq(gx("dtxsid"))
@@ -535,6 +535,7 @@ class NodesOntologyEnricher:
             "Patent_IDs": "PatentID",
             "Taxonomy_IDs": "TaxonomyID",
             "DBURLs": "DBURL",
+            "MeSH_IDs": "MeSH_IDs",
         }
 
         # Map ontology ID columns → source columns
@@ -550,6 +551,7 @@ class NodesOntologyEnricher:
             "Patent_IDs": "Patent_Sources",
             "Taxonomy_IDs": "Taxonomy_Sources",
             "DBURLs": "DBURLs_Sources",
+            "MeSH_IDs": "MeSH_Sources",
         }
 
         # Track per-ontology, per-source counts for the run summary

@@ -1,0 +1,29 @@
+digraph FigF_Cooccurrence {
+  graph [rankdir=LR, bgcolor="white", splines=ortho, nodesep=1.0, ranksep=1.15];
+  node  [style="filled", fontname="Helvetica", fontsize=14, penwidth=1.2, color="#2f2f2f"];
+  edge  [fontname="Helvetica", fontsize=13, penwidth=1.2, arrowsize=0.8, color="#6a1b9a", fontcolor="#4a148c"];
+
+  Compound1 [
+    shape=circle, 
+    shape=circle, 
+    fillcolor="#d81b60", 
+    fontcolor="white",
+    fixedsize=true, 
+    width=1.2, 
+    height=1.2,     
+    label="Compound A"];
+  Compound2 [shape=circle, 
+    shape=circle, 
+    fillcolor="#d81b60", 
+    fontcolor="white",
+    fixedsize=true, 
+    width=1.2, 
+    height=1.2,   
+    label="Compound B"];
+
+  CooccurrenceAssertion [shape=box, style="rounded,filled", fillcolor="#ce93d8", fontcolor="#111827",
+    label="CooccurrenceAssertion\narticle_count,score,\nPMIDs/sections"];
+
+  Compound1 -> CooccurrenceAssertion [label="HAS_SUBJECT"];
+  CooccurrenceAssertion -> Compound2 [label="HAS_OBJECT"];
+}

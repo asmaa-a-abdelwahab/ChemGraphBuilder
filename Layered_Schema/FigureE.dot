@@ -1,0 +1,66 @@
+digraph FigE_Metabolism {
+  graph [
+    rankdir=LR, 
+    bgcolor="white", 
+    splines=ortho, 
+    nodesep=1.0, 
+    ranksep=1.15];
+  node  [
+    style="filled", 
+    fontname="Helvetica", 
+    fontsize=14, 
+    penwidth=1.2, 
+    color="#2f2f2f"];
+  edge  [
+    fontname="Helvetica", 
+    fontsize=13, 
+    penwidth=1.2, 
+    arrowsize=0.8, 
+    color="#1b5e20", 
+    fontcolor="#1b5e20"];
+
+  CompoundA [
+    shape=circle, 
+    fillcolor="#d81b60", 
+    fontcolor="white",
+    fixedsize=true, 
+    width=1.2, 
+    height=1.2, 
+    label="Compound\n(substrate)"];
+  CompoundB [
+    shape=circle, 
+    fillcolor="#d81b60", 
+    fontcolor="white",
+    fixedsize=true, 
+    width=1.2, 
+    height=1.2, 
+    label="Compound\n(product)"];
+
+  MetabolicTransformation [
+    shape=diamond,
+    fillcolor="#a5d6a7", 
+    fontcolor="#0b1f3a",
+    label="MetabolicTransformation\nreaction_type,confidence,\norganism,context"];
+
+  Gene [
+    shape=circle, 
+    fillcolor="#039be5", 
+    fontcolor="white",
+    fixedsize=true, 
+    width=1.2, 
+    height=1.2, 
+    label="Gene"];
+  Protein [
+    shape=circle, 
+    fillcolor="#2e7d32", 
+    fontcolor="white",
+    fixedsize=true, 
+    width=1.2, 
+    height=1.2, 
+    label="Enzyme/\nProtein"];
+
+  CompoundA -> MetabolicTransformation [label="SUBSTRATE_OF"];
+  MetabolicTransformation -> CompoundB [label="PRODUCT"];
+  MetabolicTransformation -> Gene      [label="CATALYZED_BY (gene)"];
+  Gene -> Protein [color="#4b4b4b", fontcolor="#263238", label="ENCODES"];
+}

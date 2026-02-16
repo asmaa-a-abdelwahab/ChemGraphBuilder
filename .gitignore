@@ -5,3 +5,4 @@ __pycache__/
 chemgraphbuilder/__pycache__/
 Data/
 .cache/
+Layered_Schema_*/

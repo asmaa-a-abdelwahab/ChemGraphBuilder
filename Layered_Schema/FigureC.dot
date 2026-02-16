@@ -1,0 +1,23 @@
+digraph FigC_TrainingLabel {
+  graph [rankdir=LR, bgcolor="white", splines=ortho, nodesep=1.0, ranksep=1.15];
+  node  [style="filled", fontname="Helvetica", fontsize=14, penwidth=1.2, color="#2f2f2f"];
+  edge  [fontname="Helvetica", fontsize=13, penwidth=1.2, arrowsize=0.8];
+
+  Compound [shape=circle, fillcolor="#d81b60", fontcolor="white", label="Compound (CID)"];
+  Protein  [shape=circle, fillcolor="#2e7d32", fontcolor="white", label="Target protein\n(CYP is an example)"];
+
+  InteractionAssertion [shape=octagon, style="rounded,filled",
+    fillcolor="#ef5350", fontcolor="#111827",
+    label="InteractionAssertion\npredicate,direction,\nconfidence,context"];
+
+  AssayResult [shape=box, style="rounded,filled", fillcolor="#fb8c00",
+               fontcolor="#111827", label="AssayResult\n(measured evidence)"];
+  RelationType [fillcolor="#e3f2fd", fontcolor="#0b1f3a", label="RelationType\n(controlled predicate)"];
+
+  Compound -> InteractionAssertion [color="#d32f2f", label="HAS_SUBJECT"];
+  InteractionAssertion -> Protein  [color="#d32f2f", label="HAS_OBJECT"];
+
+  edge [style=dashed, color="#90a4ae", fontcolor="#546e7a"];
+  InteractionAssertion -> AssayResult  [xlabel="DERIVED_FROM"];
+  InteractionAssertion -> RelationType [xlabel="HAS_PREDICATE_TYPE"];
+}

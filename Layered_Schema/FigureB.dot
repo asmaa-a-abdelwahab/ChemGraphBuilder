@@ -1,0 +1,24 @@
+digraph FigB_AssayEvidence {
+  graph [rankdir=LR, bgcolor="white", splines=ortho, nodesep=1.0, ranksep=1.2];
+  node  [style="filled", fontname="Helvetica", fontsize=14, penwidth=1.2, color="#2f2f2f"];
+  edge  [fontname="Helvetica", fontsize=13, penwidth=1.2, arrowsize=0.8, color="#4b4b4b"];
+
+  Compound [shape=circle, fillcolor="#d81b60", fontcolor="white", label="Compound (CID)"];
+  BioAssay [shape=circle, fillcolor="#ffb300", fontcolor="#111827", label="BioAssay (AID)"];
+  AssayResult [shape=box, style="rounded,filled", fillcolor="#fb8c00", fontcolor="#111827",
+               label="AssayResult\nendpoint,value,unit,\nactivity_call,context"];
+  Protein [shape=circle, fillcolor="#2e7d32", fontcolor="white", label="Protein/Enzyme"];
+
+  Unit    [fillcolor="#bbdefb", fontcolor="#0b1f3a", label="Unit\n(UO/UCUM)"];
+  BAOTerm [fillcolor="#bbdefb", fontcolor="#0b1f3a", label="Endpoint term\n(BAO)"];
+  Taxon   [fillcolor="#bbdefb", fontcolor="#0b1f3a", label="Taxon\n(NCBITaxon)"];
+
+  Compound -> BioAssay    [xlabel="TESTED_IN"];
+  BioAssay -> AssayResult [xlabel="HAS_RESULT"];
+  AssayResult -> Protein  [xlabel="HAS_TARGET"];
+
+  edge [style=dashed, color="#90a4ae", fontcolor="#546e7a"];
+  AssayResult -> Unit   [label="HAS_UNIT"];
+  AssayResult -> BAOTerm[label="HAS_ENDPOINT_TERM"];
+  AssayResult -> Taxon  [label="IN_TAXON"];
+}

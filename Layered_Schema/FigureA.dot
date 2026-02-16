@@ -1,0 +1,227 @@
+digraph FigA_CorePlate_pub {
+  graph [
+    rankdir=LR,
+    bgcolor="white",
+    rankdir=LR,
+    splines=polyline,
+    overlap=false,
+    newrank=true,
+    pad=0.35,
+    nodesep=0.85,
+    ranksep=1.25,
+    fontname="Helvetica",
+    fontsize=18,
+    labelloc="t",
+    labeljust="l",
+    label="Figure A — Core nodes with enrichment and ontology anchors"
+  ];
+
+  node [
+    style="filled",
+    fontname="Helvetica",
+    fontsize=13,
+    penwidth=1.2,
+    color="#2f2f2f"
+  ];
+
+  // Default edge = light metadata (we override core edges later)
+  edge [
+    fontname="Helvetica",
+    fontsize=11,
+    penwidth=1.1,
+    arrowsize=0.75,
+    color="#90a4ae",
+    fontcolor="#546e7a",
+    style=dashed
+  ];
+
+  // =========================================================
+  // LEFT — Node enrichment / annotations (IDs, xrefs, metadata)
+  // =========================================================
+  subgraph cluster_ANN {
+    label="Node enrichment / annotations";
+    fontsize=12;
+    fontcolor="#0f172a";
+    color="#cbd5e1";
+    style="rounded,dashed,filled";
+    fillcolor="#f8fafc";
+    penwidth=1.0;
+
+    node [
+      shape=box,
+      style="rounded,filled",
+      fillcolor="#f3f4f6",
+      fontcolor="#111827",
+      fontsize=11,
+      penwidth=1.0
+    ];
+
+    // Order matches the core stack: BioAssay → Compound → Protein → Gene
+    AssayAnn [label=<
+      <B>BioAssay</B><BR/><FONT POINT-SIZE="9">
+      AID metadata, protocol, readouts,<BR/>
+      panel/group IDs, flags
+      </FONT>
+    >];
+
+    CompoundAnn [label=<
+      <B>Compound</B><BR/><FONT POINT-SIZE="9">
+      ChEMBL, DrugBank, UNII, CAS RN,<BR/>
+      DTXSID, PubMedID, PatentID, DBURL
+      </FONT>
+    >];
+
+    ProteinAnn [label=<
+      <B>Protein</B><BR/><FONT POINT-SIZE="9">
+      UniProt accessions/IDs, PDB IDs,<BR/>
+      STRING/BioGRID/IntAct IDs,<BR/>
+      Orphanet/OMIM IDs
+      </FONT>
+    >];
+
+    GeneAnn [label=<
+      <B>Gene</B><BR/><FONT POINT-SIZE="9">
+      GeneID, HGNC Symbol/ID,<BR/>
+      Ensembl Gene, OMIM
+      </FONT>
+    >];
+
+    // neat vertical stack in the annotation column
+    edge [style=invis];
+    AssayAnn -> CompoundAnn -> ProteinAnn -> GeneAnn;
+  }
+
+  // =========================
+  // MIDDLE — Layer 1 core entities
+  // =========================
+  subgraph cluster_L1 {
+    label="Layer 1 — Core biomedical entities";
+    fontsize=12;
+    fontcolor="#0f172a";
+    color="#cbd5e1";
+    style="rounded,dashed,filled";
+    fillcolor="#fcf7cb";
+    penwidth=1.0;
+
+    Compound [label=<<B>Compound</B><BR/>(PubChem CID)<BR/><FONT POINT-SIZE="10">InChIKey, SMILES</FONT>>,
+              fixedsize=true, width=1.9, height=1.9, shape=circle,
+              fillcolor="#d81b60", fontcolor="white"];
+
+    BioAssay [label=<<B>BioAssay</B><BR/>(PubChem AID)>,
+              fixedsize=true, width=1.9, height=1.9, shape=circle,
+              fillcolor="#ffb300", fontcolor="#111827"];
+
+    Protein  [label=<<B>Protein / Enzyme</B><BR/>(UniProt / EC)>,
+              fixedsize=true, width=1.9, height=1.9, shape=circle,
+              fillcolor="#2e7d32", fontcolor="white"];
+
+    Gene     [label=<<B>Gene</B><BR/><FONT POINT-SIZE="10">(NCBI / Ensembl / HGNC)</FONT>>,
+              fixedsize=true, width=1.9, height=1.9, shape=circle,
+              fillcolor="#039be5", fontcolor="white"];
+
+    // enforce the vertical order (BioAssay top)
+    edge [style=invis];
+    BioAssay -> Compound -> Protein -> Gene;
+  }
+
+  // =========================
+  // RIGHT — Layer 0 ontology anchors (grouped per entity)
+  // =========================
+  subgraph cluster_L0 {
+    label="Layer 0 — Ontology anchors (grouped per entity)";
+    fontsize=12;
+    fontcolor="#0f172a";
+    color="#94a3b8";
+    style="rounded,dashed,filled";
+    fillcolor="#e3f2fd";
+    penwidth=1.0;
+
+    // Use rounded boxes as “ontology bundles” to avoid edge spaghetti
+    node [
+      shape=box,
+      style="rounded,filled",
+      fillcolor="#bbdefb",
+      fontcolor="#0b1f3a",
+      fontsize=11,
+      penwidth=1.0
+    ];
+
+    AssayOnt [label=<
+      <B>Assay ontologies</B><BR/><FONT POINT-SIZE="9">
+      BAO • OBI/EFO
+      </FONT>
+    >];
+
+    CompoundOnt [label=<
+      <B>Compound ontologies</B><BR/><FONT POINT-SIZE="9">
+      ChEBI • MeSH
+      </FONT>
+    >];
+
+    ProteinOnt [label=<
+      <B>Protein ontologies</B><BR/><FONT POINT-SIZE="9">
+      GO (BP/MF/CC) • InterPro • Pfam • PROSITE
+      </FONT>
+    >];
+
+    GeneOnt [label=<
+      <B>Gene ontologies</B><BR/><FONT POINT-SIZE="9">
+      GO (BP/MF/CC) • Reactome • KEGG
+      </FONT>
+    >];
+
+    // Keep Taxon as a true anchor (ellipse)
+    Taxon [shape=ellipse, fillcolor="#bbdefb", fontcolor="#0b1f3a",
+           label="Taxon\n(NCBITaxon)"];
+
+    // tidy vertical stack to mirror the core
+    edge [style=invis];
+    AssayOnt -> CompoundOnt -> ProteinOnt -> GeneOnt -> Taxon;
+  }
+
+  // -------------------------
+  // CORE semantics (SOLID + darker + labeled)
+  // -------------------------
+  edge [style=solid, color="#4b4b4b", fontcolor="#263238", penwidth=1.25, arrowsize=0.8];
+  Compound -> BioAssay [xlabel="TESTED_IN"];
+  Gene -> Protein      [xlabel="ENCODES"];
+
+  // Optional declared target (keep dashed but make it short + non-pulling)
+  edge [style=dashed, color="#90a4ae", fontcolor="#546e7a", penwidth=1.1];
+  BioAssay -> Protein  [xlabel="DECLARED_TARGET", constraint=false];
+
+  // -------------------------
+  // Ontology links (DASHED, unlabeled — explained in legend)
+  // -------------------------
+  BioAssay -> AssayOnt   [constraint=false];
+  Compound -> CompoundOnt[constraint=false];
+  Protein  -> ProteinOnt [constraint=false];
+  Gene     -> GeneOnt    [constraint=false];
+
+  // shared organism anchoring
+  BioAssay -> Taxon [xlabel="IN_TAXON", constraint=false];
+  Protein  -> Taxon [xlabel="IN_TAXON", constraint=false];
+
+  // -------------------------
+  // Annotation links (LEFT): keep arrow direction as Core → Annotation
+  // Trick: draw (Ann -> Core) with dir=back so the box stays on the left.
+  // -------------------------
+  AssayAnn    -> BioAssay [dir=back, constraint=false];
+  CompoundAnn -> Compound [dir=back, constraint=false];
+  ProteinAnn  -> Protein  [dir=back, constraint=false];
+  GeneAnn     -> Gene     [dir=back, constraint=false];
+
+    // --- ROW ALIGNMENT (recommended for stable, clean layout) ---
+    { rank=same; AssayAnn;  BioAssay;  AssayOnt; }
+    { rank=same; CompoundAnn; Compound; CompoundOnt; }
+    { rank=same; ProteinAnn;  Protein;  ProteinOnt; }
+    { rank=same; GeneAnn;     Gene;     GeneOnt; }
+    { rank=same; Taxon; }
+
+    // Order the rows (top → bottom)
+    edge [style=invis, weight=50];
+    BioAssay -> Compound -> Protein -> Gene -> Taxon;
+    AssayAnn -> CompoundAnn -> ProteinAnn -> GeneAnn;
+    AssayOnt -> CompoundOnt -> ProteinOnt -> GeneOnt -> Taxon;
+
+}

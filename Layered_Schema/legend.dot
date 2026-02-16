@@ -1,0 +1,140 @@
+digraph LegendSchema {
+  graph [
+    rankdir=LR,
+    splines=ortho,
+    overlap=false,
+    newrank=true,
+    compound=true,
+    clusterrank=local,
+    bgcolor="white",
+    fontname="Helvetica",
+    fontsize=18,
+    labelloc="t",
+    labeljust="l",
+    pad=0.55,
+    nodesep=1.05,
+    ranksep="1.35 equally",
+    sep="+28,20",
+    esep="+18,12"
+  ];
+
+  node [
+    shape=ellipse,
+    style="filled",
+    fontname="Helvetica",
+    fontsize=14,
+    color="#2f2f2f",
+    penwidth=1.4
+  ];
+
+  edge [
+    fontname="Helvetica",
+    fontsize=14,
+    fontcolor="#263238",
+    color="#4b4b4b",
+    penwidth=1.6,
+    arrowsize=0.85,
+    labelfloat=true,
+    labeldistance=1.7,
+    labelangle=0
+  ];
+
+  // -------------------------
+  // Legend (top-left) — table format, light background
+  // -------------------------
+  subgraph cluster_legend {
+    label=< <B>Legend</B> >;
+    fontsize=20;
+    fontcolor="#111827";
+    color="#cbd5e1";
+    style="rounded,filled";
+    fillcolor="#f8fafc";   // lighter than before
+    penwidth=2.6;
+    margin=12;
+
+    LegendTable [
+      shape=plaintext,
+      sortv=0,
+      label=<
+        <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="8" BGCOLOR="#ffffff">
+          <!-- Section: Edge styles -->
+          <TR>
+            <TD COLSPAN="3" BGCOLOR="#f1f5f9" ALIGN="LEFT">
+              <B>Edge styles</B>
+            </TD>
+          </TR>
+          <TR>
+            <TD ALIGN="CENTER" BGCOLOR="#ffffff"><FONT FACE="Courier">────────</FONT></TD>
+            <TD ALIGN="LEFT"   BGCOLOR="#ffffff"><B>Solid</B></TD>
+            <TD ALIGN="LEFT"   BGCOLOR="#ffffff">
+              Primary asserted relation (e.g., TESTED_IN / HAS_TARGET)
+            </TD>
+          </TR>
+          <TR>
+            <TD ALIGN="CENTER" BGCOLOR="#ffffff"><FONT FACE="Courier">- - - - - -</FONT></TD>
+            <TD ALIGN="LEFT"   BGCOLOR="#ffffff"><B>Dashed gray</B></TD>
+            <TD ALIGN="LEFT"   BGCOLOR="#ffffff">
+              Provenance / evidence links (e.g., FROM_SOURCE, SUPPORTED_BY, DERIVED_FROM)
+            </TD>
+          </TR>
+          <TR>
+            <TD ALIGN="CENTER" BGCOLOR="#ffffff"><FONT FACE="Courier">· · · · · ·</FONT></TD>
+            <TD ALIGN="LEFT"   BGCOLOR="#ffffff"><B>Dotted</B></TD>
+            <TD ALIGN="LEFT"   BGCOLOR="#ffffff">
+              Derived / materialized training view (optional)
+            </TD>
+          </TR>
+
+          <!-- Spacer -->
+          <TR><TD COLSPAN="3" BGCOLOR="#ffffff"><FONT POINT-SIZE="6"> </FONT></TD></TR>
+
+          <!-- Section: Node roles -->
+          <TR>
+            <TD COLSPAN="3" BGCOLOR="#f1f5f9" ALIGN="LEFT">
+              <B>Node roles</B>
+            </TD>
+          </TR>
+
+          <!-- Node roles table rows -->
+          <TR>
+            <TD ALIGN="CENTER" BGCOLOR="#ffffff"><FONT COLOR="#e3f2fd"><B>●</B></FONT></TD>
+            <TD ALIGN="LEFT"   BGCOLOR="#ffffff"><B>Ontology anchors</B></TD>
+            <TD ALIGN="LEFT"   BGCOLOR="#ffffff">Taxon, Unit, BAO term, Context terms</TD>
+          </TR>
+          <TR>
+            <TD ALIGN="CENTER" BGCOLOR="#ffffff"><FONT COLOR="#fcf7cb"><B>●</B></FONT></TD>
+            <TD ALIGN="LEFT"   BGCOLOR="#ffffff"><B>Core entities</B></TD>
+            <TD ALIGN="LEFT"   BGCOLOR="#ffffff">Compound, BioAssay, Gene, Protein, Publication, DataSource</TD>
+          </TR>
+          <TR>
+            <TD ALIGN="CENTER" BGCOLOR="#ffffff"><FONT COLOR="#fb8c00"><B>●</B></FONT></TD>
+            <TD ALIGN="LEFT"   BGCOLOR="#ffffff"><B>Assay evidence</B></TD>
+            <TD ALIGN="LEFT"   BGCOLOR="#ffffff">AssayResult</TD>
+          </TR>
+          <TR>
+            <TD ALIGN="CENTER" BGCOLOR="#ffffff"><FONT COLOR="#f5f5f5"><B>●</B></FONT></TD>
+            <TD ALIGN="LEFT"   BGCOLOR="#ffffff"><B>Provenance &amp; identity</B></TD>
+            <TD ALIGN="LEFT"   BGCOLOR="#ffffff">Publication, DataSource, DatasetRelease, ExternalIdentifier</TD>
+          </TR>
+          <TR>
+            <TD ALIGN="CENTER" BGCOLOR="#ffffff"><FONT COLOR="#e8f5e8"><B>●</B></FONT></TD>
+            <TD ALIGN="LEFT"   BGCOLOR="#ffffff"><B>Mechanistic labels</B></TD>
+            <TD ALIGN="LEFT"   BGCOLOR="#ffffff">InteractionAssertion</TD>
+          </TR>
+          <TR>
+            <TD ALIGN="CENTER" BGCOLOR="#ffffff"><FONT COLOR="#f3e5f5"><B>●</B></FONT></TD>
+            <TD ALIGN="LEFT"   BGCOLOR="#ffffff"><B>Literature weak evidence</B></TD>
+            <TD ALIGN="LEFT"   BGCOLOR="#ffffff">CooccurrenceAssertion</TD>
+          </TR>
+          <TR>
+            <TD ALIGN="CENTER" BGCOLOR="#ffffff"><FONT COLOR="#fce4ec"><B>●</B></FONT></TD>
+            <TD ALIGN="LEFT"   BGCOLOR="#ffffff"><B>Metabolism normalization</B></TD>
+            <TD ALIGN="LEFT"   BGCOLOR="#ffffff">MetabolicTransformation</TD>
+          </TR>
+        </TABLE>
+      >
+    ];
+  }
+  // Force Legend to top-left
+  { rank=max; LegendTable; }
+}
