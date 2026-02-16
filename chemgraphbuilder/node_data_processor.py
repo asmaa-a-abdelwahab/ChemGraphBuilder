@@ -2,14 +2,14 @@
 node_data_processor.py
 
 This module provides the NodeDataProcessor class, which is responsible for
-preprocessing various types of node data (assays, proteins, genes, and compounds)
+preprocessing various types of node data (assays, proteins, genes, compounds, experimental contexts, and assay endpoints)
 for use in chemical knowledge graph construction. The preprocessing includes
 renaming columns, consolidating multiple files, and saving the processed data
 in a consistent format. This step ensures uniformity and ease of access for
 subsequent data analysis and integration processes.
 
 Classes:
-    NodeDataProcessor: Handles preprocessing of assay, protein, gene, and compound data.
+    NodeDataProcessor: Handles preprocessing of assay, protein, gene, compound, experimental context, and assay endpoint data.
 
 Example Usage:
     >>> processor = NodeDataProcessor(data_dir='path/to/data')
@@ -49,6 +49,8 @@ class NodeDataProcessor:
         preprocess_proteins(): Processes and renames columns in protein data.
         preprocess_genes(): Processes and renames columns in gene data.
         preprocess_compounds(): Consolidates and renames columns in compound data.
+        preprocess_experimental_contexts(): Processes and stamps ExperimentalContext node table.
+        preprocess_assay_endpoints(): Processes and stamps AssayEndpoint node table.
     """
 
     def __init__(self, data_dir: str, schema_path: str = "config/node_schema.yml"):
@@ -178,3 +180,74 @@ class NodeDataProcessor:
         df = self._stamp_provenance(df)
         self._validate_required_columns(df, "Compound")
         df.to_csv(f"{output_file.replace('.csv', '_Processed.csv')}", index=False)
+
+
+    def preprocess_experimental_contexts(self):
+        """
+        Processes ExperimentalContext data derived from assay metadata and saves it
+        as a processed node table under Data/Nodes.
+
+        Expected input:
+            Data/Nodes/ExperimentalContext_Properties.csv
+
+        Output:
+            Data/Nodes/ExperimentalContext_Properties_Processed.csv
+        """
+        in_path = f"{self.data_dir}/Nodes/ExperimentalContext_Properties.csv"
+        if not os.path.exists(in_path):
+            logging.warning("ExperimentalContext input not found at %s (skipping).", in_path)
+            return None
+
+        df = pd.read_csv(in_path, low_memory=False)
+
+        # Type normalization
+        for col in ("AssayID", "TaxonomyID"):
+            if col in df.columns:
+                df[col] = pd.to_numeric(df[col], errors="coerce").astype("Int64")
+
+        df = self._stamp_provenance(df)
+        self._validate_required_columns(df, "ExperimentalContext")
+
+        out_path = f"{self.data_dir}/Nodes/ExperimentalContext_Properties_Processed.csv"
+        df.to_csv(out_path, index=False)
+        logging.info("Saved processed ExperimentalContext to %s (%d rows)", out_path, len(df))
+        return df
+
+
+    def preprocess_assay_endpoints(self):
+        """
+        Processes AssayEndpoint data derived from AllDataConnected assay results and
+        saves it as a processed node table under Data/Nodes.
+
+        Expected input:
+            Data/Nodes/AssayEndpoint_Properties.csv
+
+        Output:
+            Data/Nodes/AssayEndpoint_Properties_Processed.csv
+        """
+        in_path = f"{self.data_dir}/Nodes/AssayEndpoint_Properties.csv"
+        if not os.path.exists(in_path):
+            logging.warning("AssayEndpoint input not found at %s (skipping).", in_path)
+            return None
+
+        df = pd.read_csv(in_path, low_memory=False)
+
+        # Type normalization
+        if "AssayID" in df.columns:
+            df["AssayID"] = pd.to_numeric(df["AssayID"], errors="coerce").astype("Int64")
+
+        if "HasNumericValue" in df.columns:
+            # robust bool conversion
+            df["HasNumericValue"] = df["HasNumericValue"].astype(str).str.lower().isin(["true", "1", "yes"])
+
+        for col in ("ValueMin_uM", "ValueMedian_uM", "ValueMax_uM"):
+            if col in df.columns:
+                df[col] = pd.to_numeric(df[col], errors="coerce")
+
+        df = self._stamp_provenance(df)
+        self._validate_required_columns(df, "AssayEndpoint")
+
+        out_path = f"{self.data_dir}/Nodes/AssayEndpoint_Properties_Processed.csv"
+        df.to_csv(out_path, index=False)
+        logging.info("Saved processed AssayEndpoint to %s (%d rows)", out_path, len(df))
+        return df

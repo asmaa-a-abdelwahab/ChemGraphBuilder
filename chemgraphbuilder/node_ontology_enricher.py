@@ -39,6 +39,8 @@ from typing import Any, Dict, Iterable, List, Optional, Set, Tuple, Union
 from biothings_client import get_client
 import pandas as pd
 import requests
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 from difflib import SequenceMatcher
 import json
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -151,6 +153,21 @@ class NodesOntologyEnricher:
         self.session = requests.Session()
         self.session.headers.update({"User-Agent": "ChemGraphBuilder-NodesOntologyEnricher/1.0"})
 
+        # Connection pooling + automatic retries (faster + more resilient for large runs)
+        retry_cfg = Retry(
+            total=5,
+            connect=5,
+            read=5,
+            status=5,
+            backoff_factor=0.5,
+            status_forcelist=(429, 500, 502, 503, 504),
+            allowed_methods=("GET", "POST"),
+            raise_on_status=False,
+        )
+        adapter = HTTPAdapter(max_retries=retry_cfg, pool_connections=64, pool_maxsize=64)
+        self.session.mount("https://", adapter)
+        self.session.mount("http://", adapter)
+
         # Internal caches (in-memory) to minimize repeated HTTP calls
         self._pug_view_cache: Dict[int, Optional[Dict[str, Any]]] = {}
         self._chebi_parents_cache: Dict[str, List[Dict[str, str]]] = {}
@@ -190,6 +207,9 @@ class NodesOntologyEnricher:
         self.enrich_proteins()
         self.enrich_compounds()
         self.enrich_assays()
+        # Optional FigureB auxiliary nodes (auto-skip if input files don't exist)
+        self.enrich_experimental_contexts()
+        self.enrich_assay_endpoints()
 
 
     # ------------------------------------------------------------------
@@ -542,10 +562,10 @@ class NodesOntologyEnricher:
                 out["GeneID"]     = self._uniq(gx("gene"))
                 out["TaxonomyID"] = self._uniq(gx("taxonomy"))
                 out["MeSH_IDs"]       = self._uniq(gx("mesh"))
-                # out["KEGG"]       = self._uniq(gx("kegg"))
-                # out["HMDB"]       = self._uniq(gx("hmdb"))
-                # out["DTXSID"]     = self._uniq(gx("dtxsid"))
-                out["DBURL"]      = self._uniq(gx("url"))
+                out["KEGG_IDs"]     = self._uniq(gx("kegg"))
+                out["HMDB_IDs"]     = self._uniq(gx("hmdb"))
+                out["DTXSID_IDs"]   = self._uniq(gx("dtxsid"))
+                out["DBURL"]            = self._uniq(gx("url"))
                 out["CAS_RN"]    += self._uniq(gx("cas"))  # add CAS from pubchem.xrefs
 
                 results[ik] = out
@@ -809,6 +829,9 @@ class NodesOntologyEnricher:
             "Taxonomy_IDs": "TaxonomyID",
             "DBURLs": "DBURL",
             "MeSH_IDs": "MeSH_IDs",
+            "DTXSID_IDs": "DTXSID_IDs",
+            "KEGG_IDs": "KEGG_IDs",
+            "HMDB_IDs": "HMDB_IDs",
         }
 
         # Map ontology ID columns → source columns
@@ -825,6 +848,9 @@ class NodesOntologyEnricher:
             "Taxonomy_IDs": "Taxonomy_Sources",
             "DBURLs": "DBURLs_Sources",
             "MeSH_IDs": "MeSH_Sources",
+            "DTXSID_IDs": "DTXSID_Sources",
+            "KEGG_IDs": "KEGG_Sources",
+            "HMDB_IDs": "HMDB_Sources",
         }
 
         # Track per-ontology, per-source counts for the run summary
@@ -1312,6 +1338,7 @@ class NodesOntologyEnricher:
     # ------------------------------------------------------------------
     # Gene enrichment via MyGene.info (BioThings client)
     # ------------------------------------------------------------------
+
     def fetch_gene_xrefs_mygene(
         self,
         gene_ids: List[Union[int, str]],
@@ -1363,6 +1390,8 @@ class NodesOntologyEnricher:
                 "ensembl",
                 "go",
                 "pathway.reactome",
+                "pathway.kegg",
+                "taxid",
                 "omim",
             ]
         )
@@ -1514,6 +1543,37 @@ class NodesOntologyEnricher:
                     out["Reactome"] = self._uniq(react_ids)
 
                 # -------------------------------
+                # KEGG pathways (IDs)
+                # -------------------------------
+                kegg_ids: List[str] = []
+                kegg = None
+                if isinstance(pathway, dict):
+                    kegg = pathway.get("kegg")
+
+                if isinstance(kegg, dict):
+                    kegg = [kegg]
+
+                if isinstance(kegg, list):
+                    for pw in kegg:
+                        if not isinstance(pw, dict):
+                            continue
+                        pid = pw.get("id") or pw.get("pathway_id")
+                        if pid:
+                            kegg_ids.append(str(pid))
+
+                if kegg_ids:
+                    out["KEGG"] = self._uniq(kegg_ids)
+
+                # -------------------------------
+                # Taxonomy (NCBITaxon)
+                # -------------------------------
+                taxid = doc.get("taxid") or doc.get("taxon") or doc.get("taxon_id")
+                if isinstance(taxid, (str, int)):
+                    out["TaxonomyID"] = [str(taxid)]
+                elif isinstance(taxid, list):
+                    out["TaxonomyID"] = self._uniq([str(x) for x in taxid if x])
+
+                # -------------------------------
                 # OMIM IDs
                 # -------------------------------
                 omim_ids: List[str] = []
@@ -1622,6 +1682,8 @@ class NodesOntologyEnricher:
             "GO_MF_IDs": "GO_MF",
             "GO_CC_IDs": "GO_CC",
             "Reactome_Pathway_IDs": "Reactome",
+            "KEGG_Pathway_IDs": "KEGG",
+            "NCBITaxon_ID": "TaxonomyID",
             "OMIM_IDs": "OMIM",
             # Reserve disease/phenotype ontologies
             # "DOID_IDs": "DOID",    # not populated (requires external KPs)
@@ -1674,6 +1736,8 @@ class NodesOntologyEnricher:
                     "GO_MF_IDs",
                     "GO_CC_IDs",
                     "Reactome_Pathway_IDs",
+                    "KEGG_Pathway_IDs",
+                    "NCBITaxon_ID",
                     "OMIM_IDs",
                 ]
             )
@@ -1705,6 +1769,8 @@ class NodesOntologyEnricher:
             "GO_MF_IDs": "MyGene.info (go.MF)",
             "GO_CC_IDs": "MyGene.info (go.CC)",
             "Reactome_Pathway_IDs": "MyGene.info (pathway.reactome)",
+            "KEGG_Pathway_IDs": "MyGene.info (pathway.kegg)",
+            "NCBITaxon_ID": "MyGene.info (taxid)",
             "OMIM_IDs": "MyGene.info (omim)",
             # "DOID_IDs": "Not populated – requires disease-centric KPs (e.g. Monarch/MyDisease)",
             # "MONDO_IDs": "Not populated – requires disease-centric KPs (e.g. ClinGen/Monarch)",
@@ -1733,6 +1799,8 @@ class NodesOntologyEnricher:
                 "ensembl",
                 "go (BP/MF/CC)",
                 "pathway.reactome",
+                "pathway.kegg",
+                "taxid",
                 "omim",
             ],
             "created_at": datetime.datetime.utcnow().isoformat() + "Z",
@@ -1882,7 +1950,7 @@ class NodesOntologyEnricher:
         # 3: go_c
         # 4..N: all selected xref_* fields in the order defined above.
         xref_field_list = list(xref_ontology_fields.keys())
-        fields = "accession,go_p,go_f,go_c," + ",".join(xref_field_list)
+        fields = "accession,ec,go_p,go_f,go_c," + ",".join(xref_field_list)
 
         def _split_go_field(raw: str) -> List[str]:
             """
@@ -1973,18 +2041,35 @@ class NodesOntologyEnricher:
                     continue
                 cols = line.split("\t")
                 # Pad if UniProt ever omits trailing fields
-                while len(cols) < 4 + len(xref_field_list):
+                while len(cols) < 5 + len(xref_field_list):
                     cols.append("")
 
                 acc = cols[0].strip()
                 if not acc:
                     continue
 
-                bp_raw = cols[1]
-                mf_raw = cols[2]
-                cc_raw = cols[3]
+                ec_raw = cols[1]
+                bp_raw = cols[2]
+                mf_raw = cols[3]
+                cc_raw = cols[4]
+
+                def _split_ec_field(raw: str) -> List[str]:
+                    """Extract EC numbers from UniProt EC field (TSV)."""
+                    if not raw:
+                        return []
+                    import re
+                    toks: List[str] = []
+                    for piece in str(raw).replace(",", ";").split(";"):
+                        piece = piece.strip()
+                        if not piece:
+                            continue
+                        m = re.search(r"(\d+\.(?:\d+|-)\.(?:\d+|-)\.(?:\d+|-))", piece)
+                        if m:
+                            toks.append(m.group(1))
+                    return toks
 
                 ann: Dict[str, List[str]] = {
+                    "EC": self._uniq(_split_ec_field(ec_raw)),
                     "GO_BP": self._uniq(_split_go_field(bp_raw)),
                     "GO_MF": self._uniq(_split_go_field(mf_raw)),
                     "GO_CC": self._uniq(_split_go_field(cc_raw)),
@@ -1992,7 +2077,7 @@ class NodesOntologyEnricher:
 
                 # Parse all configured xref_* columns into labelled lists
                 for offset, field_name in enumerate(xref_field_list):
-                    raw_val = cols[4 + offset]
+                    raw_val = cols[5 + offset]
                     label = xref_ontology_fields[field_name]
                     ann[label] = self._uniq(_split_db_field(raw_val))
 
@@ -2224,6 +2309,7 @@ class NodesOntologyEnricher:
         go_bp_ids: List[str] = []
         go_mf_ids: List[str] = []
         go_cc_ids: List[str] = []
+        ec_numbers: List[str] = []
 
         # Map annotation labels -> output column names
         xref_output_map: Dict[str, str] = {
@@ -2278,6 +2364,7 @@ class NodesOntologyEnricher:
             go_bp_ids.append(_join(ann.get("GO_BP", [])))
             go_mf_ids.append(_join(ann.get("GO_MF", [])))
             go_cc_ids.append(_join(ann.get("GO_CC", [])))
+            ec_numbers.append(_join(ann.get("EC", [])))
 
             for label, col_name in xref_output_map.items():
                 xref_values_lists[col_name].append(_join(ann.get(label, [])))
@@ -2285,6 +2372,7 @@ class NodesOntologyEnricher:
         df["GO_BP_Protein_IDs"] = go_bp_ids
         df["GO_MF_Protein_IDs"] = go_mf_ids
         df["GO_CC_Protein_IDs"] = go_cc_ids
+        df["EC_Numbers"] = ec_numbers
 
         for col_name, values in xref_values_lists.items():
             df[col_name] = values
@@ -2298,6 +2386,7 @@ class NodesOntologyEnricher:
             "GO_BP_Protein_IDs",
             "GO_MF_Protein_IDs",
             "GO_CC_Protein_IDs",
+            "EC_Numbers",
         ] + list(xref_values_lists.keys())
 
         ontology_counts: Dict[str, int] = {}
@@ -2316,6 +2405,7 @@ class NodesOntologyEnricher:
             "GO_BP_Protein_IDs",
             "GO_MF_Protein_IDs",
             "GO_CC_Protein_IDs",
+            "EC_Numbers",
         ] + [
             c for c in xref_values_lists.keys()
         ]
@@ -2563,30 +2653,28 @@ class NodesOntologyEnricher:
         input_name: str = "Assay_Properties_Processed.csv",
         output_name: str = "Assay_Properties_WithOntologies.csv",
         name_cols: Optional[List[str]] = None,
+        endpoint_cols: Optional[List[str]] = None,
+        ols_max_workers: int = 4,
     ) -> Optional[pd.DataFrame]:
         """
-        Enrich BioAssay nodes with assay ontologies via OLS.
+        Enrich BioAssay nodes with assay ontologies via EBI OLS.
 
-        Ontologies:
-            - BAO (BioAssay Ontology)  -> primary assay type
-            - OBI (Ontology for Biomedical Investigations) -> method-level context
+        Covers the schema requirements from FigureA/FigureB:
+          - Assay ontologies: BAO + OBI + EFO
+          - Endpoint terms: BAO/EFO (derived from endpoint-like columns)
+          - AssayFormat (biochemical/cellular/microsomes) via lightweight rules
 
-        Strategy:
-            - Build a 'search string' per assay from a combination of columns
-            - Query OLS in each ontology (bao, obi)
-            - For each ontology:
-                * pick best match by string_score
-                * pick best match by keyword_score
-                * pick best match by combined_score
-            - Store all three “views” in separate columns
-            - Keep legacy BAO_ID / BAO_Label / BAO_Score as aliases of the
-            combined-score mapping for backwards compatibility.
-
-        Output columns added (per ontology = BAO, OBI):
-
+        Output columns added (per ontology = BAO, OBI, EFO):
             *_ID_String, *_IRI_String, *_Label_String, *_StringScore
             *_ID_Keyword, *_IRI_Keyword, *_Label_Keyword, *_KeywordScore
             *_ID, *_IRI, *_Label, *_Score   (combined / main mapping)
+
+        Additional columns:
+            EndpointTerm_Raw
+            EndpointTerm_BAO_IDs, EndpointTerm_BAO_Labels
+            EndpointTerm_EFO_IDs, EndpointTerm_EFO_Labels
+            EndpointTerm_Sources
+            AssayFormat, AssayFormat_Confidence, AssayFormat_Method
 
         A JSON summary is written to:
             Data/Nodes/Assay_Ontology_RunSummary.json
@@ -2595,7 +2683,6 @@ class NodesOntologyEnricher:
 
         try:
             df = pd.read_csv(input_path, low_memory=False)
-            # df = df.iloc[:, :3]
         except FileNotFoundError:
             logger.info("Assay input file not found: %s (skipping)", input_path)
             return None
@@ -2603,17 +2690,23 @@ class NodesOntologyEnricher:
         if name_cols is None:
             name_cols = ["AssayName", "AssayActivityName", "AssayType", "AssayDescription"]
 
-        # ------------------------------------------------------------------
-        # Build search text per row from *informative* name/description cols
-        # ------------------------------------------------------------------
-        search_texts = [self._build_search_text(row) for _, row in df.iterrows()]
+        if endpoint_cols is None:
+            endpoint_cols = [
+                "AssayActivityName",
+                "AssayEndpoint",
+                "EndpointName",
+                "ReadoutType",
+                "AssayResultName",
+                "AssayDescription",
+            ]
 
-        # Helper to convert an OBO-style IRI to CURIE-like ID (e.g. BAO_0000015 -> BAO:0000015)
+        # -----------------------------
+        # Helpers
+        # -----------------------------
         def _iri_to_curie(iri: str) -> str:
             if not iri:
                 return ""
             local = iri.rsplit("/", 1)[-1]
-            # If a fragment is used
             if "#" in local:
                 local = local.split("#")[-1]
             if "_" in local:
@@ -2621,63 +2714,94 @@ class NodesOntologyEnricher:
                 return f"{prefix}:{rest}"
             return local
 
-        # ------------------------------------------------------------------
-        # Cache OLS lookups per (ontology, text) to avoid redundant calls
-        # Each cache entry: {
-        #   "string":   (iri, label, score),
-        #   "keyword":  (iri, label, score),
-        #   "combined": (iri, label, score),
-        # }
-        # ------------------------------------------------------------------
-        target_ontologies = ["bao", "obi"]
-        cache: Dict[str, Dict[str, Dict[str, Tuple[str, str, float]]]] = {
-            ont: {} for ont in target_ontologies
-        }
-
-        def _lookup_ontology_multi(text: str, ontology: str) -> Dict[str, Tuple[str, str, float]]:
+        def _infer_assay_format(text: str) -> Tuple[str, float]:
             """
-            For a given (text, ontology), compute and return the *best* match
-            according to three different scoring strategies:
-
-                - "string":   max string_score
-                - "keyword":  max keyword_score
-                - "combined": max combined_score (subject to threshold)
-
-            Returns a dict:
-                {
-                "string":   (iri, label, string_score),
-                "keyword":  (iri, label, keyword_score),
-                "combined": (iri, label, combined_score),
-                }
-
-            Empty/failed cases return empty IRIs/labels and 0.0 scores.
+            Very lightweight normalizer for AssayFormat node.
+            Returns (format_label, confidence).
             """
-            if not text:
-                return {
-                    "string":   ("", "", 0.0),
-                    "keyword":  ("", "", 0.0),
-                    "combined": ("", "", 0.0),
-                }
+            t = (text or "").lower()
+            if not t:
+                return ("", 0.0)
 
-            cache_for_ont = cache[ontology]
-            if text in cache_for_ont:
-                return cache_for_ont[text]
+            # microsomes / S9 / liver fractions
+            if any(k in t for k in ["microsome", "microsomes", "s9 fraction", "s9 ", "liver microsome", "hepatic microsome"]):
+                return ("microsomes", 0.9)
 
-            term_clean = str(text).strip()
+            # cell/tissue-based
+            if any(k in t for k in ["cell line", "cell-based", "cell based", "cellular", "hepg2", "primary hepatocyte", "in vivo", "tissue"]):
+                return ("cellular", 0.8)
+
+            # biochemical / enzyme / binding
+            if any(k in t for k in ["enzyme", "activity assay", "inhibition", "binding", "biochemical", "kinase", "assay buffer", "substrate"]):
+                return ("biochemical", 0.75)
+
+            return ("", 0.0)
+
+        def _split_endpoints(raw: str) -> List[str]:
+            if not raw:
+                return []
+            # split common delimiters; keep short phrases
+            parts = re.split(r"[;|,/]+", str(raw))
+            out = []
+            for p in parts:
+                p = p.strip()
+                if not p:
+                    continue
+                # drop extremely generic tokens
+                if p.lower() in {"other", "na", "n/a", "none"}:
+                    continue
+                out.append(p[:120])
+            return out
+
+        # -----------------------------
+        # Build search texts (assay-level) + endpoint tokens
+        # -----------------------------
+        # Use existing lightweight builder (prioritizes informative columns)
+        search_texts: List[str] = [self._build_search_text(row) for _, row in df.iterrows()]
+
+        endpoint_tokens_per_row: List[List[str]] = []
+        for _, row in df.iterrows():
+            toks: List[str] = []
+            for c in endpoint_cols:
+                if c in row and pd.notna(row[c]):
+                    toks.extend(_split_endpoints(str(row[c])))
+            # de-dup per row, keep order
+            seen = set()
+            uniq = []
+            for t in toks:
+                tl = t.lower()
+                if tl in seen:
+                    continue
+                seen.add(tl)
+                uniq.append(t)
+            endpoint_tokens_per_row.append(uniq)
+
+        unique_search_texts = sorted({t for t in search_texts if t})
+        unique_endpoints = sorted({t for toks in endpoint_tokens_per_row for t in toks if t})
+
+        logger.info(
+            "Enriching %d assays (unique assay texts=%d, unique endpoints=%d) using OLS BAO/OBI/EFO",
+            len(df),
+            len(unique_search_texts),
+            len(unique_endpoints),
+        )
+
+        # -----------------------------
+        # OLS lookup (multi-score)
+        # -----------------------------
+        def _ols_lookup_multi(term_clean: str, ontology: str) -> Dict[str, Tuple[str, str, float]]:
+            """
+            Returns:
+              {"string": (iri,label,score), "keyword": (...), "combined": (...)}
+            """
             if not term_clean:
-                result = {
-                    "string":   ("", "", 0.0),
-                    "keyword":  ("", "", 0.0),
-                    "combined": ("", "", 0.0),
-                }
-                cache_for_ont[text] = result
-                return result
+                return {"string": ("", "", 0.0), "keyword": ("", "", 0.0), "combined": ("", "", 0.0)}
 
             url = f"{self.ols_base_url}/search"
             params = {
                 "q": term_clean,
                 "ontology": ontology,
-                "rows": 10,  # a few more candidates to let scores differentiate
+                "rows": 10,
                 "queryFields": "label,synonym,short_form",
             }
 
@@ -2689,52 +2813,21 @@ class NodesOntologyEnricher:
                     data = resp.json()
                     break
                 except Exception as e:  # pragma: no cover
-                    logger.warning(
-                        "OLS query failed for '%s' in %s (attempt %d/3): %s",
-                        term_clean,
-                        ontology,
-                        attempt,
-                        e,
-                    )
                     if attempt == 3:
-                        logger.error(
-                            "OLS query permanently failed for '%s' in %s after %d attempts",
-                            term_clean,
-                            ontology,
-                            attempt,
-                        )
-                        result = {
-                            "string":   ("", "", 0.0),
-                            "keyword":  ("", "", 0.0),
-                            "combined": ("", "", 0.0),
-                        }
-                        cache_for_ont[text] = result
-                        return result
-                    time.sleep(0.5 * attempt)
+                        logger.debug("OLS failed for '%s' (%s): %s", term_clean, ontology, e)
+                        return {"string": ("", "", 0.0), "keyword": ("", "", 0.0), "combined": ("", "", 0.0)}
+                    time.sleep(0.4 * attempt)
 
             docs = (data or {}).get("response", {}).get("docs", [])
             if not docs:
-                logger.debug(
-                    "OLS returned no docs for '%s' in %s (raw data keys: %s)",
-                    term_clean, ontology, list((data or {}).keys())
-                )
-                result = {
-                    "string":   ("", "", 0.0),
-                    "keyword":  ("", "", 0.0),
-                    "combined": ("", "", 0.0),
-                }
-                cache_for_ont[text] = result
-                return result
+                return {"string": ("", "", 0.0), "keyword": ("", "", 0.0), "combined": ("", "", 0.0)}
 
             term_lower = term_clean.lower()
-
-            # Pre-compute query keywords once
             src_keywords = self._extract_keywords(term_clean)
 
-            # Best candidates per scoring strategy
-            best_string = ("", "", 0.0)    # (iri, label, string_score)
-            best_keyword = ("", "", 0.0)   # (iri, label, keyword_score)
-            best_combined = ("", "", 0.0)  # (iri, label, combined_score)
+            best_string = ("", "", 0.0)
+            best_keyword = ("", "", 0.0)
+            best_combined = ("", "", 0.0)
 
             for d in docs:
                 label = (d.get("label") or term_clean).strip()
@@ -2748,213 +2841,201 @@ class NodesOntologyEnricher:
                 if isinstance(short_form, str):
                     short_form = [short_form]
 
-                # -----------------------------
                 # 1) String similarity
-                # -----------------------------
-                # exact match boost
-                if label_lower == term_lower or any(
-                    str(s).strip().lower() == term_lower for s in synonyms
-                ):
+                if label_lower == term_lower or any(str(s).strip().lower() == term_lower for s in synonyms):
                     string_score = 1.0
                 else:
-                    string_score = SequenceMatcher(
-                        None,
-                        term_lower,
-                        label_lower
-                    ).ratio()
+                    string_score = SequenceMatcher(None, term_lower, label_lower).ratio()
 
-                # -----------------------------
                 # 2) Keyword overlap
-                # -----------------------------
                 if src_keywords:
-                    target_text = " ".join([label] + synonyms + short_form)
+                    target_text = " ".join([label] + [str(s) for s in synonyms] + [str(sf) for sf in short_form])
                     tgt_keywords = self._extract_keywords(target_text)
-                    if tgt_keywords:
-                        intersect = src_keywords & tgt_keywords
-                        keyword_score = len(intersect) / len(src_keywords)
-                    else:
-                        keyword_score = 0.0
+                    keyword_score = (len(src_keywords & tgt_keywords) / len(src_keywords)) if tgt_keywords else 0.0
                 else:
                     keyword_score = 0.0
 
-                # -----------------------------
-                # 3) Combined score
-                # -----------------------------
-                alpha = 0.7  # favour string a bit
+                # 3) Combined
+                alpha = 0.7
                 combined_score = alpha * string_score + (1.0 - alpha) * keyword_score
 
                 iri = d.get("iri") or ""
 
-                # Update best-by-string
                 if string_score > best_string[2]:
                     best_string = (iri, label, float(string_score))
-
-                # Update best-by-keyword
                 if keyword_score > best_keyword[2]:
                     best_keyword = (iri, label, float(keyword_score))
-
-                # Update best-by-combined
                 if combined_score > best_combined[2]:
                     best_combined = (iri, label, float(combined_score))
 
-            # Apply ontology-specific minimum threshold on the combined mapping only
-            default_min_scores = {"bao": 0.25, "obi": 0.30}
-            ontology_min_scores = getattr(self, "ontology_min_scores", default_min_scores)
-            eff_min_score = float(ontology_min_scores.get(ontology, 0.1))
-
-            iri_c, label_c, combined_score = best_combined
-            if combined_score < eff_min_score:
-                # If combined score is too low, blank out the main mapping.
+            # mild floor to avoid very weak mappings
+            min_combined = 0.35 if ontology in {"bao", "obi", "efo"} else 0.30
+            if best_combined[2] < min_combined:
                 best_combined = ("", "", 0.0)
 
-            result = {
-                "string":   best_string,
-                "keyword":  best_keyword,
-                "combined": best_combined,
-            }
-            cache_for_ont[text] = result
-
-            # Respect rate limiting if configured
             if self.OLS_SLEEP_SECONDS and self.OLS_SLEEP_SECONDS > 0:
                 time.sleep(self.OLS_SLEEP_SECONDS)
 
-            return result
+            return {"string": best_string, "keyword": best_keyword, "combined": best_combined}
 
-        # ------------------------------------------------------------------
-        # Perform enrichment
-        # ------------------------------------------------------------------
-        # BAO columns
-        bao_id_string: List[str] = []
-        bao_iri_string: List[str] = []
-        bao_label_string: List[str] = []
-        bao_string_score: List[float] = []
+        def _bulk_lookup(terms: List[str], ontology: str) -> Dict[str, Dict[str, Tuple[str, str, float]]]:
+            if not terms:
+                return {}
+            out: Dict[str, Dict[str, Tuple[str, str, float]]] = {}
+            if ols_max_workers <= 1:
+                for t in terms:
+                    out[t] = _ols_lookup_multi(t, ontology)
+                return out
 
-        bao_id_keyword: List[str] = []
-        bao_iri_keyword: List[str] = []
-        bao_label_keyword: List[str] = []
-        bao_keyword_score: List[float] = []
+            from concurrent.futures import ThreadPoolExecutor, as_completed
 
-        bao_ids: List[str] = []         # combined / main
-        bao_iris: List[str] = []
-        bao_labels: List[str] = []
-        bao_scores: List[float] = []    # combined_score
+            with ThreadPoolExecutor(max_workers=ols_max_workers) as ex:
+                futs = {ex.submit(_ols_lookup_multi, t, ontology): t for t in terms}
+                for fut in as_completed(futs):
+                    t = futs[fut]
+                    try:
+                        out[t] = fut.result()
+                    except Exception:  # pragma: no cover
+                        out[t] = {"string": ("", "", 0.0), "keyword": ("", "", 0.0), "combined": ("", "", 0.0)}
+            return out
 
-        # OBI columns
-        obi_id_string: List[str] = []
-        obi_iri_string: List[str] = []
-        obi_label_string: List[str] = []
-        obi_string_score: List[float] = []
+        # -----------------------------
+        # 1) Assay-level lookups
+        # -----------------------------
+        assay_maps = {
+            "bao": _bulk_lookup(unique_search_texts, "bao"),
+            "obi": _bulk_lookup(unique_search_texts, "obi"),
+            "efo": _bulk_lookup(unique_search_texts, "efo"),
+        }
 
-        obi_id_keyword: List[str] = []
-        obi_iri_keyword: List[str] = []
-        obi_label_keyword: List[str] = []
-        obi_keyword_score: List[float] = []
+        # -----------------------------
+        # 2) Endpoint term lookups (combined only)
+        # -----------------------------
+        endpoint_maps = {
+            "bao": _bulk_lookup(unique_endpoints, "bao"),
+            "efo": _bulk_lookup(unique_endpoints, "efo"),
+        }
 
-        obi_ids: List[str] = []         # combined / main
-        obi_iris: List[str] = []
-        obi_labels: List[str] = []
-        obi_scores: List[float] = []    # combined_score
+        # -----------------------------
+        # Attach columns (per ontology)
+        # -----------------------------
+        def _attach_ontology_cols(prefix: str, ontology_key: str) -> None:
+            id_s, iri_s, lab_s, sc_s = [], [], [], []
+            id_k, iri_k, lab_k, sc_k = [], [], [], []
+            ids, iris, labs, sc = [], [], [], []
 
-        logger.info("Enriching %d assays with BAO/OBI via OLS (per-score mappings)", len(df))
+            mapping = assay_maps[ontology_key]
+
+            for text in search_texts:
+                res = mapping.get(text) if text else None
+                if not res:
+                    res = {"string": ("", "", 0.0), "keyword": ("", "", 0.0), "combined": ("", "", 0.0)}
+
+                i_s, l_s, s_s = res["string"]
+                i_k, l_k, s_k = res["keyword"]
+                i_c, l_c, s_c = res["combined"]
+
+                iri_s.append(i_s); lab_s.append(l_s); sc_s.append(float(s_s)); id_s.append(_iri_to_curie(i_s))
+                iri_k.append(i_k); lab_k.append(l_k); sc_k.append(float(s_k)); id_k.append(_iri_to_curie(i_k))
+                iris.append(i_c); labs.append(l_c); sc.append(float(s_c)); ids.append(_iri_to_curie(i_c))
+
+            df[f"{prefix}_ID_String"] = id_s
+            df[f"{prefix}_IRI_String"] = iri_s
+            df[f"{prefix}_Label_String"] = lab_s
+            df[f"{prefix}_StringScore"] = sc_s
+
+            df[f"{prefix}_ID_Keyword"] = id_k
+            df[f"{prefix}_IRI_Keyword"] = iri_k
+            df[f"{prefix}_Label_Keyword"] = lab_k
+            df[f"{prefix}_KeywordScore"] = sc_k
+
+            df[f"{prefix}_ID"] = ids
+            df[f"{prefix}_IRI"] = iris
+            df[f"{prefix}_Label"] = labs
+            df[f"{prefix}_Score"] = sc
+
+        _attach_ontology_cols("BAO", "bao")
+        _attach_ontology_cols("OBI", "obi")
+        _attach_ontology_cols("EFO", "efo")
+
+        # -----------------------------
+        # Endpoint term columns (combined only)
+        # -----------------------------
+        endpoint_raw_col: List[str] = []
+        endpoint_bao_ids: List[str] = []
+        endpoint_bao_labels: List[str] = []
+        endpoint_efo_ids: List[str] = []
+        endpoint_efo_labels: List[str] = []
+
+        def _join_unique(xs: List[str]) -> str:
+            xs = [x for x in xs if x]
+            return "|".join(sorted(set(xs))) if xs else ""
+
+        for toks in endpoint_tokens_per_row:
+            endpoint_raw_col.append("|".join(toks) if toks else "")
+
+            bao_ids, bao_labs = [], []
+            efo_ids, efo_labs = [], []
+
+            for t in toks:
+                r_bao = endpoint_maps["bao"].get(t, {}).get("combined", ("", "", 0.0))
+                r_efo = endpoint_maps["efo"].get(t, {}).get("combined", ("", "", 0.0))
+
+                iri_b, lab_b, _ = r_bao
+                iri_e, lab_e, _ = r_efo
+
+                cid_b = _iri_to_curie(iri_b)
+                cid_e = _iri_to_curie(iri_e)
+
+                if cid_b:
+                    bao_ids.append(cid_b)
+                    bao_labs.append(lab_b)
+                if cid_e:
+                    efo_ids.append(cid_e)
+                    efo_labs.append(lab_e)
+
+            endpoint_bao_ids.append(_join_unique(bao_ids))
+            endpoint_bao_labels.append(_join_unique(bao_labs))
+            endpoint_efo_ids.append(_join_unique(efo_ids))
+            endpoint_efo_labels.append(_join_unique(efo_labs))
+
+        df["EndpointTerm_Raw"] = endpoint_raw_col
+        df["EndpointTerm_BAO_IDs"] = endpoint_bao_ids
+        df["EndpointTerm_BAO_Labels"] = endpoint_bao_labels
+        df["EndpointTerm_EFO_IDs"] = endpoint_efo_ids
+        df["EndpointTerm_EFO_Labels"] = endpoint_efo_labels
+        df["EndpointTerm_Sources"] = "OLS(BAO;EFO)"
+
+        # -----------------------------
+        # AssayFormat columns (rule-based)
+        # -----------------------------
+        fmt_vals: List[str] = []
+        fmt_conf: List[float] = []
+        fmt_method: List[str] = []
 
         for text in search_texts:
-            # ---------------- BAO ----------------
-            bao_res = _lookup_ontology_multi(text, "bao")
+            fmt, conf = _infer_assay_format(text)
+            fmt_vals.append(fmt)
+            fmt_conf.append(conf)
+            fmt_method.append("rule-based")
 
-            # best by string
-            b_iri_s, b_label_s, b_score_s = bao_res["string"]
-            bao_iri_string.append(b_iri_s)
-            bao_label_string.append(b_label_s)
-            bao_id_string.append(_iri_to_curie(b_iri_s))
-            bao_string_score.append(b_score_s)
+        df["AssayFormat"] = fmt_vals
+        df["AssayFormat_Confidence"] = fmt_conf
+        df["AssayFormat_Method"] = fmt_method
 
-            # best by keyword
-            b_iri_k, b_label_k, b_score_k = bao_res["keyword"]
-            bao_iri_keyword.append(b_iri_k)
-            bao_label_keyword.append(b_label_k)
-            bao_id_keyword.append(_iri_to_curie(b_iri_k))
-            bao_keyword_score.append(b_score_k)
+        # -----------------------------
+        # Coverage summary (combined mappings)
+        # -----------------------------
+        ontology_cols = [
+            "BAO_ID",
+            "OBI_ID",
+            "EFO_ID",
+            "EndpointTerm_BAO_IDs",
+            "EndpointTerm_EFO_IDs",
+            "AssayFormat",
+        ]
 
-            # best by combined (main mapping)
-            b_iri_c, b_label_c, b_score_c = bao_res["combined"]
-            bao_iris.append(b_iri_c)
-            bao_labels.append(b_label_c)
-            bao_ids.append(_iri_to_curie(b_iri_c))
-            bao_scores.append(b_score_c)
-
-            # ---------------- OBI ----------------
-            obi_res = _lookup_ontology_multi(text, "obi")
-
-            # best by string
-            o_iri_s, o_label_s, o_score_s = obi_res["string"]
-            obi_iri_string.append(o_iri_s)
-            obi_label_string.append(o_label_s)
-            obi_id_string.append(_iri_to_curie(o_iri_s))
-            obi_string_score.append(o_score_s)
-
-            # best by keyword
-            o_iri_k, o_label_k, o_score_k = obi_res["keyword"]
-            obi_iri_keyword.append(o_iri_k)
-            obi_label_keyword.append(o_label_k)
-            obi_id_keyword.append(_iri_to_curie(o_iri_k))
-            obi_keyword_score.append(o_score_k)
-
-            # best by combined (main mapping)
-            o_iri_c, o_label_c, o_score_c = obi_res["combined"]
-            obi_iris.append(o_iri_c)
-            obi_labels.append(o_label_c)
-            obi_ids.append(_iri_to_curie(o_iri_c))
-            obi_scores.append(o_score_c)
-
-        # ------------------------------------------------------------------
-        # Attach ontology columns
-        #   - String-based mapping
-        #   - Keyword-based mapping
-        #   - Combined (main) mapping (keeps legacy column names)
-        # ------------------------------------------------------------------
-        # BAO
-        df["BAO_ID_String"] = bao_id_string
-        df["BAO_IRI_String"] = bao_iri_string
-        df["BAO_Label_String"] = bao_label_string
-        df["BAO_StringScore"] = bao_string_score
-
-        df["BAO_ID_Keyword"] = bao_id_keyword
-        df["BAO_IRI_Keyword"] = bao_iri_keyword
-        df["BAO_Label_Keyword"] = bao_label_keyword
-        df["BAO_KeywordScore"] = bao_keyword_score
-
-        # Legacy / main: combined mapping
-        df["BAO_ID"] = bao_ids
-        df["BAO_IRI"] = bao_iris
-        df["BAO_Label"] = bao_labels
-        df["BAO_Score"] = bao_scores
-
-        # OBI
-        df["OBI_ID_String"] = obi_id_string
-        df["OBI_IRI_String"] = obi_iri_string
-        df["OBI_Label_String"] = obi_label_string
-        df["OBI_StringScore"] = obi_string_score
-
-        df["OBI_ID_Keyword"] = obi_id_keyword
-        df["OBI_IRI_Keyword"] = obi_iri_keyword
-        df["OBI_Label_Keyword"] = obi_label_keyword
-        df["OBI_KeywordScore"] = obi_keyword_score
-
-        # Legacy / main: combined mapping
-        df["OBI_ID"] = obi_ids
-        df["OBI_IRI"] = obi_iris
-        df["OBI_Label"] = obi_labels
-        df["OBI_Score"] = obi_scores
-
-        # ------------------------------------------------------------------
-        # Ontology counts summary + transparency metadata
-        # (based on main / combined mapping)
-        # ------------------------------------------------------------------
-        ontology_cols = ["BAO_ID", "OBI_ID"]
-
-        ontology_counts: Dict[str, int] = {}
-        for col in ontology_cols:
-            ontology_counts[col] = self._count_non_empty_column(df[col])
+        ontology_counts: Dict[str, int] = {c: self._count_non_empty_column(df[c]) for c in ontology_cols}
 
         num_rows = len(df)
         ontology_percent = {
@@ -2962,73 +3043,419 @@ class NodesOntologyEnricher:
             for k, v in ontology_counts.items()
         }
 
-        # Identify assays with no ontology at all (BAO and OBI both empty for main mapping)
+        # Identify assays with no ontology at all (BAO/OBI/EFO empty AND no endpoint term)
         missing_all: List[int] = []
         id_col = "AssayID" if "AssayID" in df.columns else None
 
         for _, row in df.iterrows():
-            has_any = any(
-                pd.notna(row[col]) and str(row[col]).strip() != ""
-                for col in ontology_cols
-            )
+            has_any = any(pd.notna(row[c]) and str(row[c]).strip() != "" for c in ["BAO_ID", "OBI_ID", "EFO_ID", "EndpointTerm_BAO_IDs", "EndpointTerm_EFO_IDs"])
             if not has_any and id_col is not None:
                 aid = row.get(id_col)
                 if pd.notna(aid):
-                    missing_all.append(int(aid))
+                    try:
+                        missing_all.append(int(aid))
+                    except Exception:
+                        pass
 
         num_missing = len(missing_all)
         num_success = num_rows - num_missing
 
         logger.info("=== Assay Ontology Retrieval Summary ===")
         logger.info("Total assays processed: %d", num_rows)
-        logger.info("Successful hits (any of BAO/OBI, combined score): %d", num_success)
-        logger.info("Missing entries (no BAO/OBI at all): %d", num_missing)
-        logger.info("Ontology counts / coverage (by ID, combined mapping):")
+        logger.info("Successful hits (any ontology/endpoint): %d", num_success)
+        logger.info("Missing entries (no BAO/OBI/EFO/endpoint at all): %d", num_missing)
         for k, v in ontology_counts.items():
             logger.info("  %s: %d  (%.2f%%)", k, v, ontology_percent[k])
 
-        # Build and save JSON summary
         run_summary = {
             "total_assays_processed": int(num_rows),
-            "total_nodes_processed": int(num_rows),  # generic key for tooling/tests
+            "total_nodes_processed": int(num_rows),
             "total_successful_hits_any": int(num_success),
             "total_missing_entries": int(num_missing),
             "missing_assay_ids": missing_all,
             "ontology_counts": ontology_counts,
             "ontology_coverage_percent": ontology_percent,
-            "retrieved_fields": [
+            "retrieved_fields": (
                 # BAO
-                "BAO_ID_String", "BAO_IRI_String", "BAO_Label_String", "BAO_StringScore",
-                "BAO_ID_Keyword", "BAO_IRI_Keyword", "BAO_Label_Keyword", "BAO_KeywordScore",
-                "BAO_ID", "BAO_IRI", "BAO_Label", "BAO_Score",
+                ["BAO_ID_String", "BAO_IRI_String", "BAO_Label_String", "BAO_StringScore",
+                 "BAO_ID_Keyword", "BAO_IRI_Keyword", "BAO_Label_Keyword", "BAO_KeywordScore",
+                 "BAO_ID", "BAO_IRI", "BAO_Label", "BAO_Score"]
                 # OBI
-                "OBI_ID_String", "OBI_IRI_String", "OBI_Label_String", "OBI_StringScore",
-                "OBI_ID_Keyword", "OBI_IRI_Keyword", "OBI_Label_Keyword", "OBI_KeywordScore",
-                "OBI_ID", "OBI_IRI", "OBI_Label", "OBI_Score",
-            ],
+                + ["OBI_ID_String", "OBI_IRI_String", "OBI_Label_String", "OBI_StringScore",
+                   "OBI_ID_Keyword", "OBI_IRI_Keyword", "OBI_Label_Keyword", "OBI_KeywordScore",
+                   "OBI_ID", "OBI_IRI", "OBI_Label", "OBI_Score"]
+                # EFO
+                + ["EFO_ID_String", "EFO_IRI_String", "EFO_Label_String", "EFO_StringScore",
+                   "EFO_ID_Keyword", "EFO_IRI_Keyword", "EFO_Label_Keyword", "EFO_KeywordScore",
+                   "EFO_ID", "EFO_IRI", "EFO_Label", "EFO_Score"]
+                # endpoints + format
+                + ["EndpointTerm_Raw", "EndpointTerm_BAO_IDs", "EndpointTerm_BAO_Labels",
+                   "EndpointTerm_EFO_IDs", "EndpointTerm_EFO_Labels", "EndpointTerm_Sources",
+                   "AssayFormat", "AssayFormat_Confidence", "AssayFormat_Method"]
+            ),
             "input_file": input_path,
             "output_file": f"{self.data_dir}/{output_name}",
             "name_columns_used": name_cols,
-            "ols_ontologies": ["bao", "obi"],
+            "endpoint_columns_used": endpoint_cols,
+            "ols_ontologies": ["bao", "obi", "efo"],
             "ols_base_url": self.ols_base_url,
             "created_at": datetime.datetime.utcnow().isoformat() + "Z",
             "ols_sleep_seconds": self.OLS_SLEEP_SECONDS,
-            "source": "EBI OLS (BAO;OBI)",
+            "ols_max_workers": int(ols_max_workers),
+            "source": "EBI OLS (BAO;OBI;EFO) + rule-based AssayFormat",
         }
 
         summary_path = f"{self.data_dir}/Assay_Ontology_RunSummary.json"
         self._save_run_summary(run_summary, summary_path)
 
-        # ------------------------------------------------------------------
         # Save enriched version
-        # ------------------------------------------------------------------
         enrichment_time = datetime.datetime.utcnow().isoformat() + "Z"
         df["OntologyEnrichedAt"] = enrichment_time
-        df["OntologyEnricherVersion"] = "ChemGraphBuilder.AssaysOLS/1.3"
-        df["OntologySources"] = "OLS(BAO;OBI)"
+        df["OntologyEnricherVersion"] = "ChemGraphBuilder.AssaysOLS/2.0"
+        df["OntologySources"] = "OLS(BAO;OBI;EFO);RuleBased(AssayFormat)"
 
         out_path = f"{self.data_dir}/{output_name}"
         df.to_csv(out_path, index=False)
         logger.info("Saved assay-enriched table to %s", out_path)
+
+        return df
+
+    # ------------------------------------------------------------------
+    # Auxiliary schema nodes (FigureB): ExperimentalContext, Unit, Taxon, Tissue, CellLine, AssayEndpoint
+    # These are optional: the methods auto-skip if the expected input file doesn't exist.
+    # ------------------------------------------------------------------
+    def _detect_first_column(self, df: pd.DataFrame, candidates: List[str]) -> Optional[str]:
+        for c in candidates:
+            if c in df.columns:
+                return c
+        return None
+
+    def _ols_best_match(
+        self,
+        term_clean: str,
+        ontology: str,
+        min_combined: float = 0.35,
+        rows: int = 10,
+    ) -> Tuple[str, str, str, float]:
+        """
+        Best-effort OLS matcher for controlled terms.
+
+        Returns:
+            (curie, iri, label, combined_score)
+        """
+        if not term_clean:
+            return ("", "", "", 0.0)
+
+        url = f"{self.ols_base_url}/search"
+        params = {
+            "q": term_clean,
+            "ontology": ontology,
+            "rows": rows,
+            "queryFields": "label,synonym,short_form",
+        }
+
+        try:
+            resp = self.session.get(url, params=params, timeout=self.http_timeout)
+            resp.raise_for_status()
+            data = resp.json()
+        except Exception:  # pragma: no cover
+            return ("", "", "", 0.0)
+
+        docs = (data or {}).get("response", {}).get("docs", [])
+        if not docs:
+            return ("", "", "", 0.0)
+
+        term_lower = term_clean.lower()
+        src_keywords = self._extract_keywords(term_clean)
+
+        best = ("", "", "", 0.0)  # curie, iri, label, score
+
+        def iri_to_curie(iri: str) -> str:
+            if not iri:
+                return ""
+            local = iri.rsplit("/", 1)[-1]
+            if "#" in local:
+                local = local.split("#")[-1]
+            if "_" in local:
+                prefix, rest = local.split("_", 1)
+                return f"{prefix}:{rest}"
+            return local
+
+        for d in docs:
+            label = (d.get("label") or term_clean).strip()
+            label_lower = label.lower()
+
+            synonyms = d.get("synonym") or []
+            if isinstance(synonyms, str):
+                synonyms = [synonyms]
+
+            # string score
+            if label_lower == term_lower or any(str(s).strip().lower() == term_lower for s in synonyms):
+                string_score = 1.0
+            else:
+                string_score = SequenceMatcher(None, term_lower, label_lower).ratio()
+
+            # keyword score
+            if src_keywords:
+                target_text = " ".join([label] + [str(s) for s in synonyms])
+                tgt_keywords = self._extract_keywords(target_text)
+                keyword_score = (len(src_keywords & tgt_keywords) / len(src_keywords)) if tgt_keywords else 0.0
+            else:
+                keyword_score = 0.0
+
+            alpha = 0.7
+            combined = alpha * string_score + (1.0 - alpha) * keyword_score
+            iri = d.get("iri") or ""
+            curie = iri_to_curie(iri)
+
+            if combined > best[3]:
+                best = (curie, iri, label, float(combined))
+
+        if best[3] < float(min_combined):
+            return ("", "", "", 0.0)
+
+        if self.OLS_SLEEP_SECONDS and self.OLS_SLEEP_SECONDS > 0:
+            time.sleep(self.OLS_SLEEP_SECONDS)
+
+        return best
+
+    def _bulk_ols_best(
+        self,
+        terms: List[str],
+        ontology: str,
+        ols_max_workers: int = 4,
+        min_combined: float = 0.35,
+    ) -> Dict[str, Tuple[str, str, str, float]]:
+        """
+        Map unique term strings -> (curie, iri, label, score).
+        """
+        terms = [t for t in terms if t]
+        if not terms:
+            return {}
+
+        uniq_terms = sorted(set(terms))
+        out: Dict[str, Tuple[str, str, str, float]] = {}
+
+        if ols_max_workers <= 1:
+            for t in uniq_terms:
+                out[t] = self._ols_best_match(t, ontology=ontology, min_combined=min_combined)
+            return out
+
+        from concurrent.futures import ThreadPoolExecutor, as_completed
+        with ThreadPoolExecutor(max_workers=ols_max_workers) as ex:
+            futs = {
+                ex.submit(self._ols_best_match, t, ontology, min_combined): t
+                for t in uniq_terms
+            }
+            for fut in as_completed(futs):
+                t = futs[fut]
+                try:
+                    out[t] = fut.result()
+                except Exception:  # pragma: no cover
+                    out[t] = ("", "", "", 0.0)
+
+        return out
+
+    def enrich_experimental_contexts(
+        self,
+        input_name: str = "ExperimentalContext_Properties_Processed.csv",
+        output_name: str = "ExperimentalContext_Properties_WithOntologies.csv",
+        ols_max_workers: int = 4,
+    ) -> Optional[pd.DataFrame]:
+        """
+        Optional enrichment for ExperimentalContext nodes (FigureB):
+          - Organism/species -> NCBITaxon
+          - Cell line -> Cellosaurus
+          - Tissue -> UBERON
+          - Unit (if present) -> UO
+        """
+        input_path = f"{self.data_dir}/{input_name}"
+        try:
+            df = pd.read_csv(input_path, low_memory=False)
+        except FileNotFoundError:
+            logger.info("ExperimentalContext file not found: %s (skipping)", input_path)
+            return None
+
+        org_col = self._detect_first_column(df, ["Organism", "Species", "Taxon", "TaxonName", "OrganismName"])
+        cell_col = self._detect_first_column(df, ["CellLine", "Cell_Line", "CellLineName"])
+        tissue_col = self._detect_first_column(df, ["Tissue", "TissueName", "AnatomicalSite"])
+        unit_col = self._detect_first_column(df, ["Unit", "UnitLabel", "UnitName"])
+
+        if org_col:
+            org_terms = df[org_col].fillna("").astype(str).str.strip().tolist()
+            org_map = self._bulk_ols_best(org_terms, "ncbitaxon", ols_max_workers=ols_max_workers, min_combined=0.35)
+            df["NCBITaxon_ID"] = [org_map.get(t, ("", "", "", 0.0))[0] if t else "" for t in org_terms]
+            df["NCBITaxon_IRI"] = [org_map.get(t, ("", "", "", 0.0))[1] if t else "" for t in org_terms]
+            df["NCBITaxon_Label"] = [org_map.get(t, ("", "", "", 0.0))[2] if t else "" for t in org_terms]
+            df["NCBITaxon_Score"] = [org_map.get(t, ("", "", "", 0.0))[3] if t else 0.0 for t in org_terms]
+        else:
+            df["NCBITaxon_ID"] = ""
+            df["NCBITaxon_IRI"] = ""
+            df["NCBITaxon_Label"] = ""
+            df["NCBITaxon_Score"] = 0.0
+
+        if cell_col:
+            cell_terms = df[cell_col].fillna("").astype(str).str.strip().tolist()
+            cell_map = self._bulk_ols_best(cell_terms, "cellosaurus", ols_max_workers=ols_max_workers, min_combined=0.35)
+            df["Cellosaurus_ID"] = [cell_map.get(t, ("", "", "", 0.0))[0] if t else "" for t in cell_terms]
+            df["Cellosaurus_IRI"] = [cell_map.get(t, ("", "", "", 0.0))[1] if t else "" for t in cell_terms]
+            df["Cellosaurus_Label"] = [cell_map.get(t, ("", "", "", 0.0))[2] if t else "" for t in cell_terms]
+            df["Cellosaurus_Score"] = [cell_map.get(t, ("", "", "", 0.0))[3] if t else 0.0 for t in cell_terms]
+        else:
+            df["Cellosaurus_ID"] = ""
+            df["Cellosaurus_IRI"] = ""
+            df["Cellosaurus_Label"] = ""
+            df["Cellosaurus_Score"] = 0.0
+
+        if tissue_col:
+            tissue_terms = df[tissue_col].fillna("").astype(str).str.strip().tolist()
+            tissue_map = self._bulk_ols_best(tissue_terms, "uberon", ols_max_workers=ols_max_workers, min_combined=0.35)
+            df["UBERON_ID"] = [tissue_map.get(t, ("", "", "", 0.0))[0] if t else "" for t in tissue_terms]
+            df["UBERON_IRI"] = [tissue_map.get(t, ("", "", "", 0.0))[1] if t else "" for t in tissue_terms]
+            df["UBERON_Label"] = [tissue_map.get(t, ("", "", "", 0.0))[2] if t else "" for t in tissue_terms]
+            df["UBERON_Score"] = [tissue_map.get(t, ("", "", "", 0.0))[3] if t else 0.0 for t in tissue_terms]
+        else:
+            df["UBERON_ID"] = ""
+            df["UBERON_IRI"] = ""
+            df["UBERON_Label"] = ""
+            df["UBERON_Score"] = 0.0
+
+        if unit_col:
+            unit_terms = df[unit_col].fillna("").astype(str).str.strip().tolist()
+            uo_map = self._bulk_ols_best(unit_terms, "uo", ols_max_workers=ols_max_workers, min_combined=0.30)
+            df["UO_ID"] = [uo_map.get(t, ("", "", "", 0.0))[0] if t else "" for t in unit_terms]
+            df["UO_IRI"] = [uo_map.get(t, ("", "", "", 0.0))[1] if t else "" for t in unit_terms]
+            df["UO_Label"] = [uo_map.get(t, ("", "", "", 0.0))[2] if t else "" for t in unit_terms]
+            df["UO_Score"] = [uo_map.get(t, ("", "", "", 0.0))[3] if t else 0.0 for t in unit_terms]
+            # Best-effort UCUM: if the value already looks like a UCUM code, keep it as-is
+            df["UCUM_Code"] = [t if re.search(r"[A-Za-z].*", t) else "" for t in unit_terms]
+        else:
+            df["UO_ID"] = ""
+            df["UO_IRI"] = ""
+            df["UO_Label"] = ""
+            df["UO_Score"] = 0.0
+            df["UCUM_Code"] = ""
+
+        df["OntologyEnrichedAt"] = datetime.datetime.utcnow().isoformat() + "Z"
+        df["OntologyEnricherVersion"] = "ChemGraphBuilder.ExperimentalContextOLS/1.0"
+        df["OntologySources"] = "OLS(ncbitaxon;cellosaurus;uberon;uo)"
+
+        out_path = f"{self.data_dir}/{output_name}"
+        df.to_csv(out_path, index=False)
+        logger.info("Saved ExperimentalContext enriched table to %s", out_path)
+        
+        # Write a run summary JSON (mirrors the 4-core-node summaries)
+        try:
+            key_fields = ["NCBITaxon_ID", "Cellosaurus_ID", "UBERON_ID", "UO_ID"]
+            def _nonempty(col: str) -> pd.Series:
+                if col not in df.columns:
+                    return pd.Series([False] * len(df))
+                return df[col].fillna("").astype(str).str.strip().ne("")
+            hit_any_mask = _nonempty("NCBITaxon_ID") | _nonempty("Cellosaurus_ID") | _nonempty("UBERON_ID") | _nonempty("UO_ID")
+            summary = {
+                "total_nodes_processed": int(len(df)),
+                "total_successful_hits_any": int(hit_any_mask.sum()),
+                "total_missing_entries": int((~hit_any_mask).sum()),
+                "ontology_counts": {k: int(_nonempty(k).sum()) for k in key_fields},
+                "ontology_sources": "OLS(ncbitaxon;cellosaurus;uberon;uo)",
+                "generated_at_utc": datetime.datetime.utcnow().isoformat() + "Z",
+                "input_file": input_name,
+                "output_file": output_name,
+            }
+            summary_path = f"{self.data_dir}/ExperimentalContext_Ontology_RunSummary.json"
+            with open(summary_path, "w", encoding="utf-8") as f:
+                json.dump(summary, f, indent=2)
+            logger.info("Saved ExperimentalContext ontology run summary to %s", summary_path)
+        except Exception as exc:  # pragma: no cover
+            logger.warning("Could not write ExperimentalContext run summary: %s", exc)
+
+        return df
+
+    def enrich_assay_endpoints(
+        self,
+        input_name: str = "AssayEndpoint_Properties_Processed.csv",
+        output_name: str = "AssayEndpoint_Properties_WithOntologies.csv",
+        endpoint_col: Optional[str] = None,
+        ols_max_workers: int = 4,
+    ) -> Optional[pd.DataFrame]:
+        """
+        Optional enrichment for AssayEndpoint nodes (FigureB):
+          - endpoint_name -> BAO/EFO
+          - unit -> UO (+ best-effort UCUM)
+        """
+        input_path = f"{self.data_dir}/{input_name}"
+        try:
+            df = pd.read_csv(input_path, low_memory=False)
+        except FileNotFoundError:
+            logger.info("AssayEndpoint file not found: %s (skipping)", input_path)
+            return None
+
+        if endpoint_col is None:
+            endpoint_col = self._detect_first_column(df, ["endpoint_name", "EndpointName", "Endpoint", "ReadoutType"])
+        if endpoint_col is None:
+            endpoint_col = df.columns[0]
+
+        endpoint_terms = df[endpoint_col].fillna("").astype(str).str.strip().tolist()
+        bao_map = self._bulk_ols_best(endpoint_terms, "bao", ols_max_workers=ols_max_workers, min_combined=0.35)
+        efo_map = self._bulk_ols_best(endpoint_terms, "efo", ols_max_workers=ols_max_workers, min_combined=0.35)
+
+        df["BAO_ID"] = [bao_map.get(t, ("", "", "", 0.0))[0] if t else "" for t in endpoint_terms]
+        df["BAO_IRI"] = [bao_map.get(t, ("", "", "", 0.0))[1] if t else "" for t in endpoint_terms]
+        df["BAO_Label"] = [bao_map.get(t, ("", "", "", 0.0))[2] if t else "" for t in endpoint_terms]
+        df["BAO_Score"] = [bao_map.get(t, ("", "", "", 0.0))[3] if t else 0.0 for t in endpoint_terms]
+
+        df["EFO_ID"] = [efo_map.get(t, ("", "", "", 0.0))[0] if t else "" for t in endpoint_terms]
+        df["EFO_IRI"] = [efo_map.get(t, ("", "", "", 0.0))[1] if t else "" for t in endpoint_terms]
+        df["EFO_Label"] = [efo_map.get(t, ("", "", "", 0.0))[2] if t else "" for t in endpoint_terms]
+        df["EFO_Score"] = [efo_map.get(t, ("", "", "", 0.0))[3] if t else 0.0 for t in endpoint_terms]
+
+        unit_col = self._detect_first_column(df, ["unit", "Unit", "UnitLabel", "UnitName"])
+        if unit_col:
+            unit_terms = df[unit_col].fillna("").astype(str).str.strip().tolist()
+            uo_map = self._bulk_ols_best(unit_terms, "uo", ols_max_workers=ols_max_workers, min_combined=0.30)
+            df["UO_ID"] = [uo_map.get(t, ("", "", "", 0.0))[0] if t else "" for t in unit_terms]
+            df["UO_IRI"] = [uo_map.get(t, ("", "", "", 0.0))[1] if t else "" for t in unit_terms]
+            df["UO_Label"] = [uo_map.get(t, ("", "", "", 0.0))[2] if t else "" for t in unit_terms]
+            df["UO_Score"] = [uo_map.get(t, ("", "", "", 0.0))[3] if t else 0.0 for t in unit_terms]
+            df["UCUM_Code"] = [t if re.search(r"[A-Za-z].*", t) else "" for t in unit_terms]
+        else:
+            df["UO_ID"] = ""
+            df["UO_IRI"] = ""
+            df["UO_Label"] = ""
+            df["UO_Score"] = 0.0
+            df["UCUM_Code"] = ""
+
+        df["OntologyEnrichedAt"] = datetime.datetime.utcnow().isoformat() + "Z"
+        df["OntologyEnricherVersion"] = "ChemGraphBuilder.AssayEndpointOLS/1.0"
+        df["OntologySources"] = "OLS(bao;efo;uo)"
+
+        out_path = f"{self.data_dir}/{output_name}"
+        df.to_csv(out_path, index=False)
+        logger.info("Saved AssayEndpoint enriched table to %s", out_path)
+        
+        # Write a run summary JSON (mirrors the 4-core-node summaries)
+        try:
+            key_fields = ["BAO_ID", "EFO_ID", "UO_ID"]
+            def _nonempty(col: str) -> pd.Series:
+                if col not in df.columns:
+                    return pd.Series([False] * len(df))
+                return df[col].fillna("").astype(str).str.strip().ne("")
+            hit_any_mask = _nonempty("BAO_ID") | _nonempty("EFO_ID") | _nonempty("UO_ID")
+            summary = {
+                "total_nodes_processed": int(len(df)),
+                "total_successful_hits_any": int(hit_any_mask.sum()),
+                "total_missing_entries": int((~hit_any_mask).sum()),
+                "ontology_counts": {k: int(_nonempty(k).sum()) for k in key_fields},
+                "ontology_sources": "OLS(bao;efo;uo)",
+                "generated_at_utc": datetime.datetime.utcnow().isoformat() + "Z",
+                "input_file": input_name,
+                "output_file": output_name,
+            }
+            summary_path = f"{self.data_dir}/AssayEndpoint_Ontology_RunSummary.json"
+            with open(summary_path, "w", encoding="utf-8") as f:
+                json.dump(summary, f, indent=2)
+            logger.info("Saved AssayEndpoint ontology run summary to %s", summary_path)
+        except Exception as exc:  # pragma: no cover
+            logger.warning("Could not write AssayEndpoint run summary: %s", exc)
 
         return df

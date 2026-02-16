@@ -917,3 +917,377 @@ class NodePropertiesExtractor:
                 )
         else:
             logging.info("No more chunks to process.")
+
+
+    # -------------------------------------------------------------------------
+    # Derived nodes for KG schema completeness (no extra API calls)
+    # -------------------------------------------------------------------------
+    def extract_experimental_context_properties(
+        self,
+        main_data: str = "Data/AllDataConnected.csv",
+        assay_properties_processed: str | None = "Data/Nodes/Assay_Properties_Processed.csv",
+        gene_properties_processed: str | None = "Data/Nodes/Gene_Properties_Processed.csv",
+        out_path: str = "Data/Nodes/ExperimentalContext_Properties.csv",
+    ):
+        """
+        Build a normalized ExperimentalContext node table required by the KG schema.
+
+        Since PubChem assay results do not reliably expose rich experimental context
+        (organism, tissue/cell line, matrix, conditions) in a structured way,
+        this function derives a *best-effort* context per AssayID (AID) using:
+          - AssayName / AssayDescription / AssayType (when available)
+          - Target Gene taxonomy (when available)
+
+        The output is intentionally conservative: it produces one context row per assay
+        with reasonable defaults and parsed hints (e.g., "human", "microsomes", "25 uM").
+
+        Input:
+          - main_data: AllDataConnected.csv (must contain AID, Assay Name, Assay Type, Target GeneID)
+          - assay_properties_processed: optional, richer processed assay table (preferred)
+          - gene_properties_processed: optional, to map GeneID -> TaxonomyID/Taxonomy
+
+        Output:
+          - Data/Nodes/ExperimentalContext_Properties.csv
+        """
+        import pandas as pd
+        import numpy as np
+        import os
+        import re
+        import datetime
+        import logging
+
+        if not os.path.exists(main_data):
+            raise FileNotFoundError(f"main_data not found: {main_data}")
+
+        df_main = pd.read_csv(main_data, low_memory=False)
+
+        # Load processed assay properties if available (preferred source for assay name/type/description)
+        df_assay = None
+        if assay_properties_processed and os.path.exists(assay_properties_processed):
+            try:
+                df_assay = pd.read_csv(assay_properties_processed, low_memory=False)
+            except Exception as exc:  # pragma: no cover
+                logging.warning("Could not read %s: %s", assay_properties_processed, exc)
+                df_assay = None
+
+        # Load gene -> taxonomy mapping if available
+        gene_tax = {}
+        gene_tax_name = {}
+        if gene_properties_processed and os.path.exists(gene_properties_processed):
+            try:
+                df_gene = pd.read_csv(gene_properties_processed, low_memory=False)
+                if "GeneID" in df_gene.columns and "TaxonomyID" in df_gene.columns:
+                    gene_tax = dict(zip(df_gene["GeneID"].astype(str), df_gene["TaxonomyID"]))
+                if "GeneID" in df_gene.columns and "Taxonomy" in df_gene.columns:
+                    gene_tax_name = dict(zip(df_gene["GeneID"].astype(str), df_gene["Taxonomy"]))
+            except Exception as exc:  # pragma: no cover
+                logging.warning("Could not read %s: %s", gene_properties_processed, exc)
+
+        def _norm(s: str) -> str:
+            return re.sub(r"\s+", " ", str(s or "")).strip().lower()
+
+        def _infer_taxon(assay_text: str, aid: int) -> tuple[int, str]:
+            t = _norm(assay_text)
+
+            # keyword mapping
+            if "human" in t or "homo sapiens" in t:
+                return 9606, "Homo sapiens (human)"
+            if "mouse" in t or "murine" in t:
+                return 10090, "Mus musculus (mouse)"
+            if "rat" in t:
+                return 10116, "Rattus norvegicus (rat)"
+            if "dog" in t or "canine" in t:
+                return 9615, "Canis lupus familiaris (dog)"
+
+            # fallback: most common taxonomy among genes for this assay
+            sub = df_main[df_main["AID"] == aid]
+            gids = sub.get("Target GeneID")
+            if gids is not None:
+                gids = gids.dropna().astype("Int64").astype(str).unique().tolist()
+                tax_ids = [gene_tax.get(g) for g in gids if g in gene_tax]
+                tax_ids = [int(x) for x in tax_ids if pd.notna(x)]
+                if tax_ids:
+                    # mode
+                    from collections import Counter
+                    tid = Counter(tax_ids).most_common(1)[0][0]
+                    # try name
+                    # choose any gene with that tax id
+                    name = None
+                    for g in gids:
+                        if gene_tax.get(g) == tid:
+                            name = gene_tax_name.get(g)
+                            break
+                    return int(tid), str(name or "Unknown")
+
+            # default to human (common in CYP pipelines)
+            return 9606, "Homo sapiens (human)"
+
+        def _infer_matrix(assay_text: str) -> str:
+            t = _norm(assay_text)
+            if "microsome" in t:
+                return "microsomes"
+            if "hepatocyte" in t:
+                return "hepatocytes"
+            if "plasma" in t:
+                return "plasma"
+            if "serum" in t:
+                return "serum"
+            if "cell" in t or "cells" in t:
+                return "cell culture"
+            return "in vitro (unspecified)"
+
+        def _infer_cell_tissue(assay_text: str) -> str:
+            t = _norm(assay_text)
+            # cell lines (small common set; extend as needed)
+            for cl in ["hepg2", "hek293", "cos-7", "v79", "caco-2", "a549", "mcf-7", "hela", "u2os", "k562"]:
+                if cl.lower() in t:
+                    return cl.upper() if "-" not in cl else cl
+            # tissues
+            if "liver" in t:
+                return "liver"
+            if "intest" in t:
+                return "intestine"
+            if "kidney" in t:
+                return "kidney"
+            return "unspecified"
+
+        def _infer_assay_format(assay_text: str, matrix: str) -> str:
+            t = _norm(assay_text)
+            if matrix == "microsomes":
+                return "microsomes"
+            if "cell" in t or "hepg2" in t or "hek293" in t:
+                return "cellular"
+            # CYP inhibition assays are often biochemical
+            if "inhibition" in t or "enzyme" in t or "cyp" in t:
+                return "biochemical"
+            return "unknown"
+
+        def _extract_conditions(assay_text: str) -> str:
+            t = str(assay_text or "")
+            # concentration patterns e.g. "25 uM"
+            m = re.findall(r"(\d+(?:\.\d+)?)\s*(?:µm|um|nm|mm)\b", t, flags=re.IGNORECASE)
+            concs = []
+            for mm in re.finditer(r"(\d+(?:\.\d+)?)\s*(µM|uM|nM|mM)\b", t, flags=re.IGNORECASE):
+                concs.append(mm.group(0))
+            concs = list(dict.fromkeys(concs))
+            if concs:
+                return "test_concentration=" + ";".join(concs)
+            return ""
+
+        # Build per-assay contexts
+        aids = pd.Series(df_main["AID"].unique()).dropna().astype(int).tolist()
+
+        # Prepare assay metadata lookup
+        assay_meta = {}
+        if df_assay is not None and "AssayID" in df_assay.columns:
+            cols = [c for c in ["AssayID", "AssayName", "AssayType", "AssayDescription"] if c in df_assay.columns]
+            assay_meta = df_assay[cols].drop_duplicates("AssayID").set_index("AssayID").to_dict(orient="index")
+
+        retrieval_time = datetime.datetime.utcnow().isoformat() + "Z"
+        rows = []
+        for aid in aids:
+            if aid in assay_meta:
+                name = assay_meta[aid].get("AssayName", "")
+                atype = assay_meta[aid].get("AssayType", "")
+                desc = assay_meta[aid].get("AssayDescription", "")
+                assay_text = " ".join([str(name), str(atype), str(desc)])
+            else:
+                # fallback to main_data columns
+                sub = df_main[df_main["AID"] == aid]
+                name = sub["Assay Name"].dropna().iloc[0] if "Assay Name" in sub.columns and sub["Assay Name"].notna().any() else ""
+                atype = sub["Assay Type"].dropna().iloc[0] if "Assay Type" in sub.columns and sub["Assay Type"].notna().any() else ""
+                assay_text = " ".join([str(name), str(atype)])
+
+            tax_id, org_name = _infer_taxon(assay_text, aid)
+            matrix = _infer_matrix(assay_text)
+            cell_tissue = _infer_cell_tissue(assay_text)
+            aformat = _infer_assay_format(assay_text, matrix)
+            cond = _extract_conditions(assay_text)
+
+            rows.append(
+                {
+                    "ExperimentalContextID": f"ECX:{aid}",
+                    "AssayID": int(aid),
+                    "OrganismName": org_name,
+                    "TaxonomyID": int(tax_id) if tax_id is not None else np.nan,
+                    "Matrix": matrix,
+                    "CellOrTissue": cell_tissue,
+                    "AssayFormat": aformat,
+                    "Conditions": cond,
+                    "SourceDatabase": "Derived",
+                    "SourceEndpoint": main_data,
+                    "RetrievedAt": retrieval_time,
+                }
+            )
+
+        df_out = pd.DataFrame(rows)
+        os.makedirs(os.path.dirname(out_path), exist_ok=True)
+        df_out.to_csv(out_path, index=False)
+        logging.info("Saved ExperimentalContext properties to %s (%d rows)", out_path, len(df_out))
+        return df_out
+
+
+    def extract_assay_endpoint_properties(
+        self,
+        main_data: str = "Data/AllDataConnected.csv",
+        assay_properties_processed: str | None = "Data/Nodes/Assay_Properties_Processed.csv",
+        out_path: str = "Data/Nodes/AssayEndpoint_Properties.csv",
+    ):
+        """
+        Build a normalized AssayEndpoint node table required by the KG schema.
+
+        This table is derived from the assay result view (AllDataConnected.csv) by:
+          - grouping per assay (AID) and endpoint name (Activity Name when present)
+          - falling back to a qualitative endpoint ("Activity Outcome") when no endpoint name exists
+          - computing basic numeric summaries over Activity Value [uM] when present
+
+        Output:
+          - Data/Nodes/AssayEndpoint_Properties.csv
+
+        Notes:
+          - AssayEndpoint IDs are stable strings: "AEP:<AID>:<endpoint_name>"
+          - This node table is intentionally lightweight; BAO/EFO ontology IDs are
+            added later by NodesOntologyEnricher.enrich_assay_endpoints().
+        """
+        import pandas as pd
+        import numpy as np
+        import os
+        import re
+        import datetime
+        import logging
+
+        if not os.path.exists(main_data):
+            raise FileNotFoundError(f"main_data not found: {main_data}")
+
+        df = pd.read_csv(main_data, low_memory=False)
+
+        # Basic hygiene
+        if "AID" not in df.columns:
+            raise ValueError("main_data must contain 'AID' column")
+
+        # Optional lookup for assay name/type to help infer readout type
+        assay_meta = {}
+        if assay_properties_processed and os.path.exists(assay_properties_processed):
+            try:
+                df_assay = pd.read_csv(assay_properties_processed, low_memory=False)
+                if "AssayID" in df_assay.columns:
+                    cols = [c for c in ["AssayID", "AssayName", "AssayType", "AssayDescription"] if c in df_assay.columns]
+                    assay_meta = df_assay[cols].drop_duplicates("AssayID").set_index("AssayID").to_dict(orient="index")
+            except Exception as exc:  # pragma: no cover
+                logging.warning("Could not read %s: %s", assay_properties_processed, exc)
+
+        def _norm(s: str) -> str:
+            return re.sub(r"\s+", " ", str(s or "")).strip().lower()
+
+        def _infer_readout_type(endpoint_name: str, aid: int) -> str:
+            e = _norm(endpoint_name)
+            if e in ("ic50", "ac50", "ec50", "gi50", "kc50"):
+                return "potency"
+            if "inhib" in e or e in ("inh",):
+                return "inhibition"
+            if e in ("km", "ki", "kd"):
+                return "kinetic"
+            # Use assay text hints
+            meta = assay_meta.get(aid, {})
+            assay_text = _norm(" ".join([str(meta.get("AssayName","")), str(meta.get("AssayDescription","")), str(meta.get("AssayType",""))]))
+            if "induction" in assay_text:
+                return "induction"
+            if "inhibition" in assay_text:
+                return "inhibition"
+            return "unknown"
+
+        retrieval_time = datetime.datetime.utcnow().isoformat() + "Z"
+
+        # Normalize columns from main_data
+        df["AID"] = pd.to_numeric(df["AID"], errors="coerce").astype("Int64")
+        df["Activity Name"] = df.get("Activity Name")
+        df["Activity Outcome"] = df.get("Activity Outcome")
+        val_col = "Activity Value [uM]" if "Activity Value [uM]" in df.columns else None
+
+        # Create endpoint_name with fallback
+        endpoint_name = df["Activity Name"].astype(str)
+        endpoint_name = endpoint_name.where(df["Activity Name"].notna() & (endpoint_name.str.strip() != ""), other="Activity Outcome")
+        df["_EndpointName"] = endpoint_name
+
+        group_cols = ["AID", "_EndpointName"]
+        gb = df.groupby(group_cols, dropna=True)
+
+        rows = []
+        for (aid, ep), sub in gb:
+            if pd.isna(aid):
+                continue
+            aid_int = int(aid)
+            ep_str = str(ep).strip()
+            if not ep_str:
+                ep_str = "Activity Outcome"
+
+            readout_type = _infer_readout_type(ep_str, aid_int)
+
+            # Numeric summaries
+            has_numeric = False
+            vmin = vmed = vmax = np.nan
+            unit = ""
+            if val_col is not None:
+                vals = pd.to_numeric(sub[val_col], errors="coerce").dropna()
+                if len(vals) > 0:
+                    has_numeric = True
+                    vmin = float(vals.min())
+                    vmed = float(vals.median())
+                    vmax = float(vals.max())
+                    unit = "uM"
+
+            # Outcome counts (optional)
+            oc = {}
+            if "Activity Outcome" in sub.columns:
+                vc = sub["Activity Outcome"].astype(str).str.strip().replace({"nan": ""})
+                for k, cnt in vc.value_counts().items():
+                    if not k:
+                        continue
+                    oc[f"OutcomeCount_{k}"] = int(cnt)
+
+            ep_id = f"AEP:{aid_int}:{re.sub(r'[^A-Za-z0-9]+', '_', ep_str).strip('_')}"
+            row = {
+                "AssayEndpointID": ep_id,
+                "AssayID": aid_int,
+                "EndpointName": ep_str,
+                "ReadoutType": readout_type,
+                "Unit": unit,
+                "HasNumericValue": bool(has_numeric),
+                "ValueMin_uM": vmin,
+                "ValueMedian_uM": vmed,
+                "ValueMax_uM": vmax,
+                "SourceDatabase": "Derived",
+                "SourceEndpoint": main_data,
+                "RetrievedAt": retrieval_time,
+            }
+            row.update(oc)
+            rows.append(row)
+
+        df_out = pd.DataFrame(rows)
+
+        # Make sure every assay gets at least one endpoint row
+        all_aids = pd.Series(df["AID"].dropna().astype(int).unique())
+        have_aids = pd.Series(df_out["AssayID"].dropna().astype(int).unique()) if not df_out.empty else pd.Series([], dtype=int)
+        missing_aids = sorted(set(all_aids.tolist()) - set(have_aids.tolist()))
+        for aid in missing_aids:
+            ep_str = "Activity Outcome"
+            ep_id = f"AEP:{aid}:Activity_Outcome"
+            df_out = pd.concat([df_out, pd.DataFrame([{
+                "AssayEndpointID": ep_id,
+                "AssayID": int(aid),
+                "EndpointName": ep_str,
+                "ReadoutType": "qualitative",
+                "Unit": "",
+                "HasNumericValue": False,
+                "ValueMin_uM": np.nan,
+                "ValueMedian_uM": np.nan,
+                "ValueMax_uM": np.nan,
+                "SourceDatabase": "Derived",
+                "SourceEndpoint": main_data,
+                "RetrievedAt": retrieval_time,
+            }])], ignore_index=True)
+
+        os.makedirs(os.path.dirname(out_path), exist_ok=True)
+        df_out.to_csv(out_path, index=False)
+        logging.info("Saved AssayEndpoint properties to %s (%d rows)", out_path, len(df_out))
+        return df_out

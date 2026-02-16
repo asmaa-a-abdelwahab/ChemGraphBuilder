@@ -47,7 +47,7 @@ class NodesCollectorProcessor:
         Initializes the NodesCollectorProcessor.
 
         Args:
-            node_type (str): 'Compound', 'BioAssay', 'Gene', or 'Protein'.
+            node_type (str): 'Compound', 'BioAssay', 'Gene', 'Protein', 'ExperimentalContext', or 'AssayEndpoint'.
             enzyme_list (list[str]): Enzyme names to fetch data for.
             start_chunk (int, optional): Starting chunk index for compounds.
             with_ontologies (bool): If True, run ontology enrichment after processing.
@@ -168,6 +168,59 @@ class NodesCollectorProcessor:
                     summary["enriched_file"] = enriched_path
                     summary["n_enriched_rows"] = len(df_enriched)
 
+            # ------------------------------------------------------------------
+            # Derived schema-support nodes (ExperimentalContext + AssayEndpoint)
+            # These are computed locally from AllDataConnected + processed assay table.
+            # ------------------------------------------------------------------
+            try:
+                logging.info("Deriving ExperimentalContext and AssayEndpoint node tables...")
+                self.extractor.extract_experimental_context_properties(
+                    main_data=data_file,
+                    assay_properties_processed="Data/Nodes/Assay_Properties_Processed.csv",
+                    gene_properties_processed="Data/Nodes/Gene_Properties_Processed.csv",
+                    out_path="Data/Nodes/ExperimentalContext_Properties.csv",
+                )
+                self.processor.preprocess_experimental_contexts()
+
+                self.extractor.extract_assay_endpoint_properties(
+                    main_data=data_file,
+                    assay_properties_processed="Data/Nodes/Assay_Properties_Processed.csv",
+                    out_path="Data/Nodes/AssayEndpoint_Properties.csv",
+                )
+                self.processor.preprocess_assay_endpoints()
+
+
+                # Record derived node outputs in the parent BioAssay summary
+                ec_processed = "Data/Nodes/ExperimentalContext_Properties_Processed.csv"
+                aep_processed = "Data/Nodes/AssayEndpoint_Properties_Processed.csv"
+                summary["derived_nodes"] = {
+                    "ExperimentalContext": {
+                        "node_type": "ExperimentalContext",
+                        "processed_file": ec_processed,
+                        "n_processed_rows": _safe_count_csv(ec_processed),
+                    },
+                    "AssayEndpoint": {
+                        "node_type": "AssayEndpoint",
+                        "processed_file": aep_processed,
+                        "n_processed_rows": _safe_count_csv(aep_processed),
+                    },
+                }
+
+                # Optional ontology enrichment if supported by NodesOntologyEnricher implementation
+                if self.ontology_enricher is not None:
+                    if hasattr(self.ontology_enricher, "enrich_experimental_contexts"):
+                        self.ontology_enricher.enrich_experimental_contexts(
+                            input_name="ExperimentalContext_Properties_Processed.csv",
+                            output_name="ExperimentalContext_Properties_WithOntologies.csv",
+                        )
+                    if hasattr(self.ontology_enricher, "enrich_assay_endpoints"):
+                        self.ontology_enricher.enrich_assay_endpoints(
+                            input_name="AssayEndpoint_Properties_Processed.csv",
+                            output_name="AssayEndpoint_Properties_WithOntologies.csv",
+                        )
+            except Exception as exc:  # pragma: no cover
+                logging.warning("Could not derive ExperimentalContext/AssayEndpoint: %s", exc)
+
         # ---------------------- GENES ----------------------
         elif self.node_type == "Gene":
             logging.info("Starting GENE extraction & preprocessing...")
@@ -215,20 +268,84 @@ class NodesCollectorProcessor:
                     summary["enriched_file"] = enriched_path
                     summary["n_enriched_rows"] = len(df_enriched)
 
+        # ---------------------- EXPERIMENTAL CONTEXT ----------------------
+        elif self.node_type == "ExperimentalContext":
+            logging.info("Starting EXPERIMENTAL CONTEXT derivation & preprocessing...")
+            self.extractor.extract_experimental_context_properties(
+                main_data=data_file,
+                assay_properties_processed="Data/Nodes/Assay_Properties_Processed.csv",
+                gene_properties_processed="Data/Nodes/Gene_Properties_Processed.csv",
+                out_path="Data/Nodes/ExperimentalContext_Properties.csv",
+            )
+            self.processor.preprocess_experimental_contexts()
+            processed_path = "Data/Nodes/ExperimentalContext_Properties_Processed.csv"
+            summary["processed_file"] = processed_path
+            summary["n_processed_rows"] = _safe_count_csv(processed_path)
+
+            if self.ontology_enricher is not None and hasattr(self.ontology_enricher, "enrich_experimental_contexts"):
+                df_enriched = self.ontology_enricher.enrich_experimental_contexts(
+                    input_name=os.path.basename(processed_path),
+                    output_name="ExperimentalContext_Properties_WithOntologies.csv",
+                )
+                if df_enriched is not None:
+                    enriched_path = "Data/Nodes/ExperimentalContext_Properties_WithOntologies.csv"
+                    summary["enriched_file"] = enriched_path
+                    summary["n_enriched_rows"] = len(df_enriched)
+
+        # ---------------------- ASSAY ENDPOINT ----------------------
+        elif self.node_type == "AssayEndpoint":
+            logging.info("Starting ASSAY ENDPOINT derivation & preprocessing...")
+            self.extractor.extract_assay_endpoint_properties(
+                main_data=data_file,
+                assay_properties_processed="Data/Nodes/Assay_Properties_Processed.csv",
+                out_path="Data/Nodes/AssayEndpoint_Properties.csv",
+            )
+            self.processor.preprocess_assay_endpoints()
+            processed_path = "Data/Nodes/AssayEndpoint_Properties_Processed.csv"
+            summary["processed_file"] = processed_path
+            summary["n_processed_rows"] = _safe_count_csv(processed_path)
+
+            if self.ontology_enricher is not None and hasattr(self.ontology_enricher, "enrich_assay_endpoints"):
+                df_enriched = self.ontology_enricher.enrich_assay_endpoints(
+                    input_name=os.path.basename(processed_path),
+                    output_name="AssayEndpoint_Properties_WithOntologies.csv",
+                )
+                if df_enriched is not None:
+                    enriched_path = "Data/Nodes/AssayEndpoint_Properties_WithOntologies.csv"
+                    summary["enriched_file"] = enriched_path
+                    summary["n_enriched_rows"] = len(df_enriched)
+
         else:
             raise ValueError(
                 f"Unsupported node_type '{self.node_type}'. "
-                "Expected one of: 'Compound', 'BioAssay', 'Gene', 'Protein'."
+                "Expected one of: 'Compound', 'BioAssay', 'Gene', 'Protein', 'ExperimentalContext', 'AssayEndpoint'."
             )
 
-        # # after logging summary
-        # report_path = f"Data/Nodes/{self.node_type}_run_summary.json"
-        # try:
-        #     with open(report_path, "w", encoding="utf-8") as f:
-        #         json.dump(summary, f, indent=2)
-        #     logging.info("Saved node run summary to %s", report_path)
-        # except Exception as exc:
-        #     logging.warning("Could not write run summary to %s: %s", report_path, exc)
+        # ------------------------------------------------------------------
+        # Persist run summary JSON(s)
+        # ------------------------------------------------------------------
+        report_path = f"Data/Nodes/{self.node_type}_run_summary.json"
+        try:
+            with open(report_path, "w", encoding="utf-8") as f:
+                json.dump(summary, f, indent=2)
+            logging.info("Saved node run summary to %s", report_path)
+        except Exception as exc:  # pragma: no cover
+            logging.warning("Could not write run summary to %s: %s", report_path, exc)
+
+        # If BioAssay derived schema-support nodes, write their own summaries too (if present)
+        derived = summary.get("derived_nodes")
+        if isinstance(derived, dict):
+            for derived_type, derived_summary in derived.items():
+                if not isinstance(derived_summary, dict):
+                    continue
+                dpath = f"Data/Nodes/{derived_type}_run_summary.json"
+                try:
+                    with open(dpath, "w", encoding="utf-8") as f:
+                        json.dump(derived_summary, f, indent=2)
+                    logging.info("Saved derived node run summary to %s", dpath)
+                except Exception as exc:  # pragma: no cover
+                    logging.warning("Could not write derived run summary to %s: %s", dpath, exc)
+
 
 
 def main():
@@ -243,7 +360,7 @@ def main():
         "--node_type",
         type=str,
         required=True,
-        choices=["Compound", "BioAssay", "Gene", "Protein"],
+        choices=["Compound", "BioAssay", "Gene", "Protein", "ExperimentalContext", "AssayEndpoint"],
         help="The type of node to collect data for",
     )
     parser.add_argument(
