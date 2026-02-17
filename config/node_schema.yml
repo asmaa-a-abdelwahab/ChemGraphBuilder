@@ -7,10 +7,7 @@ nodes:
     unique_property: CompoundID
     csv_processed: Data/Nodes/Compound_Properties_Processed.csv
     csv_ontologies: Data/Nodes/Compound_Properties_WithOntologies.csv
-    required_columns:
-      - CompoundID
-      - CompoundName
-      - InChIKey
+    required_columns: [CompoundID, CompoundName, InChIKey]
 
   gene:
     label: Gene
@@ -18,31 +15,37 @@ nodes:
     unique_property: GeneID
     csv_processed: Data/Nodes/Gene_Properties_Processed.csv
     csv_ontologies: Data/Nodes/Gene_Properties_WithOntologies.csv
-    required_columns:
-      - GeneID
-      - GeneSymbol
-      - TaxonomyID
+    required_columns: [GeneID, GeneSymbol, TaxonomyID]
 
   protein:
     label: Protein
     aliases: ["Protein"]
-    # Use ProteinRefSeqAccession here; it's guaranteed to exist in both processed and enriched tables
     unique_property: ProteinRefSeqAccession
     csv_processed: Data/Nodes/Protein_Properties_Processed.csv
     csv_ontologies: Data/Nodes/Protein_Properties_WithOntologies.csv
-    required_columns:
-      - ProteinRefSeqAccession
-      - ProteinDescription
+    required_columns: [ProteinRefSeqAccession, ProteinDescription]
 
-  bioassay:
-    label: BioAssay
-    # NodeDataProcessor uses node_type="Assay", so we add it as an alias
-    aliases: ["Assay"]
+  assay:
+    # ✅ Use Assay as the Neo4j label to match your pipeline naming
+    label: Assay
+    aliases: ["BioAssay", "Assay"]
     unique_property: AssayID
     csv_processed: Data/Nodes/Assay_Properties_Processed.csv
     csv_ontologies: Data/Nodes/Assay_Properties_WithOntologies.csv
-    required_columns:
-      - AssayID
-      - AssayName
-      - AssayType
-      - AssayActivityName
+    required_columns: [AssayID, AssayName, AssayType, AssayActivityName]
+
+  experimental_context:
+    label: ExperimentalContext
+    aliases: ["ExperimentalContext"]
+    unique_property: ExperimentalContextID
+    csv_processed: Data/Nodes/ExperimentalContext_Properties_Processed.csv
+    csv_ontologies: Data/Nodes/ExperimentalContext_Properties_WithOntologies.csv
+    required_columns: [ExperimentalContextID]
+
+  assay_endpoint:
+    label: AssayEndpoint
+    aliases: ["AssayEndpoint"]
+    unique_property: AssayEndpointID
+    csv_processed: Data/Nodes/AssayEndpoint_Properties_Processed.csv
+    csv_ontologies: Data/Nodes/AssayEndpoint_Properties_WithOntologies.csv
+    required_columns: [AssayEndpointID]
