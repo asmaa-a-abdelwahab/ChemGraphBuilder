@@ -1,3 +1,5 @@
+
+
 # ChemGraphBuilder [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.13148036.svg)](https://doi.org/10.5281/zenodo.13148036)
 
 `chemgraphbuilder` is a Python package designed for transforming chemical data into knowledge graphs.  
@@ -151,7 +153,7 @@ setup-data-folder
 collect-process-nodes --node_type Compound --enzyme_list gene1,gene2 --start_chunk 0
 collect-process-relationships --relationship_type Assay_Compound --start_chunk 0
 load-graph-nodes --uri bolt://localhost:7687 --username neo4j --password password --label Compound
-load-graph_relationships --uri bolt://localhost:7687 --username neo4j --password password --relationship_type Assay_Gene
+load-graph-relationships --uri bolt://localhost:7687 --username neo4j --password password --relationship_type Assay_Gene
 ```
 
 More examples: [Usage Examples](https://asmaa-a-abdelwahab.github.io/ChemGraphBuilder/1.node_collector_processor/).
